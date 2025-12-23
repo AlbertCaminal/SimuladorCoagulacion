@@ -592,32 +592,32 @@
             },
             particles: {
                 maxCount: 180,
-                spawnRate: 3,
-                plateletRatio: 0.25,
-                rbcRatio: 0.70,
+                spawnRate: 4,
+                plateletRatio: 0.35,
+                rbcRatio: 0.60,
                 wbcRatio: 0.05
             },
             conditions: {
                 normal: {
-                    plateletRatio: 0.25,
+                    plateletRatio: 0.35,
                     canStick: true,
                     canFormFibrin: true,
                     stickProbability: 0.95
                 },
                 hemophilia: {
-                    plateletRatio: 0.25,
+                    plateletRatio: 0.35,
                     canStick: true,
                     canFormFibrin: false,
                     stickProbability: 0.95
                 },
                 vwd: {
-                    plateletRatio: 0.25,
+                    plateletRatio: 0.35,
                     canStick: false,
                     canFormFibrin: true,
                     stickProbability: 0.1
                 },
                 thrombocytopenia: {
-                    plateletRatio: 0.06,
+                    plateletRatio: 0.08,
                     canStick: true,
                     canFormFibrin: true,
                     stickProbability: 0.95
@@ -866,8 +866,8 @@
             const woundRight = woundX + woundWidth / 2;
             
             // Invisible adhesion line parameters - positioned at wound opening
-            const adhesionLineY = 22; // Y position of the invisible line (at top wall level)
-            const adhesionLineThreshold = 8; // How close to trigger adhesion check
+            const adhesionLineY = 18; // Y position of the invisible line (at top of wound)
+            const adhesionLineThreshold = 14; // How close to trigger adhesion check
 
             state.allBodies.forEach(body => {
                 if (body.isStuck) return;
@@ -940,12 +940,13 @@
             
             // Stop movement and position at the line
             Body.setVelocity(platelet, { x: 0, y: 0 });
-            Body.setPosition(platelet, { x: platelet.position.x, y: lineY + 4 });
+            const stickY = lineY + 6;
+            Body.setPosition(platelet, { x: platelet.position.x, y: stickY });
             
             // Create constraint to the line (static point)
             const constraint = Constraint.create({
                 bodyA: platelet,
-                pointB: { x: platelet.position.x, y: lineY + 4 },
+                pointB: { x: platelet.position.x, y: stickY },
                 stiffness: 0.95,
                 damping: 0.6,
                 length: 0,
@@ -1028,7 +1029,7 @@
                 const woundLeft = CONFIG.wound.x - CONFIG.wound.width / 2;
                 const woundRight = CONFIG.wound.x + CONFIG.wound.width / 2;
                 
-                if (platelet.position.x >= woundLeft - 20 && platelet.position.x <= woundRight + 20 && platelet.position.y < 50) {
+                if (platelet.position.x >= woundLeft - 20 && platelet.position.x <= woundRight + 20 && platelet.position.y < 45) {
                     if (canStick && Math.random() < stickProb) {
                         stickPlatelet(platelet, other);
                     } else if (state.condition === 'vwd' && !state.treatmentApplied) {
@@ -1128,47 +1129,27 @@
             const woundWidth = CONFIG.wound.width;
             const woundLeft = woundX - woundWidth / 2;
             
-            // Render ointment layer when treatment is applied - simple and fast
+            // Render ointment layer when treatment is applied - ultra simple for performance
             if (state.showOintment) {
-                // Simple semi-transparent ointment rectangle
-                ctx.fillStyle = 'rgba(59, 130, 246, 0.4)';
-                ctx.fillRect(woundLeft, 0, woundWidth, 28);
-                
-                // Border
-                ctx.strokeStyle = 'rgba(147, 197, 253, 0.7)';
-                ctx.lineWidth = 2;
-                ctx.strokeRect(woundLeft, 0, woundWidth, 28);
-                
-                // Simple highlight line
-                ctx.fillStyle = 'rgba(255, 255, 255, 0.2)';
-                ctx.fillRect(woundLeft + 20, 4, woundWidth - 40, 6);
+                ctx.fillStyle = 'rgba(59, 130, 246, 0.35)';
+                ctx.fillRect(woundLeft, 0, woundWidth, 22);
             }
             
-            // Render fibrin connections
-            state.fibrinConstraints.forEach(fibrin => {
-                const pointA = fibrin.pointA.position;
-                const pointB = fibrin.pointB.position;
-
+            // Render fibrin connections - no shadows for performance
+            if (state.fibrinConstraints.length > 0) {
+                ctx.strokeStyle = state.treatmentApplied ? '#39FF14' : '#00E676';
+                ctx.lineWidth = state.treatmentApplied ? 2 : 1.5;
                 ctx.beginPath();
-                ctx.moveTo(pointA.x, pointA.y);
-                ctx.lineTo(pointB.x, pointB.y);
                 
-                if (fibrin.glowing || state.treatmentApplied) {
-                    ctx.shadowColor = '#00E676';
-                    ctx.shadowBlur = 8;
-                    ctx.strokeStyle = '#00E676';
-                    ctx.lineWidth = 2;
-                } else {
-                    ctx.shadowBlur = 0;
-                    ctx.strokeStyle = '#00E676';
-                    ctx.lineWidth = 1.5;
-                }
+                state.fibrinConstraints.forEach(fibrin => {
+                    const pointA = fibrin.pointA.position;
+                    const pointB = fibrin.pointB.position;
+                    ctx.moveTo(pointA.x, pointA.y);
+                    ctx.lineTo(pointB.x, pointB.y);
+                });
                 
                 ctx.stroke();
-            });
-            
-            // Reset shadow after all drawing
-            ctx.shadowBlur = 0;
+            }
         }
 
         function calculateClotPercentage() {
@@ -1186,7 +1167,7 @@
                 // Check if any stuck platelet covers this segment
                 const covered = state.stuckPlatelets.some(p => {
                     const dx = Math.abs(p.body.position.x - segmentX);
-                    return dx < 15 && p.body.position.y < 40;
+                    return dx < 15 && p.body.position.y < 35;
                 });
 
                 if (covered) coveredSegments++;
