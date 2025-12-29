@@ -410,6 +410,105 @@
             fill: currentColor;
         }
 
+        /* Simulation Wizard */
+        .simulation-wizard {
+            margin: 20px 0;
+            padding: 16px;
+            background: #F8FAFC;
+            border-radius: 12px;
+            border: 1px solid #E2E8F0;
+        }
+
+        .wizard-step {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            padding: 12px;
+            margin-bottom: 8px;
+            border-radius: 8px;
+            opacity: 0.5;
+            transition: all 0.3s;
+        }
+
+        .wizard-step.active {
+            opacity: 1;
+            background: #E0F2FE;
+            border: 2px solid #0EA5E9;
+        }
+
+        .wizard-step.completed {
+            opacity: 0.8;
+            background: #D1FAE5;
+        }
+
+        .step-number {
+            width: 32px;
+            height: 32px;
+            border-radius: 50%;
+            background: #CBD5E1;
+            color: white;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 700;
+            font-size: 0.875rem;
+            flex-shrink: 0;
+        }
+
+        .wizard-step.active .step-number {
+            background: #0EA5E9;
+        }
+
+        .wizard-step.completed .step-number {
+            background: #10B981;
+        }
+
+        .step-content {
+            flex: 1;
+        }
+
+        .step-title {
+            font-weight: 600;
+            color: #1E293B;
+            font-size: 0.875rem;
+            margin-bottom: 2px;
+        }
+
+        .step-desc {
+            font-size: 0.75rem;
+            color: #64748B;
+        }
+
+        /* Start Button */
+        .start-btn {
+            width: 100%;
+            padding: 14px;
+            background: linear-gradient(135deg, #10B981 0%, #059669 100%);
+            color: white;
+            border: none;
+            border-radius: 10px;
+            font-size: 1rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.2s;
+            margin-top: 12px;
+            box-shadow: 0 4px 14px rgba(16, 185, 129, 0.3);
+        }
+
+        .start-btn:hover:not(:disabled) {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(16, 185, 129, 0.4);
+        }
+
+        .start-btn:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+        }
+
+        .start-btn.paused {
+            background: linear-gradient(135deg, #F59E0B 0%, #D97706 100%);
+        }
+
         /* Reset Button */
         .reset-btn {
             width: 100%;
@@ -449,15 +548,107 @@
         }
 
         .legend-dot {
+            position: relative;
+            display: inline-block;
+        }
+
+        /* Plaqueta: circular gris con highlight */
+        .legend-dot.platelet {
             width: 12px;
             height: 12px;
             border-radius: 50%;
+            background: #808080;
+            box-shadow: 
+                0 0 2px rgba(100, 100, 100, 0.3),
+                inset -2px -2px 2px rgba(220, 220, 220, 0.4);
+            position: relative;
+        }
+        
+        .legend-dot.platelet::before {
+            content: '';
+            position: absolute;
+            top: 2px;
+            left: 2px;
+            width: 3px;
+            height: 3px;
+            border-radius: 50%;
+            background: rgba(220, 220, 220, 0.7);
         }
 
-        .legend-dot.platelet { background: #F1F5F9; border: 1px solid #CBD5E1; }
-        .legend-dot.rbc { background: #EF4444; }
-        .legend-dot.wbc { background: #E3F2FD; border: 1px solid #90CAF9; }
-        .legend-dot.fibrin { background: #00E676; box-shadow: 0 0 6px #00E676; }
+        /* Glóbulo rojo: ovalado con highlight */
+        .legend-dot.rbc {
+            width: 14px;
+            height: 10px;
+            border-radius: 50%;
+            background: #B91C1C;
+            box-shadow: 
+                0 0 3px rgba(139, 0, 0, 0.4),
+                inset -2px -1px 2px rgba(139, 0, 0, 0.2);
+            position: relative;
+        }
+        
+        .legend-dot.rbc::before {
+            content: '';
+            position: absolute;
+            top: 2px;
+            left: 3px;
+            width: 3px;
+            height: 3px;
+            border-radius: 50%;
+            background: rgba(255, 200, 200, 0.8);
+        }
+
+        /* Glóbulo blanco: circular con highlight brillante y contorno */
+        .legend-dot.wbc {
+            width: 20px;
+            height: 20px;
+            border-radius: 50%;
+            background: #87CEEB;
+            border: 1.5px solid #4A90E2;
+            box-shadow: 
+                0 0 2px rgba(74, 144, 226, 0.3),
+                inset -4px -4px 6px rgba(255, 255, 255, 0.6);
+            position: relative;
+        }
+        
+        .legend-dot.wbc::before {
+            content: '';
+            position: absolute;
+            top: 4px;
+            left: 4px;
+            width: 6px;
+            height: 6px;
+            border-radius: 50%;
+            background: radial-gradient(circle, rgba(255, 255, 255, 0.95) 0%, rgba(255, 255, 255, 0.6) 50%, rgba(255, 255, 255, 0) 100%);
+        }
+        
+        .legend-dot.wbc::after {
+            content: '';
+            position: absolute;
+            top: 5px;
+            left: 5px;
+            width: 3px;
+            height: 3px;
+            border-radius: 50%;
+            background: rgba(255, 255, 255, 1);
+        }
+
+        /* Fibrina: morada con efecto de brillo */
+        .legend-dot.fibrin {
+            width: 24px;
+            height: 3px;
+            border-radius: 2px;
+            background: #9D4EDD;
+            box-shadow: 0 0 4px rgba(157, 78, 221, 0.6);
+        }
+        
+        .legend-dot.vwf {
+            width: 20px;
+            height: 2px;
+            border-radius: 1px;
+            background: #22C55E;
+            box-shadow: 0 0 3px rgba(34, 197, 94, 0.5);
+        }
 
         /* Hemostasis Achieved Overlay */
         .hemostasis-achieved {
@@ -546,6 +737,7 @@
                 <div class="legend-item"><div class="legend-dot rbc"></div> Glóbulos Rojos</div>
                 <div class="legend-item"><div class="legend-dot wbc"></div> Glóbulos Blancos</div>
                 <div class="legend-item"><div class="legend-dot fibrin"></div> Red de Fibrina</div>
+                <div class="legend-item"><div class="legend-dot vwf"></div> Factor von Willebrand</div>
             </div>
         </section>
 
@@ -603,12 +795,39 @@
                     </div>
                     <div class="metric-box">
                         <div class="metric-value clot-progress" id="clot-percentage">0%</div>
-                        <div class="metric-label">Formación Coágulo</div>
+                        <div class="metric-label">Cierre de la Herida</div>
                     </div>
                 </div>
                 <div class="clot-progress-bar">
                     <div class="clot-progress-fill" id="clot-bar"></div>
                 </div>
+                
+                <!-- Simulation Wizard -->
+                <div class="simulation-wizard">
+                    <div class="wizard-step active" data-step="1">
+                        <div class="step-number">1</div>
+                        <div class="step-content">
+                            <div class="step-title">Selecciona condición</div>
+                            <div class="step-desc">Elige una condición clínica arriba</div>
+                        </div>
+                    </div>
+                    <div class="wizard-step" data-step="2">
+                        <div class="step-number">2</div>
+                        <div class="step-content">
+                            <div class="step-title">Configura parámetros</div>
+                            <div class="step-desc">Opcional: ajusta tratamiento</div>
+                        </div>
+                    </div>
+                    <div class="wizard-step" data-step="3">
+                        <div class="step-number">3</div>
+                        <div class="step-content">
+                            <div class="step-title">Inicia simulación</div>
+                            <div class="step-desc">Presiona el botón Iniciar</div>
+                        </div>
+                    </div>
+                </div>
+                
+                <button class="start-btn" id="start-btn">▶ Iniciar Simulación</button>
                 <button class="treatment-btn" id="treatment-btn">
                     <svg viewBox="0 0 24 24"><path d="M11.15,15.18L9.73,13.77L11.15,12.35L12.56,13.77L13.97,12.35L12.56,10.94L13.97,9.53L15.39,10.94L16.8,9.53L13.97,6.7L6.9,13.77L9.73,16.6L11.15,15.18M3.08,9.27L9.73,2.62L11.15,4.03L4.5,10.69L3.08,9.27M20.92,14.73L14.27,21.38L12.85,19.97L19.5,13.31L20.92,14.73Z"/></svg>
                     Administrar Tratamiento
@@ -669,8 +888,12 @@
                     fibrinDecayRate: 0.0,
                     fibrinFormationDelay: 0,
                     bleedingTime: 3,
+                    blockThickCords: false,
+                    blockMediumCords: false,
+                    blockThinCords: false,
+                    requiresTreatment: false, // Puede sellarse automáticamente
                     visualEffects: {
-                        plateletColor: '#F1F5F9',
+                        plateletColor: '#808080',
                         fibrinColor: '#00E676',
                         fibrinGlow: false,
                         fibrinOpacity: 1.0
@@ -692,7 +915,7 @@
                     fibrinFormationDelay: 1500,
                     bleedingTime: 30,
                     visualEffects: {
-                        plateletColor: '#F1F5F9',
+                        plateletColor: '#808080',
                         fibrinColor: '#FF6B6B',
                         fibrinGlow: false,
                         fibrinOpacity: 0.6
@@ -715,8 +938,12 @@
                     plateletBounceFactor: 0.7,
                     adhesionRetryChance: 0.4,
                     bleedingTime: 15,
+                    blockThickCords: false,
+                    blockMediumCords: false,
+                    blockThinCords: false,
+                    requiresTreatment: true, // Requiere tratamiento para sellado completo
                     visualEffects: {
-                        plateletColor: '#FFE5B4',
+                        plateletColor: '#808080',
                         fibrinColor: '#00E676',
                         fibrinGlow: false,
                         fibrinOpacity: 1.0
@@ -738,8 +965,12 @@
                     fibrinFormationDelay: 0,
                     spawnRateMultiplier: 0.3,
                     bleedingTime: 20,
+                    blockThickCords: false,
+                    blockMediumCords: false,
+                    blockThinCords: false,
+                    requiresTreatment: false,
                     visualEffects: {
-                        plateletColor: '#F1F5F9',
+                        plateletColor: '#808080',
                         fibrinColor: '#00E676',
                         fibrinGlow: false,
                         fibrinOpacity: 1.0
@@ -760,8 +991,12 @@
                     fibrinDecayRate: 0.2,
                     fibrinFormationDelay: 0,
                     bleedingTime: 60,
+                    blockThickCords: true, // Bloquear todas las cuerdas gruesas
+                    blockMediumCords: true, // Solo cuerdas pequeñas permitidas
+                    blockThinCords: false,
+                    requiresTreatment: true,
                     visualEffects: {
-                        plateletColor: '#F1F5F9',
+                        plateletColor: '#808080',
                         fibrinColor: '#FF0000',
                         fibrinGlow: false,
                         fibrinOpacity: 0.3
@@ -783,8 +1018,12 @@
                     fibrinFormationDelay: 500,
                     maxPlateletClusterSize: 2,
                     bleedingTime: 25,
+                    blockThickCords: false,
+                    blockMediumCords: false,
+                    blockThinCords: false,
+                    requiresTreatment: true,
                     visualEffects: {
-                        plateletColor: '#FFB6C1',
+                        plateletColor: '#808080',
                         fibrinColor: '#FFA500',
                         fibrinGlow: false,
                         fibrinOpacity: 0.8
@@ -805,8 +1044,12 @@
                     fibrinDecayRate: 0.01,
                     fibrinFormationDelay: 1000,
                     bleedingTime: 12,
+                    blockThickCords: false,
+                    blockMediumCords: true, // Bloquear cuerdas medianas y pequeñas
+                    blockThinCords: true, // Solo cuerdas gruesas (pero débiles)
+                    requiresTreatment: false,
                     visualEffects: {
-                        plateletColor: '#F1F5F9',
+                        plateletColor: '#808080',
                         fibrinColor: '#FFD700',
                         fibrinGlow: false,
                         fibrinOpacity: 0.9
@@ -828,7 +1071,7 @@
                     fibrinFormationDelay: 800,
                     bleedingTime: 8,
                     visualEffects: {
-                        plateletColor: '#F1F5F9',
+                        plateletColor: '#808080',
                         fibrinColor: '#FF6347',
                         fibrinGlow: false,
                         fibrinOpacity: 0.7
@@ -848,7 +1091,10 @@
             fibrinConstraints: [],
             fibrinBodies: [], // Physical bodies for fibrin network
             allBodies: [],
-            showOintment: false
+            showOintment: false,
+            fibrinFormationStarted: false, // Secuencia: plaquetas primero, luego malla
+            simulationRunning: false, // Control manual de simulación
+            currentStep: 1 // Paso actual del wizard
         };
 
         // Spawn timing for fixed interval
@@ -918,10 +1164,16 @@
             const ctx = canvas.getContext('2d');
             ctx.clearRect(0, 0, canvas.width, canvas.height);
 
+            // Reset state
+            state.fibrinFormationStarted = false;
+            state.simulationRunning = false;
+            state.currentStep = 1;
+            
             // Reset UI elements
             document.getElementById('hemostasis-indicator').classList.remove('visible');
-            document.getElementById('wound-label').classList.remove('healed');
-            document.getElementById('wound-label').innerHTML = '⚠️ Lesión Activa';
+            const woundLabel = document.getElementById('wound-label');
+            woundLabel.classList.remove('healed', 'hidden');
+            woundLabel.innerHTML = '⚠️ Lesión Activa';
             
             const treatmentBtn = document.getElementById('treatment-btn');
             treatmentBtn.classList.remove('applied');
@@ -957,8 +1209,12 @@
                 delta: 1000 / 60, // Fixed timestep: 60 FPS equivalent
                 isFixed: true
             });
-            Runner.run(runner, engine);
+            // NO iniciar automáticamente - esperar botón de inicio
+            // Runner.run(runner, engine);
             Render.run(render);
+            
+            // Estado inicial: simulación no corriendo
+            state.simulationRunning = false;
 
             // Setup collision events
             setupCollisionEvents();
@@ -969,10 +1225,16 @@
             // Reset frame counter
             frameCount = 0;
             
-            // Update loop for forces
+            // Update loop for forces - use fixed timestep for frame-independent forces
             Events.on(engine, 'beforeUpdate', () => {
+                // Solo actualizar si la simulación está corriendo
+                if (!state.simulationRunning) return;
+                
                 frameCount++;
-                applyForces();
+                // Use fixed timestep (16.67ms = 60 FPS) - Runner with isFixed ensures this is consistent
+                // Even if FPS drops, Runner will execute multiple steps to maintain fixed timestep
+                const timestep = 16.67; // milliseconds (1000/60)
+                applyForces(timestep);
                 
                 // Update fibrin barrier positions to follow platelets (every 3 frames for performance)
                 if (frameCount % 3 === 0 && state.fibrinConstraints.length > 0) {
@@ -1005,10 +1267,14 @@
                     calculateClotPercentage();
                     updateUI();
                 }
+                
+                // vWF se renderiza como líneas entre plaquetas (no necesita actualización)
             });
 
-            // Custom render for fibrin
+            // Custom render - orden importante: primero fibrina (cuerdas blancas y malla morada), luego vWF (líneas verdes), luego partículas
             Events.on(render, 'afterRender', renderFibrin);
+            Events.on(render, 'afterRender', renderVWF); // vWF se renderiza después de las cuerdas blancas
+            Events.on(render, 'afterRender', renderParticlesCustom);
             
             // Start FPS counter
             startFPSCounter();
@@ -1160,12 +1426,12 @@
         }
         
         function createInvisibleAnchorPlatelets(woundX, woundWidth, wallThickness) {
-            const adhesionLineY = 18; // Same Y position as the adhesion line
+            const adhesionLineY = 23; // Same Y position as the adhesion line
             const woundLeft = woundX - woundWidth / 2;
             const woundRight = woundX + woundWidth / 2;
             
-            // Left anchor platelet - positioned just outside the left edge of the wound
-            const leftAnchorX = woundLeft - 15;
+            // Left anchor platelet - positioned just inside the left edge of the wound
+            const leftAnchorX = woundLeft + 2;
             const leftAnchor = Bodies.circle(leftAnchorX, adhesionLineY + 6, 4, {
                 isStatic: true,
                 render: { fillStyle: 'transparent', visible: false },
@@ -1174,8 +1440,8 @@
                 isAnchor: true // Mark as anchor platelet
             });
             
-            // Right anchor platelet - positioned just outside the right edge of the wound
-            const rightAnchorX = woundRight + 15;
+            // Right anchor platelet - positioned just inside the right edge of the wound
+            const rightAnchorX = woundRight - 10;
             const rightAnchor = Bodies.circle(rightAnchorX, adhesionLineY + 6, 4, {
                 isStatic: true,
                 render: { fillStyle: 'transparent', visible: false },
@@ -1225,7 +1491,11 @@
             switch (type) {
                 case 'platelet':
                     body = Bodies.circle(x, y, 4, {
-                        render: { fillStyle: '#F1F5F9' },
+                        render: { 
+                            fillStyle: 'transparent',
+                            strokeStyle: 'transparent',
+                            visible: false // No renderizar con Matter.js - solo custom
+                        },
                         label: 'platelet',
                         restitution: 0.5, // Increased for better wall bounce
                         friction: 0.1,
@@ -1242,8 +1512,13 @@
                     break;
 
                 case 'rbc':
+                    // Glóbulos rojos: usar círculo pero renderizar como elipse en custom render
                     body = Bodies.circle(x, y, 6, {
-                        render: { fillStyle: '#EF4444' },
+                        render: { 
+                            fillStyle: 'transparent',
+                            strokeStyle: 'transparent',
+                            visible: false // No renderizar con Matter.js - solo custom
+                        },
                         label: 'rbc',
                         restitution: 0.8, // Higher restitution for better bounce
                         friction: 0.05,
@@ -1259,7 +1534,11 @@
 
                 case 'wbc':
                     body = Bodies.circle(x, y, 10, {
-                        render: { fillStyle: '#E3F2FD' },
+                        render: { 
+                            fillStyle: 'transparent',
+                            strokeStyle: 'transparent',
+                            visible: false // No renderizar con Matter.js - solo custom
+                        },
                         label: 'wbc',
                         restitution: 0.7, // Higher restitution for better bounce
                         friction: 0.1,
@@ -1292,6 +1571,12 @@
             
             // Use requestAnimationFrame with time-based spawning for consistent rate
             function spawnLoop(currentTime) {
+                // Solo spawnear si la simulación está corriendo y la herida no está sellada
+                if (!state.simulationRunning || state.hemostasisAchieved) {
+                    spawnInterval = requestAnimationFrame(spawnLoop);
+                    return;
+                }
+                
                 if (state.allBodies.length < CONFIG.particles.maxCount) {
                     const elapsed = currentTime - lastSpawnTime;
                     
@@ -1327,16 +1612,52 @@
             
             spawnInterval = requestAnimationFrame(spawnLoop);
         }
+        
+        function toggleSimulation() {
+            if (!state.simulationRunning) {
+                // Iniciar simulación
+                state.simulationRunning = true;
+                Runner.run(runner, engine);
+                const startBtn = document.getElementById('start-btn');
+                startBtn.textContent = '⏸ Pausar Simulación';
+                startBtn.classList.add('paused');
+                updateWizardStep(3);
+            } else {
+                // Pausar simulación
+                state.simulationRunning = false;
+                Runner.stop(runner);
+                const startBtn = document.getElementById('start-btn');
+                startBtn.textContent = '▶ Reanudar Simulación';
+                startBtn.classList.remove('paused');
+            }
+        }
+        
+        function updateWizardStep(step) {
+            state.currentStep = step;
+            document.querySelectorAll('.wizard-step').forEach((el, index) => {
+                const stepNum = index + 1;
+                el.classList.remove('active', 'completed');
+                if (stepNum < step) {
+                    el.classList.add('completed');
+                } else if (stepNum === step) {
+                    el.classList.add('active');
+                }
+            });
+        }
 
-        function applyForces() {
+        function applyForces(timestep = 16.67) {
             const woundX = CONFIG.wound.x;
             const woundWidth = CONFIG.wound.width;
             const woundLeft = woundX - woundWidth / 2;
             const woundRight = woundX + woundWidth / 2;
             
             // Invisible adhesion line parameters - positioned at wound opening
-            const adhesionLineY = 18; // Y position of the invisible line (at top of wound)
+            const adhesionLineY = 23; // Y position of the invisible line
             const adhesionLineThreshold = 14; // How close to trigger adhesion check
+            
+            // Normalize timestep to 60 FPS (16.67ms) for consistent force application
+            // timestep is in milliseconds, convert to seconds and normalize
+            const timeScale = timestep / 16.67; // Scale factor: 1.0 at 60 FPS
 
             state.allBodies.forEach(body => {
                 // Skip stuck platelets and static bodies
@@ -1380,13 +1701,13 @@
                     }
                 }
 
-                // Laminar flow force (right)
+                // Laminar flow force (right) - scaled by timestep for frame independence
                 Body.applyForce(body, body.position, {
-                    x: CONFIG.physics.flowForce * body.mass,
+                    x: CONFIG.physics.flowForce * body.mass * timeScale,
                     y: 0
                 });
 
-                // Suction force (only under the wound)
+                // Suction force (only under the wound) - scaled by timestep
                 if (body.position.x > woundLeft - 50 && body.position.x < woundRight + 50) {
                     const distanceToWound = Math.abs(body.position.y - 20);
 
@@ -1395,7 +1716,7 @@
                         const suctionStrength = CONFIG.physics.suctionForce * (1 - distanceToWound / 150);
                         Body.applyForce(body, body.position, {
                             x: 0,
-                            y: -suctionStrength * body.mass
+                            y: -suctionStrength * body.mass * timeScale
                         });
                     }
                 }
@@ -1445,8 +1766,23 @@
                             const bounceThresholdSq = bounceThreshold * bounceThreshold;
                             const distanceSq = distance * distance;
                             
-                            // If cell is close to fibrin line, apply strong bounce force
+                            // If cell is close to fibrin line, apply bounce force (or allow passage if weak)
                             if (distanceSq < bounceThresholdSq && distance > 0.1) {
+                                // Get fibrin stability - affects barrier effectiveness
+                                const fibrinStability = fibrin.stability || 1.0;
+                                
+                                // Si está sellado, bloquear completamente el paso
+                                const passThroughChance = state.hemostasisAchieved ? 0 : (1 - fibrinStability) * 0.3; // Up to 30% chance for very weak fibrin
+                                
+                                if (Math.random() < passThroughChance) {
+                                    // Cell passes through weak fibrin - reduce velocity slightly
+                                    Body.setVelocity(body, {
+                                        x: body.velocity.x * 0.9,
+                                        y: body.velocity.y * 0.9
+                                    });
+                                    continue; // Skip bounce for this fibrin connection
+                                }
+                                
                                 // Normalize distance vector to get bounce direction
                                 const bounceDir = {
                                     x: distVec.x / distance,
@@ -1458,24 +1794,26 @@
                                 
                                 // Only apply bounce if moving towards the line
                                 if (velocityDot < 0) {
-                                    // Strong bounce force - much stronger when very close
+                                    // Bounce force reduced by stability - weaker fibrin = weaker bounce
                                     const proximityFactor = 1 - (distance / bounceThreshold);
-                                    const bounceForce = bounceStrength * proximityFactor * proximityFactor; // Quadratic for stronger effect
+                                    const stabilityMultiplier = 0.3 + (fibrinStability * 0.7); // 0.3-1.0 range
+                                    const bounceForce = bounceStrength * proximityFactor * proximityFactor * stabilityMultiplier;
                                     
+                                    // Scale bounce force by timestep for frame independence (use timeScale from function scope)
                                     Body.applyForce(body, body.position, {
-                                        x: bounceDir.x * bounceForce * body.mass * 10,
-                                        y: bounceDir.y * bounceForce * body.mass * 10
+                                        x: bounceDir.x * bounceForce * body.mass * 10 * timeScale,
+                                        y: bounceDir.y * bounceForce * body.mass * 10 * timeScale
                                     });
                                     
-                                    // Invert velocity component towards the line (strong bounce)
-                                    const bounceFactor = 0.8 + (proximityFactor * 0.2); // 0.8 to 1.0
+                                    // Invert velocity component - effectiveness depends on stability
+                                    const bounceFactor = (0.5 + fibrinStability * 0.3) + (proximityFactor * 0.2); // 0.5-1.0 range
                                     Body.setVelocity(body, {
                                         x: body.velocity.x - bounceDir.x * velocityDot * bounceFactor,
                                         y: body.velocity.y - bounceDir.y * velocityDot * bounceFactor
                                     });
                                     
-                                    // Push cell away from the line
-                                    const pushDistance = (bounceThreshold - distance) * 0.3;
+                                    // Push cell away from the line - less effective for weak fibrin
+                                    const pushDistance = (bounceThreshold - distance) * 0.3 * fibrinStability;
                                     Body.setPosition(body, {
                                         x: body.position.x + bounceDir.x * pushDistance,
                                         y: body.position.y + bounceDir.y * pushDistance
@@ -1498,12 +1836,12 @@
 
                         // Check platelet function first
                         if (!state.treatmentApplied && Math.random() > conditionConfig.plateletFunction) {
-                            // Platelet dysfunction - bounce off
-                            const bounceFactor = conditionConfig.plateletBounceFactor || 0.7;
-                            body.restitution = 0.9;
+                            // Platelet dysfunction - let it pass through fibrin network instead of bouncing
+                            // Reduce restitution to prevent bouncing and allow passage
+                            body.restitution = 0;
                             Body.setVelocity(body, {
-                                x: body.velocity.x * bounceFactor,
-                                y: Math.abs(body.velocity.y) * 1.5 + 1
+                                x: body.velocity.x * 0.95,
+                                y: body.velocity.y * 0.95
                             });
                             return;
                         }
@@ -1523,12 +1861,12 @@
                                 }
                             }, 100);
                         } else {
-                            // Platelet bounces off
-                            const bounceFactor = conditionConfig.plateletBounceFactor || 0.7;
-                            body.restitution = 0.9;
+                            // Las plaquetas que no se adhieren atraviesan la malla en lugar de rebotar
+                            // Reducir restitution para evitar rebotes y permitir paso
+                            body.restitution = 0;
                             Body.setVelocity(body, {
-                                x: body.velocity.x * bounceFactor,
-                                y: Math.abs(body.velocity.y) * 1.5 + 1
+                                x: body.velocity.x * 0.95,
+                                y: body.velocity.y * 0.95
                             });
                         }
                     }
@@ -1541,11 +1879,11 @@
                  conditionConfig.fibrinStability < 0.5) && !state.treatmentApplied) {
                 state.stuckPlatelets.forEach(platelet => {
                     if (!platelet.hasFibrin || platelet.fibrinConnections.length === 0) {
-                        // Gradually increase dislodge force for platelets without fibrin support
+                        // Gradually increase dislodge force for platelets without fibrin support - scaled by timestep
                         const dislodgeForce = 0.00015 * (1 - conditionConfig.fibrinStability);
                         Body.applyForce(platelet.body, platelet.body.position, {
                             x: 0,
-                            y: -dislodgeForce * platelet.body.mass * (1 + Math.random())
+                            y: -dislodgeForce * platelet.body.mass * (1 + Math.random()) * timeScale
                         });
                     }
                 });
@@ -1559,7 +1897,7 @@
             
             // Apply visual effects based on condition
             const visualEffects = conditionConfig.visualEffects || CONFIG.conditions.normal.visualEffects;
-            platelet.render.fillStyle = visualEffects.plateletColor || '#E2E8F0';
+            platelet.render.fillStyle = visualEffects.plateletColor || '#808080';
             
             // Stop movement and position at the line
             Body.setVelocity(platelet, { x: 0, y: 0 });
@@ -1590,24 +1928,37 @@
             };
 
             state.stuckPlatelets.push(plateletData);
+            
+            // Ocultar cartel cuando hay plaquetas pegadas
+            const woundLabel = document.getElementById('wound-label');
+            if (state.stuckPlatelets.length > 0) {
+                woundLabel.classList.add('hidden');
+            }
 
-            // Try to form fibrin after delay if specified
-            const delay = conditionConfig.fibrinFormationDelay || 150;
-            setTimeout(() => {
-                if (state.stuckPlatelets.includes(plateletData)) {
-                    tryFormFibrin(plateletData);
-                    
-                    // Also try to form fibrin from nearby anchor platelets
-                    state.stuckPlatelets.forEach(other => {
-                        if (other.isAnchor && other.body) {
-                            const dist = Vector.magnitude(Vector.sub(plateletData.body.position, other.body.position));
-                            if (dist < 80) {
-                                tryFormFibrin(other);
+            // Secuencia: plaquetas primero, luego malla
+            // Activar formación de fibrina solo después de umbral de plaquetas
+            const minPlateletsForFibrin = 3;
+            if (state.stuckPlatelets.length >= minPlateletsForFibrin) {
+                state.fibrinFormationStarted = true;
+                
+                // Try to form fibrin after delay if specified
+                const delay = conditionConfig.fibrinFormationDelay || 150;
+                setTimeout(() => {
+                    if (state.stuckPlatelets.includes(plateletData)) {
+                        tryFormFibrin(plateletData);
+                        
+                        // Also try to form fibrin from nearby anchor platelets
+                        state.stuckPlatelets.forEach(other => {
+                            if (other.isAnchor && other.body) {
+                                const dist = Vector.magnitude(Vector.sub(plateletData.body.position, other.body.position));
+                                if (dist < 80) {
+                                    tryFormFibrin(other);
+                                }
                             }
-                        }
-                    });
-                }
-            }, delay);
+                        });
+                    }
+                }, delay);
+            }
         }
 
         function cleanupParticles() {
@@ -1682,8 +2033,57 @@
                     // Check for platelet collision with wound edges or stuck platelets
                     handlePlateletCollision(bodyA, bodyB);
                     handlePlateletCollision(bodyB, bodyA);
+                    
+                    // Handle weak fibrin barrier collisions - allow occasional passage
+                    handleFibrinBarrierCollision(bodyA, bodyB);
+                    handleFibrinBarrierCollision(bodyB, bodyA);
                 });
             });
+        }
+        
+        function handleFibrinBarrierCollision(cell, barrier) {
+            // Check if cell (RBC/WBC) collides with fibrin barrier
+            if ((cell.label !== 'rbc' && cell.label !== 'wbc') || barrier.label !== 'fibrinBarrier') {
+                return;
+            }
+            
+            // Get fibrin stability from barrier
+            const fibrinStability = barrier.fibrinStability || 1.0;
+            
+            // Si está sellado, bloquear completamente el paso
+            if (state.hemostasisAchieved) {
+                return; // No permitir paso cuando está sellado
+            }
+            
+            // Weak fibrin occasionally allows cells to pass through
+            if (fibrinStability < 0.6) {
+                const passThroughChance = (1 - fibrinStability) * 0.4; // Up to 40% chance for very weak fibrin
+                
+                if (Math.random() < passThroughChance) {
+                    // Allow cell to pass through - make barrier temporarily non-collidable
+                    barrier.collisionFilter.mask = 0x0000; // No collisions
+                    
+                    // Restore collision after a short time
+                    setTimeout(() => {
+                        if (barrier.label === 'fibrinBarrier') {
+                            barrier.collisionFilter.mask = 0x0001;
+                        }
+                    }, 500);
+                    
+                    // Reduce cell velocity slightly as it passes through
+                    Body.setVelocity(cell, {
+                        x: cell.velocity.x * 0.85,
+                        y: cell.velocity.y * 0.85
+                    });
+                } else {
+                    // Reduce bounce effectiveness for weak fibrin
+                    const bounceReduction = 1 - fibrinStability;
+                    Body.setVelocity(cell, {
+                        x: cell.velocity.x * (1 - bounceReduction * 0.3),
+                        y: cell.velocity.y * (1 - bounceReduction * 0.3)
+                    });
+                }
+            }
         }
 
         function handlePlateletCollision(platelet, other) {
@@ -1693,12 +2093,12 @@
             
             // Check platelet function first
             if (!state.treatmentApplied && Math.random() > conditionConfig.plateletFunction) {
-                // Platelet dysfunction - bounce off
-                const bounceFactor = conditionConfig.plateletBounceFactor || 0.7;
-                platelet.restitution = 0.9;
+                // Platelet dysfunction - let it pass through instead of bouncing
+                // Reduce restitution to prevent bouncing and allow passage
+                platelet.restitution = 0;
                 Body.setVelocity(platelet, {
-                    x: platelet.velocity.x * bounceFactor,
-                    y: Math.abs(platelet.velocity.y) * 1.5 + 2
+                    x: platelet.velocity.x * 0.95,
+                    y: platelet.velocity.y * 0.95
                 });
                 return;
             }
@@ -1717,14 +2117,17 @@
                 
                 if (platelet.position.x >= woundLeft - 20 && platelet.position.x <= woundRight + 20 && platelet.position.y < 45) {
                     // Check aggregation rate for platelet-to-platelet adhesion
+                    // En vWD sin tratamiento, las plaquetas no se agregan (no hay cemento vWF)
                     if (isStuckPlatelet) {
                         const aggregationRate = state.treatmentApplied ? 0.9 : conditionConfig.aggregationRate;
                         if (Math.random() > aggregationRate) {
-                            // Failed aggregation
+                            // Failed aggregation - plaquetas rebotan/se separan (sin cemento vWF)
                             platelet.restitution = 0.9;
+                            // En vWD, rebote más fuerte para simular que no hay cemento
+                            const bounceStrength = (state.condition === 'vwd' && !state.treatmentApplied) ? 1.5 : 1.0;
                             Body.setVelocity(platelet, {
-                                x: platelet.velocity.x * 0.8,
-                                y: Math.abs(platelet.velocity.y) * 1.2 + 1
+                                x: platelet.velocity.x * (0.8 * bounceStrength),
+                                y: Math.abs(platelet.velocity.y) * (1.2 * bounceStrength) + 1
                             });
                             return;
                         }
@@ -1742,12 +2145,12 @@
                             }
                         }, 100);
                     } else {
-                        // Platelet bounces off
-                        const bounceFactor = conditionConfig.plateletBounceFactor || 0.7;
-                        platelet.restitution = 0.9;
+                        // Las plaquetas que no se adhieren atraviesan en lugar de rebotar
+                        // Reducir restitution para evitar rebotes y permitir paso
+                        platelet.restitution = 0;
                         Body.setVelocity(platelet, {
-                            x: platelet.velocity.x * bounceFactor,
-                            y: Math.abs(platelet.velocity.y) * 2 + 2
+                            x: platelet.velocity.x * 0.95,
+                            y: platelet.velocity.y * 0.95
                         });
                     }
                 }
@@ -1761,7 +2164,7 @@
             
             // Apply visual effects based on condition
             const visualEffects = conditionConfig.visualEffects || CONFIG.conditions.normal.visualEffects;
-            platelet.render.fillStyle = visualEffects.plateletColor || '#E2E8F0';
+            platelet.render.fillStyle = visualEffects.plateletColor || '#808080';
             
             // Stop movement completely
             Body.setVelocity(platelet, { x: 0, y: 0 });
@@ -1791,14 +2194,27 @@
             };
 
             state.stuckPlatelets.push(plateletData);
+            
+            // Ocultar cartel cuando hay plaquetas pegadas
+            const woundLabel = document.getElementById('wound-label');
+            if (state.stuckPlatelets.length > 0) {
+                woundLabel.classList.add('hidden');
+            }
 
-            // Try to form fibrin with delay if specified
-            const delay = conditionConfig.fibrinFormationDelay || 100;
-            setTimeout(() => {
-                if (state.stuckPlatelets.includes(plateletData)) {
-                    tryFormFibrin(plateletData);
-                }
-            }, delay);
+            // Secuencia: plaquetas primero, luego malla
+            // Activar formación de fibrina solo después de umbral de plaquetas
+            const minPlateletsForFibrin = 3;
+            if (state.stuckPlatelets.length >= minPlateletsForFibrin) {
+                state.fibrinFormationStarted = true;
+                
+                // Try to form fibrin with delay if specified
+                const delay = conditionConfig.fibrinFormationDelay || 100;
+                setTimeout(() => {
+                    if (state.stuckPlatelets.includes(plateletData)) {
+                        tryFormFibrin(plateletData);
+                    }
+                }, delay);
+            }
         }
 
         function tryFormFibrin(plateletData) {
@@ -1806,6 +2222,9 @@
             const canFormFibrin = state.treatmentApplied ? true : conditionConfig.canFormFibrin;
 
             if (!canFormFibrin) return;
+            
+            // Secuencia: plaquetas primero, luego malla - solo formar si ya empezó la formación
+            if (!state.fibrinFormationStarted) return;
             
             // Check fibrin formation rate
             const fibrinFormationRate = state.treatmentApplied ? 1.0 : conditionConfig.fibrinFormationRate;
@@ -1832,7 +2251,17 @@
             }
 
             const platelet = plateletData.body;
-            const searchRadius = 90; // Increased search radius for more separated connections
+            
+            // Get fibrin stability from condition - affects connection distance
+            const fibrinStability = state.treatmentApplied ? 1.0 : conditionConfig.fibrinStability;
+            
+            // When fibrin is weaker, platelets must be closer to form connections
+            // Strong fibrin (1.0): can connect up to 90px away, minimum 20px
+            // Weak fibrin (0.3): can connect up to 40px away, minimum 8px
+            const maxSearchRadius = 40 + (fibrinStability * 50); // 40-90px range
+            const minDistance = 8 + (fibrinStability * 12); // 8-20px range
+            const minDistanceSq = minDistance * minDistance;
+            
             const plateletX = platelet.position.x;
             const plateletY = platelet.position.y;
 
@@ -1849,14 +2278,30 @@
                 const dx = other.body.position.x - plateletX;
                 const dy = other.body.position.y - plateletY;
                 const distSq = dx * dx + dy * dy;
-                const searchRadiusSq = searchRadius * searchRadius;
-                const minDistanceSq = 400; // Increased minimum distance: 20^2 = 400 (was 5^2 = 25)
+                const searchRadiusSq = maxSearchRadius * maxSearchRadius;
 
                 if (distSq < searchRadiusSq && distSq > minDistanceSq) {
                     const dist = Math.sqrt(distSq);
                     
-                    // Get fibrin stability from condition
-                    const fibrinStability = state.treatmentApplied ? 1.0 : conditionConfig.fibrinStability;
+                    // Clasificar tipo de cuerda según distancia y estabilidad
+                    let fibrinType = 'thin'; // Por defecto pequeña
+                    if (dist < 30 && fibrinStability > 0.7) {
+                        fibrinType = 'thick'; // Gruesa: distancia < 30px y estabilidad alta
+                    } else if (dist < 60 && fibrinStability > 0.4) {
+                        fibrinType = 'medium'; // Mediana: distancia 30-60px y estabilidad media
+                    }
+                    
+                    // Verificar restricciones según condición
+                    const canFormThick = !conditionConfig.blockThickCords;
+                    const canFormMedium = !conditionConfig.blockMediumCords;
+                    const canFormThin = !conditionConfig.blockThinCords;
+                    
+                    if ((fibrinType === 'thick' && !canFormThick) ||
+                        (fibrinType === 'medium' && !canFormMedium) ||
+                        (fibrinType === 'thin' && !canFormThin)) {
+                        continue; // Saltar esta conexión si está bloqueada
+                    }
+                    
                     const visualEffects = conditionConfig.visualEffects || CONFIG.conditions.normal.visualEffects;
                     
                     // Create fibrin constraint with stability-based properties
@@ -1880,7 +2325,9 @@
                     );
                     
                     // Create a thin rectangular body as barrier
-                    const fibrinBody = Bodies.rectangle(midX, midY, dist, 4, {
+                    // Thickness depends on stability - weaker fibrin = thinner barrier
+                    const barrierThickness = 2 + (fibrinStability * 3); // 2-5px range
+                    const fibrinBody = Bodies.rectangle(midX, midY, dist, barrierThickness, {
                         isStatic: true, // Static so it acts as a solid barrier
                         render: { 
                             fillStyle: 'transparent', // Invisible, we render it separately
@@ -1893,7 +2340,9 @@
                             group: 0,
                             category: 0x0002, // Separate category for fibrin
                             mask: 0x0001 // Only collide with RBCs and WBCs
-                        }
+                        },
+                        // Store stability for collision handling
+                        fibrinStability: fibrinStability
                     });
                     
                     Body.setAngle(fibrinBody, angle);
@@ -1907,8 +2356,9 @@
                         glowing: state.treatmentApplied,
                         stability: fibrinStability,
                         decayRate: conditionConfig.fibrinDecayRate || 0,
-                        visualColor: visualEffects.fibrinColor,
+                        visualColor: '#FFFFFF', // Blanco para las cuerdas (solo la malla horizontal es morada)
                         opacity: visualEffects.fibrinOpacity || 1.0,
+                        fibrinType: fibrinType, // 'thick', 'medium', o 'thin'
                         createdAt: Date.now()
                     };
                     
@@ -1985,11 +2435,17 @@
         function checkWoundSealed() {
             if (state.hemostasisAchieved) return; // Already sealed
             
+            const conditionConfig = CONFIG.conditions[state.condition];
+            // En condiciones patológicas, requerir tratamiento para sellado completo
+            if (conditionConfig.requiresTreatment && !state.treatmentApplied) {
+                return; // No sellar sin tratamiento
+            }
+            
             const woundX = CONFIG.wound.x;
             const woundWidth = CONFIG.wound.width;
             const woundLeft = woundX - woundWidth / 2;
             const woundRight = woundX + woundWidth / 2;
-            const woundCenterY = 24; // Y position where platelets stick
+            const woundCenterY = 29; // Y position where platelets stick
             
             // Find platelets on the left side of the wound (including anchor platelets)
             const leftSidePlatelets = state.stuckPlatelets.filter(p => {
@@ -2019,8 +2475,9 @@
                     state.hemostasisAchieved = true;
                     state.clotPercentage = 100;
                     document.getElementById('hemostasis-indicator').classList.add('visible');
-                    document.getElementById('wound-label').classList.add('healed');
-                    document.getElementById('wound-label').innerHTML = '✓ Lesión Sellada';
+                    const woundLabel = document.getElementById('wound-label');
+                    woundLabel.classList.add('healed', 'hidden'); // Ocultar cuando está sellada
+                    woundLabel.innerHTML = '✓ Lesión Sellada';
                     updateUI();
                     return;
                 }
@@ -2080,15 +2537,47 @@
             const woundX = CONFIG.wound.x;
             const woundWidth = CONFIG.wound.width;
             const woundLeft = woundX - woundWidth / 2;
+            const woundRight = woundX + woundWidth / 2;
+            const woundCenterY = 29; // Y position where platelets stick
             
             // Render ointment layer when treatment is applied - ultra simple for performance
             if (state.showOintment) {
                 ctx.fillStyle = 'rgba(59, 130, 246, 0.35)';
-                ctx.fillRect(woundLeft, 0, woundWidth, 22);
+                ctx.fillRect(woundLeft, 0, woundWidth, 32);
             }
             
-            // Render fibrin connections - optimized for performance with condition-based colors
+            // Calcular opacidad de la malla morada basada en densidad de plaquetas pegadas
+            const stuckPlateletsInWound = state.stuckPlatelets.filter(p => {
+                const px = p.body.position.x;
+                const py = p.body.position.y;
+                return px >= woundLeft - 20 && px <= woundRight + 20 && 
+                       py >= woundCenterY - 15 && py <= woundCenterY + 15;
+            }).length;
+            
+            const maxPlatelets = 20; // Máximo esperado de plaquetas en la herida
+            // La malla morada empieza muy transparente (0.05) y se opaca progresivamente hasta 0.9
+            const meshOpacity = Math.min(0.9, 0.05 + (stuckPlateletsInWound / maxPlatelets) * 0.85);
+            
+            // Ajustar posición Y de la malla morada para que esté más abajo
+            const meshY = woundCenterY - 2;
+            
+            // Renderizar malla morada horizontal en la zona de la herida que se opaca progresivamente
+            // Solo esta línea horizontal es morada - las cuerdas son blancas
+            if (state.fibrinFormationStarted && stuckPlateletsInWound > 0) {
+                ctx.fillStyle = `rgba(157, 78, 221, ${meshOpacity})`; // Morado #9D4EDD
+                ctx.fillRect(woundLeft, meshY, woundWidth, 4);
+            }
+            
+            // Overlay verde cuando está sellada
+            if (state.hemostasisAchieved) {
+                ctx.fillStyle = 'rgba(34, 197, 94, 0.3)'; // Verde semitransparente
+                ctx.fillRect(woundLeft, meshY - 3, woundWidth, 10);
+            }
+            
+            // Render fibrin connections (cuerdas) - optimized for performance
             if (state.fibrinConstraints.length > 0) {
+                ctx.save(); // Guardar estado del contexto antes de dibujar cuerdas verdes
+                
                 for (let i = 0; i < state.fibrinConstraints.length; i++) {
                     const fibrin = state.fibrinConstraints[i];
                     const pointA = fibrin.pointA.position;
@@ -2096,15 +2585,32 @@
                     
                     // Only draw if both points are still valid
                     if (pointA && pointB) {
-                        // Use condition-specific color and opacity
-                        const color = fibrin.visualColor || (state.treatmentApplied ? '#39FF14' : '#00E676');
-                        const opacity = fibrin.opacity !== undefined ? fibrin.opacity : 1.0;
-                        const lineWidth = fibrin.glowing ? 2.5 : (state.treatmentApplied ? 2 : 1.5);
+                        const fibrinType = fibrin.fibrinType || 'thin';
+                        let lineWidth, opacity;
                         
-                        // Set color with opacity
-                        const rgb = hexToRgb(color);
-                        ctx.strokeStyle = `rgba(${rgb.r}, ${rgb.g}, ${rgb.b}, ${opacity})`;
-                        ctx.lineWidth = lineWidth * (fibrin.stability || 1.0); // Thinner if unstable
+                        // Configurar grosor y opacidad según tipo de cuerda
+                        switch (fibrinType) {
+                            case 'thick':
+                                lineWidth = 5;
+                                opacity = 0.9;
+                                break;
+                            case 'medium':
+                                lineWidth = 3;
+                                opacity = 0.6;
+                                break;
+                            case 'thin':
+                            default:
+                                lineWidth = 1.5;
+                                opacity = 0.4;
+                                break;
+                        }
+                        
+                        // Ajustar opacidad según estabilidad
+                        opacity *= (fibrin.stability || 1.0);
+                        
+                        // Color verde para las cuerdas (solo la malla horizontal es morada)
+                        ctx.strokeStyle = `rgba(34, 197, 94, ${opacity * 0.8})`; // Verde #22C55E con opacidad
+                        ctx.lineWidth = lineWidth;
                         
                         ctx.beginPath();
                         ctx.moveTo(pointA.x, pointA.y);
@@ -2112,6 +2618,8 @@
                         ctx.stroke();
                     }
                 }
+                
+                ctx.restore(); // Restaurar estado del contexto después de dibujar cuerdas blancas
             }
         }
         
@@ -2123,10 +2631,177 @@
                 b: parseInt(result[3], 16)
             } : { r: 0, g: 230, b: 118 };
         }
+        
+        function renderVWF(event) {
+            const ctx = render.context;
+            
+            // Verificar si debe mostrar vWF (cemento entre plaquetas)
+            const conditionConfig = CONFIG.conditions[state.condition];
+            const shouldShowVWF = state.condition === 'normal' || state.treatmentApplied || 
+                                  (state.condition === 'vwd' && state.treatmentApplied);
+            
+            if (!shouldShowVWF || state.stuckPlatelets.length < 2) {
+                return; // No mostrar vWF si no hay vWF o menos de 2 plaquetas
+            }
+            
+            // Dibujar líneas verdes cortas (cemento) entre plaquetas pegadas que están cerca
+            const maxVWFDistance = 12; // Distancia máxima para mostrar conexión vWF
+            const maxVWFDistanceSq = maxVWFDistance * maxVWFDistance;
+            
+            // Asegurar que el color verde se aplique correctamente
+            ctx.save(); // Guardar estado del contexto
+            
+            // Usar rgba para asegurar que el color verde se aplique correctamente
+            ctx.strokeStyle = 'rgba(34, 197, 94, 1.0)'; // Verde #22C55E en formato rgba
+            ctx.lineWidth = 1.5;
+            ctx.lineCap = 'round';
+            ctx.globalAlpha = 1.0; // Asegurar opacidad completa para el verde
+            
+            // Dibujar líneas entre plaquetas cercanas
+            for (let i = 0; i < state.stuckPlatelets.length; i++) {
+                const plateletA = state.stuckPlatelets[i];
+                if (!plateletA.body) continue;
+                
+                const posA = plateletA.body.position;
+                
+                for (let j = i + 1; j < state.stuckPlatelets.length; j++) {
+                    const plateletB = state.stuckPlatelets[j];
+                    if (!plateletB.body) continue;
+                    
+                    const posB = plateletB.body.position;
+                    const dx = posB.x - posA.x;
+                    const dy = posB.y - posA.y;
+                    const distSq = dx * dx + dy * dy;
+                    
+                    // Solo dibujar si están cerca (como cemento entre piedras adyacentes)
+                    if (distSq < maxVWFDistanceSq && distSq > 4) {
+                        const dist = Math.sqrt(distSq);
+                        // Opacidad basada en distancia (más opaco cuanto más cerca)
+                        const opacity = 0.7 + (1.0 - dist / maxVWFDistance) * 0.3; // Entre 0.7 y 1.0
+                        
+                        // Re-establecer el color verde antes de cada línea para asegurar que siempre sea verde
+                        ctx.strokeStyle = `rgba(34, 197, 94, ${opacity})`; // Verde con opacidad variable
+                        ctx.beginPath();
+                        ctx.moveTo(posA.x, posA.y);
+                        ctx.lineTo(posB.x, posB.y);
+                        ctx.stroke();
+                    }
+                }
+            }
+            
+            ctx.restore(); // Restaurar estado del contexto
+        }
+        
+        function renderParticlesCustom(event) {
+            const ctx = render.context;
+            
+            // Renderizar todas las partículas con estilo personalizado (highlights, sombras, formas)
+            // Renderizar solo plaquetas, glóbulos rojos y glóbulos blancos
+            state.allBodies.forEach(body => {
+                if (!body.label || (body.label !== 'platelet' && body.label !== 'rbc' && body.label !== 'wbc')) return;
+                
+                const x = body.position.x;
+                const y = body.position.y;
+                const angle = body.angle;
+                
+                ctx.save();
+                ctx.translate(x, y);
+                ctx.rotate(angle);
+                
+                if (body.label === 'rbc') {
+                    // Glóbulo rojo: ovalado con highlight y sombra
+                    const radiusX = 6;
+                    const radiusY = 4.5; // Más ancho que alto para efecto ovalado
+                    
+                    // Sombra/contorno oscuro
+                    ctx.beginPath();
+                    ctx.ellipse(0, 0, radiusX + 0.5, radiusY + 0.5, 0, 0, Math.PI * 2);
+                    ctx.fillStyle = 'rgba(139, 0, 0, 0.3)'; // Rojo muy oscuro para sombra
+                    ctx.fill();
+                    
+                    // Cuerpo principal rojo oscuro
+                    ctx.beginPath();
+                    ctx.ellipse(0, 0, radiusX, radiusY, 0, 0, Math.PI * 2);
+                    ctx.fillStyle = '#B91C1C'; // Rojo oscuro
+                    ctx.fill();
+                    
+                    // Highlight pequeño cerca del centro (superior izquierda)
+                    ctx.beginPath();
+                    ctx.arc(-1.5, -1, 1.2, 0, Math.PI * 2);
+                    ctx.fillStyle = 'rgba(255, 200, 200, 0.8)'; // Rojo claro/rosa para highlight
+                    ctx.fill();
+                    
+                } else if (body.label === 'wbc') {
+                    // Glóbulo blanco: circular con highlight brillante y contorno azul oscuro
+                    const radius = 10;
+                    
+                    // Contorno azul oscuro para profundidad
+                    ctx.beginPath();
+                    ctx.arc(0, 0, radius + 1, 0, Math.PI * 2);
+                    ctx.strokeStyle = '#4A90E2'; // Azul más oscuro para contorno
+                    ctx.lineWidth = 1.5;
+                    ctx.stroke();
+                    
+                    // Cuerpo principal azul claro
+                    ctx.beginPath();
+                    ctx.arc(0, 0, radius, 0, Math.PI * 2);
+                    ctx.fillStyle = '#87CEEB'; // Azul claro
+                    ctx.fill();
+                    
+                    // Highlight brillante blanco en cuadrante superior izquierdo
+                    const gradient = ctx.createRadialGradient(-3, -3, 0, -3, -3, 4);
+                    gradient.addColorStop(0, 'rgba(255, 255, 255, 0.95)'); // Blanco brillante en el centro
+                    gradient.addColorStop(0.5, 'rgba(255, 255, 255, 0.6)');
+                    gradient.addColorStop(1, 'rgba(255, 255, 255, 0)'); // Transparente hacia afuera
+                    
+                    ctx.beginPath();
+                    ctx.arc(-3, -3, 4, 0, Math.PI * 2);
+                    ctx.fillStyle = gradient;
+                    ctx.fill();
+                    
+                    // Punto de highlight más pequeño y brillante
+                    ctx.beginPath();
+                    ctx.arc(-3, -3, 1.5, 0, Math.PI * 2);
+                    ctx.fillStyle = 'rgba(255, 255, 255, 1)'; // Blanco sólido
+                    ctx.fill();
+                    
+                } else if (body.label === 'platelet') {
+                    // Plaqueta: circular gris con highlight sutil
+                    const radius = 4;
+                    
+                    // Sombra sutil
+                    ctx.beginPath();
+                    ctx.arc(0, 0, radius + 0.3, 0, Math.PI * 2);
+                    ctx.fillStyle = 'rgba(100, 100, 100, 0.2)'; // Gris oscuro para sombra
+                    ctx.fill();
+                    
+                    // Cuerpo principal gris
+                    ctx.beginPath();
+                    ctx.arc(0, 0, radius, 0, Math.PI * 2);
+                    ctx.fillStyle = '#808080'; // Gris medio
+                    ctx.fill();
+                    
+                    // Highlight pequeño en cuadrante superior izquierdo
+                    ctx.beginPath();
+                    ctx.arc(-1.2, -1.2, 0.8, 0, Math.PI * 2);
+                    ctx.fillStyle = 'rgba(220, 220, 220, 0.7)'; // Gris claro para highlight
+                    ctx.fill();
+                }
+                
+                ctx.restore();
+            });
+        }
 
         function calculateClotPercentage() {
+            // Si la herida está sellada (red de fibrina de izquierda a derecha y no pasan partículas), 100%
+            if (state.hemostasisAchieved) {
+                state.clotPercentage = 100;
+                return;
+            }
+            
             const woundLeft = CONFIG.wound.x - CONFIG.wound.width / 2;
             const woundWidth = CONFIG.wound.width;
+            const woundCenterY = 29; // Y position where platelets stick
 
             // Optimized coverage calculation
             const segments = 20; // Reduced from 30 for better performance
@@ -2138,7 +2813,8 @@
             const relevantPlatelets = state.stuckPlatelets.filter(p => {
                 const px = p.body.position.x;
                 const py = p.body.position.y;
-                return px >= woundLeft - 20 && px <= woundLeft + woundWidth + 20 && py < 35;
+                return px >= woundLeft - 20 && px <= woundLeft + woundWidth + 20 && 
+                       py >= woundCenterY - 15 && py <= woundCenterY + 15;
             });
 
             for (let i = 0; i < segments; i++) {
@@ -2147,7 +2823,7 @@
                 // Check if any stuck platelet covers this segment (optimized)
                 const covered = relevantPlatelets.some(p => {
                     const dx = p.body.position.x - segmentX;
-                    const dy = p.body.position.y - 18; // Center Y of wound
+                    const dy = p.body.position.y - woundCenterY;
                     return (dx * dx + dy * dy) < coverageThreshold;
                 });
 
@@ -2157,16 +2833,12 @@
             state.clotPercentage = Math.min(100, Math.round((coveredSegments / segments) * 100));
 
             // Check if wound is sealed by fibrin network crossing left to right
-            if (!state.hemostasisAchieved) {
-                checkWoundSealed();
-            }
+            // Esto detecta cuando la red de fibrina va de izquierda a derecha
+            checkWoundSealed();
             
-            // Fallback: Check for hemostasis by coverage percentage
-            if (state.clotPercentage >= 85 && !state.hemostasisAchieved) {
-                state.hemostasisAchieved = true;
-                document.getElementById('hemostasis-indicator').classList.add('visible');
-                document.getElementById('wound-label').classList.add('healed');
-                document.getElementById('wound-label').innerHTML = '✓ Lesión Sellada';
+            // Si está sellada, asegurar que el porcentaje sea 100%
+            if (state.hemostasisAchieved) {
+                state.clotPercentage = 100;
             }
         }
 
@@ -2199,6 +2871,9 @@
 
             state.treatmentApplied = true;
             state.showOintment = true;
+            
+            // Actualizar wizard - paso 2 completado
+            updateWizardStep(2);
 
             // Show treatment indicator
             const indicator = document.getElementById('treatment-indicator');
@@ -2288,7 +2963,7 @@
             
             // Update visual effects - platelets return to normal color
             state.stuckPlatelets.forEach(platelet => {
-                platelet.body.render.fillStyle = '#F1F5F9';
+                platelet.body.render.fillStyle = '#808080';
             });
             
             // Improve adhesion for new platelets (handled by canStick check)
@@ -2337,6 +3012,8 @@
 
         function setCondition(condition) {
             state.condition = condition;
+            state.treatmentApplied = false;
+            state.simulationRunning = false;
             
             // Update UI
             document.querySelectorAll('.condition-btn').forEach(btn => {
@@ -2345,6 +3022,49 @@
 
             // Reset simulation
             initSimulation();
+            
+            // Actualizar wizard - paso 1 completado
+            updateWizardStep(1);
+            
+            // Habilitar botón de inicio
+            const startBtn = document.getElementById('start-btn');
+            if (startBtn) {
+                startBtn.disabled = false;
+                startBtn.textContent = '▶ Iniciar Simulación';
+                startBtn.classList.remove('paused');
+            }
+        }
+        
+        function toggleSimulation() {
+            if (!state.simulationRunning) {
+                // Iniciar simulación
+                state.simulationRunning = true;
+                Runner.run(runner, engine);
+                const startBtn = document.getElementById('start-btn');
+                startBtn.textContent = '⏸ Pausar Simulación';
+                startBtn.classList.add('paused');
+                updateWizardStep(3);
+            } else {
+                // Pausar simulación
+                state.simulationRunning = false;
+                Runner.stop(runner);
+                const startBtn = document.getElementById('start-btn');
+                startBtn.textContent = '▶ Reanudar Simulación';
+                startBtn.classList.remove('paused');
+            }
+        }
+        
+        function updateWizardStep(step) {
+            state.currentStep = step;
+            document.querySelectorAll('.wizard-step').forEach((el, index) => {
+                const stepNum = index + 1;
+                el.classList.remove('active', 'completed');
+                if (stepNum < step) {
+                    el.classList.add('completed');
+                } else if (stepNum === step) {
+                    el.classList.add('active');
+                }
+            });
         }
 
         // Event Listeners
@@ -2360,11 +3080,40 @@
 
             // Treatment button
             document.getElementById('treatment-btn').addEventListener('click', applyTreatment);
+            
+            // Start button
+            const startBtn = document.getElementById('start-btn');
+            if (startBtn) {
+                startBtn.addEventListener('click', toggleSimulation);
+                startBtn.disabled = true; // Deshabilitado hasta seleccionar condición
+            }
 
             // Reset button
             document.getElementById('reset-btn').addEventListener('click', () => {
+                state.simulationRunning = false;
+                if (runner) Runner.stop(runner);
                 initSimulation();
+                updateWizardStep(1);
+                if (startBtn) {
+                    startBtn.textContent = '▶ Iniciar Simulación';
+                    startBtn.classList.remove('paused');
+                    startBtn.disabled = false;
+                }
             });
+            
+            // Inicializar wizard
+            updateWizardStep(1);
+            
+            // Asegurar que la condición normal esté activa por defecto
+            const normalBtn = document.querySelector('[data-condition="normal"]');
+            if (normalBtn) {
+                normalBtn.classList.add('active');
+            }
+            
+            // Habilitar botón de inicio ya que la condición normal está activa por defecto
+            if (startBtn) {
+                startBtn.disabled = false;
+            }
         });
     </script>
 </body>
