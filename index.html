@@ -155,8 +155,9 @@
 
         .label-wound {
             top: 12px;
-            left: 50%;
-            transform: translateX(-50%);
+            right: 12px;
+            left: auto;
+            transform: none;
             background: rgba(239, 68, 68, 0.2);
             border-color: rgba(239, 68, 68, 0.3);
             color: #FCA5A5;
@@ -197,6 +198,35 @@
 
         #simulation-canvas {
             display: block;
+        }
+
+        /* FPS Counter */
+        .fps-counter {
+            position: absolute;
+            top: 12px;
+            left: 12px;
+            background: rgba(0, 0, 0, 0.6);
+            backdrop-filter: blur(8px);
+            padding: 6px 12px;
+            border-radius: 6px;
+            font-size: 0.75rem;
+            font-weight: 600;
+            color: #94A3B8;
+            font-family: 'Courier New', monospace;
+            z-index: 15;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .fps-counter.good {
+            color: #22C55E;
+        }
+
+        .fps-counter.medium {
+            color: #F59E0B;
+        }
+
+        .fps-counter.low {
+            color: #EF4444;
         }
 
         /* Control Panel */
@@ -240,6 +270,12 @@
             display: grid;
             grid-template-columns: repeat(2, 1fr);
             gap: 12px;
+        }
+        
+        @media (min-width: 1200px) {
+            .condition-grid {
+                grid-template-columns: repeat(4, 1fr);
+            }
         }
 
         .condition-btn {
@@ -494,7 +530,6 @@
         <section class="viewer-section">
             <div class="viewer-container">
                 <div class="viewer-labels">
-                    <div class="label label-lumen">🔬 Lumen Vascular</div>
                     <div class="label label-wound" id="wound-label">⚠️ Lesión Activa</div>
                 </div>
                 <div class="treatment-indicator" id="treatment-indicator">
@@ -503,6 +538,7 @@
                 <div class="hemostasis-achieved" id="hemostasis-indicator">
                     ✓ Hemostasia Lograda
                 </div>
+                <div class="fps-counter" id="fps-counter">FPS: --</div>
                 <canvas id="simulation-canvas"></canvas>
             </div>
             <div class="legend">
@@ -522,19 +558,35 @@
                 <div class="condition-grid">
                     <button class="condition-btn active" data-condition="normal">
                         <div class="condition-name">Normal</div>
-                        <div class="condition-desc">Coagulación fisiológica normal</div>
+                        <div class="condition-desc">Coagulación fisiológica normal - Todos los factores funcionan correctamente</div>
                     </button>
                     <button class="condition-btn" data-condition="hemophilia">
-                        <div class="condition-name">Hemofilia</div>
-                        <div class="condition-desc">Déficit Factor VIII/IX</div>
+                        <div class="condition-name">Hemofilia A/B</div>
+                        <div class="condition-desc">Déficit Factor VIII/IX - Las plaquetas se adhieren pero la fibrina se forma muy lentamente y es inestable</div>
                     </button>
                     <button class="condition-btn" data-condition="vwd">
                         <div class="condition-name">Von Willebrand</div>
-                        <div class="condition-desc">Déficit Factor vWF</div>
+                        <div class="condition-desc">Déficit Factor vWF - Las plaquetas tienen dificultad para adherirse a la herida</div>
                     </button>
                     <button class="condition-btn" data-condition="thrombocytopenia">
-                        <div class="condition-name">Plaquetopenia</div>
-                        <div class="condition-desc">Recuento bajo de plaquetas</div>
+                        <div class="condition-name">Trombocitopenia</div>
+                        <div class="condition-desc">Recuento bajo de plaquetas - Pocas plaquetas disponibles para formar el coágulo</div>
+                    </button>
+                    <button class="condition-btn" data-condition="hemophiliaSevere">
+                        <div class="condition-name">Hemofilia Severa</div>
+                        <div class="condition-desc">Déficit grave Factor VIII/IX (<1%) - Sin formación de fibrina, sangrado prolongado</div>
+                    </button>
+                    <button class="condition-btn" data-condition="thrombasthenia">
+                        <div class="condition-name">Trombastenia</div>
+                        <div class="condition-desc">Déficit glicoproteína IIb/IIIa - Las plaquetas se adhieren pero no se agregan entre sí</div>
+                    </button>
+                    <button class="condition-btn" data-condition="factorDeficiency">
+                        <div class="condition-name">Déficit Factor VII</div>
+                        <div class="condition-desc">Vía extrínseca defectuosa - Formación de fibrina reducida</div>
+                    </button>
+                    <button class="condition-btn" data-condition="anticoagulated">
+                        <div class="condition-name">Anticoagulado</div>
+                        <div class="condition-desc">Warfarina - Factores dependientes de vitamina K reducidos, fibrina inestable</div>
                     </button>
                 </div>
             </div>
@@ -582,7 +634,7 @@
                 height: 20
             },
             wall: {
-                thickness: 20,
+                thickness: 30, // Increased thickness to prevent particles from passing through
                 color: '#FDA4AF'
             },
             physics: {
@@ -591,36 +643,196 @@
                 suctionRadius: 180
             },
             particles: {
-                maxCount: 180,
-                spawnRate: 4,
+                maxCount: 150, // Reduced for better performance
+                spawnRate: 3, // Reduced for better performance
                 plateletRatio: 0.35,
                 rbcRatio: 0.60,
                 wbcRatio: 0.05
             },
+            fibrin: {
+                maxConnections: 200, // Limit fibrin connections to prevent performance issues
+                maxConnectionsPerPlatelet: 8 // Limit connections per platelet
+            },
             conditions: {
                 normal: {
+                    name: "Normal",
+                    description: "Coagulación fisiológica normal - Todos los factores funcionan correctamente",
                     plateletRatio: 0.35,
                     canStick: true,
                     canFormFibrin: true,
-                    stickProbability: 0.95
+                    stickProbability: 0.95,
+                    plateletFunction: 1.0,
+                    adhesionStrength: 0.95,
+                    aggregationRate: 0.9,
+                    fibrinFormationRate: 1.0,
+                    fibrinStability: 1.0,
+                    fibrinDecayRate: 0.0,
+                    fibrinFormationDelay: 0,
+                    bleedingTime: 3,
+                    visualEffects: {
+                        plateletColor: '#F1F5F9',
+                        fibrinColor: '#00E676',
+                        fibrinGlow: false,
+                        fibrinOpacity: 1.0
+                    }
                 },
                 hemophilia: {
+                    name: "Hemofilia A/B",
+                    description: "Déficit Factor VIII/IX - Las plaquetas se adhieren pero la fibrina se forma muy lentamente y es inestable",
                     plateletRatio: 0.35,
                     canStick: true,
-                    canFormFibrin: false,
-                    stickProbability: 0.95
+                    canFormFibrin: true,
+                    stickProbability: 0.95,
+                    plateletFunction: 1.0,
+                    adhesionStrength: 0.95,
+                    aggregationRate: 0.9,
+                    fibrinFormationRate: 0.15,
+                    fibrinStability: 0.3,
+                    fibrinDecayRate: 0.03,
+                    fibrinFormationDelay: 1500,
+                    bleedingTime: 30,
+                    visualEffects: {
+                        plateletColor: '#F1F5F9',
+                        fibrinColor: '#FF6B6B',
+                        fibrinGlow: false,
+                        fibrinOpacity: 0.6
+                    }
                 },
                 vwd: {
+                    name: "Enfermedad de Von Willebrand",
+                    description: "Déficit Factor vWF - Las plaquetas tienen dificultad para adherirse a la herida",
                     plateletRatio: 0.35,
-                    canStick: false,
+                    canStick: true,
                     canFormFibrin: true,
-                    stickProbability: 0.1
+                    stickProbability: 0.2,
+                    plateletFunction: 0.4,
+                    adhesionStrength: 0.25,
+                    aggregationRate: 0.3,
+                    fibrinFormationRate: 0.7,
+                    fibrinStability: 0.85,
+                    fibrinDecayRate: 0.0,
+                    fibrinFormationDelay: 0,
+                    plateletBounceFactor: 0.7,
+                    adhesionRetryChance: 0.4,
+                    bleedingTime: 15,
+                    visualEffects: {
+                        plateletColor: '#FFE5B4',
+                        fibrinColor: '#00E676',
+                        fibrinGlow: false,
+                        fibrinOpacity: 1.0
+                    }
                 },
                 thrombocytopenia: {
+                    name: "Trombocitopenia",
+                    description: "Recuento bajo de plaquetas - Pocas plaquetas disponibles para formar el coágulo",
                     plateletRatio: 0.08,
                     canStick: true,
                     canFormFibrin: true,
-                    stickProbability: 0.95
+                    stickProbability: 0.95,
+                    plateletFunction: 1.0,
+                    adhesionStrength: 0.95,
+                    aggregationRate: 0.9,
+                    fibrinFormationRate: 0.6,
+                    fibrinStability: 0.8,
+                    fibrinDecayRate: 0.0,
+                    fibrinFormationDelay: 0,
+                    spawnRateMultiplier: 0.3,
+                    bleedingTime: 20,
+                    visualEffects: {
+                        plateletColor: '#F1F5F9',
+                        fibrinColor: '#00E676',
+                        fibrinGlow: false,
+                        fibrinOpacity: 1.0
+                    }
+                },
+                hemophiliaSevere: {
+                    name: "Hemofilia Severa",
+                    description: "Déficit grave Factor VIII/IX (<1%) - Sin formación de fibrina, sangrado prolongado",
+                    plateletRatio: 0.35,
+                    canStick: true,
+                    canFormFibrin: false,
+                    stickProbability: 0.95,
+                    plateletFunction: 1.0,
+                    adhesionStrength: 0.95,
+                    aggregationRate: 0.9,
+                    fibrinFormationRate: 0.0,
+                    fibrinStability: 0.0,
+                    fibrinDecayRate: 0.2,
+                    fibrinFormationDelay: 0,
+                    bleedingTime: 60,
+                    visualEffects: {
+                        plateletColor: '#F1F5F9',
+                        fibrinColor: '#FF0000',
+                        fibrinGlow: false,
+                        fibrinOpacity: 0.3
+                    }
+                },
+                thrombasthenia: {
+                    name: "Trombastenia de Glanzmann",
+                    description: "Déficit glicoproteína IIb/IIIa - Las plaquetas se adhieren pero no se agregan entre sí",
+                    plateletRatio: 0.35,
+                    canStick: true,
+                    canFormFibrin: true,
+                    stickProbability: 0.9,
+                    plateletFunction: 0.2,
+                    adhesionStrength: 0.85,
+                    aggregationRate: 0.1,
+                    fibrinFormationRate: 0.4,
+                    fibrinStability: 0.6,
+                    fibrinDecayRate: 0.01,
+                    fibrinFormationDelay: 500,
+                    maxPlateletClusterSize: 2,
+                    bleedingTime: 25,
+                    visualEffects: {
+                        plateletColor: '#FFB6C1',
+                        fibrinColor: '#FFA500',
+                        fibrinGlow: false,
+                        fibrinOpacity: 0.8
+                    }
+                },
+                factorDeficiency: {
+                    name: "Déficit Factor VII",
+                    description: "Déficit Factor VII - Vía extrínseca defectuosa, formación de fibrina reducida",
+                    plateletRatio: 0.35,
+                    canStick: true,
+                    canFormFibrin: true,
+                    stickProbability: 0.95,
+                    plateletFunction: 1.0,
+                    adhesionStrength: 0.95,
+                    aggregationRate: 0.9,
+                    fibrinFormationRate: 0.5,
+                    fibrinStability: 0.75,
+                    fibrinDecayRate: 0.01,
+                    fibrinFormationDelay: 1000,
+                    bleedingTime: 12,
+                    visualEffects: {
+                        plateletColor: '#F1F5F9',
+                        fibrinColor: '#FFD700',
+                        fibrinGlow: false,
+                        fibrinOpacity: 0.9
+                    }
+                },
+                anticoagulated: {
+                    name: "Anticoagulado (Warfarina)",
+                    description: "Anticoagulación oral - Factores dependientes de vitamina K reducidos, fibrina inestable",
+                    plateletRatio: 0.35,
+                    canStick: true,
+                    canFormFibrin: true,
+                    stickProbability: 0.95,
+                    plateletFunction: 1.0,
+                    adhesionStrength: 0.95,
+                    aggregationRate: 0.9,
+                    fibrinFormationRate: 0.4,
+                    fibrinStability: 0.5,
+                    fibrinDecayRate: 0.05,
+                    fibrinFormationDelay: 800,
+                    bleedingTime: 8,
+                    visualEffects: {
+                        plateletColor: '#F1F5F9',
+                        fibrinColor: '#FF6347',
+                        fibrinGlow: false,
+                        fibrinOpacity: 0.7
+                    }
                 }
             }
         };
@@ -634,12 +846,20 @@
             hemostasisAchieved: false,
             stuckPlatelets: [],
             fibrinConstraints: [],
+            fibrinBodies: [], // Physical bodies for fibrin network
             allBodies: [],
             showOintment: false
         };
 
-        // Spawn interval reference for cleanup
+        // Spawn timing for fixed interval
         let spawnInterval = null;
+        let lastSpawnTime = 0;
+        const SPAWN_INTERVAL_MS = 100; // Fixed spawn interval in milliseconds
+        
+        // Performance optimization: frame counters for throttling
+        let frameCount = 0;
+        const CLEANUP_INTERVAL = 10; // Cleanup every 10 frames
+        const UI_UPDATE_INTERVAL = 5; // Update UI every 5 frames
 
         // Matter.js Setup
         let engine, render, runner;
@@ -647,9 +867,10 @@
         function initSimulation() {
             // Clear spawn interval
             if (spawnInterval) {
-                clearInterval(spawnInterval);
+                cancelAnimationFrame(spawnInterval);
                 spawnInterval = null;
             }
+            lastSpawnTime = 0;
 
             // Reset state
             state = {
@@ -660,18 +881,32 @@
                 hemostasisAchieved: false,
                 stuckPlatelets: [],
                 fibrinConstraints: [],
+                fibrinBodies: [],
                 allBodies: [],
                 showOintment: false
             };
 
+            // Stop FPS counter
+            stopFPSCounter();
+            
             // Clear previous engine events
             if (engine) {
-                Events.off(engine);
+                Events.off(engine, 'beforeUpdate');
+                Events.off(engine, 'afterUpdate');
+                Events.off(engine, 'collisionStart');
+                // Remove anchor platelets before clearing world
+                if (state.stuckPlatelets) {
+                    state.stuckPlatelets.forEach(plateletData => {
+                        if (plateletData.isAnchor && plateletData.body) {
+                            Composite.remove(engine.world, plateletData.body);
+                        }
+                    });
+                }
                 Composite.clear(engine.world);
                 Engine.clear(engine);
             }
             if (render) {
-                Events.off(render);
+                Events.off(render, 'afterRender');
                 Render.stop(render);
             }
             if (runner) {
@@ -717,8 +952,11 @@
             // Create vessel walls
             createVesselWalls();
 
-            // Start engine and renderer
-            runner = Runner.create();
+            // Start engine and renderer with fixed timestep
+            runner = Runner.create({
+                delta: 1000 / 60, // Fixed timestep: 60 FPS equivalent
+                isFixed: true
+            });
             Runner.run(runner, engine);
             Render.run(render);
 
@@ -728,15 +966,116 @@
             // Start particle spawning
             startParticleSpawning();
 
+            // Reset frame counter
+            frameCount = 0;
+            
             // Update loop for forces
-            Events.on(engine, 'beforeUpdate', applyForces);
-            Events.on(engine, 'afterUpdate', cleanupParticles);
+            Events.on(engine, 'beforeUpdate', () => {
+                frameCount++;
+                applyForces();
+                
+                // Update fibrin barrier positions to follow platelets (every 3 frames for performance)
+                if (frameCount % 3 === 0 && state.fibrinConstraints.length > 0) {
+                    state.fibrinConstraints.forEach(fibrin => {
+                        if (fibrin.body && fibrin.pointA && fibrin.pointB) {
+                            const midX = (fibrin.pointA.position.x + fibrin.pointB.position.x) / 2;
+                            const midY = (fibrin.pointA.position.y + fibrin.pointB.position.y) / 2;
+                            const dist = Vector.magnitude(Vector.sub(fibrin.pointB.position, fibrin.pointA.position));
+                            const angle = Math.atan2(
+                                fibrin.pointB.position.y - fibrin.pointA.position.y,
+                                fibrin.pointB.position.x - fibrin.pointA.position.x
+                            );
+                            
+                            Body.setPosition(fibrin.body, { x: midX, y: midY });
+                            Body.setAngle(fibrin.body, angle);
+                            // Update width to match distance
+                            const currentWidth = fibrin.body.bounds.max.x - fibrin.body.bounds.min.x;
+                            if (Math.abs(currentWidth - dist) > 1) {
+                                Body.scale(fibrin.body, dist / currentWidth, 1);
+                            }
+                        }
+                    });
+                }
+                
+                // Throttle expensive operations
+                if (frameCount % CLEANUP_INTERVAL === 0) {
+                    cleanupParticles();
+                }
+                if (frameCount % UI_UPDATE_INTERVAL === 0) {
+                    calculateClotPercentage();
+                    updateUI();
+                }
+            });
 
             // Custom render for fibrin
             Events.on(render, 'afterRender', renderFibrin);
+            
+            // Start FPS counter
+            startFPSCounter();
 
             // Update UI
             updateUI();
+        }
+        
+        // FPS Counter variables
+        let fpsValue = 0;
+        let fpsLastTime = performance.now();
+        let fpsFrameCount = 0;
+        let fpsUpdateInterval = 0;
+        let fpsAnimationFrame = null;
+        
+        function startFPSCounter() {
+            // Cancel any existing FPS counter loop
+            if (fpsAnimationFrame !== null) {
+                cancelAnimationFrame(fpsAnimationFrame);
+                fpsAnimationFrame = null;
+            }
+            
+            fpsValue = 0;
+            fpsLastTime = performance.now();
+            fpsFrameCount = 0;
+            fpsUpdateInterval = 0;
+            updateFPS();
+        }
+        
+        function stopFPSCounter() {
+            if (fpsAnimationFrame !== null) {
+                cancelAnimationFrame(fpsAnimationFrame);
+                fpsAnimationFrame = null;
+            }
+        }
+        
+        function updateFPS() {
+            fpsAnimationFrame = requestAnimationFrame(() => {
+                const currentTime = performance.now();
+                fpsFrameCount++;
+                fpsUpdateInterval += currentTime - fpsLastTime;
+                fpsLastTime = currentTime;
+                
+                // Update FPS display every 500ms
+                if (fpsUpdateInterval >= 500) {
+                    fpsValue = Math.round((fpsFrameCount * 1000) / fpsUpdateInterval);
+                    fpsFrameCount = 0;
+                    fpsUpdateInterval = 0;
+                    
+                    const fpsElement = document.getElementById('fps-counter');
+                    if (fpsElement) {
+                        fpsElement.textContent = `FPS: ${fpsValue}`;
+                        
+                        // Color coding based on FPS
+                        fpsElement.classList.remove('good', 'medium', 'low');
+                        if (fpsValue >= 55) {
+                            fpsElement.classList.add('good');
+                        } else if (fpsValue >= 30) {
+                            fpsElement.classList.add('medium');
+                        } else {
+                            fpsElement.classList.add('low');
+                        }
+                    }
+                }
+                
+                updateFPS();
+            });
         }
 
         function createVesselWalls() {
@@ -745,46 +1084,136 @@
             const woundX = CONFIG.wound.x;
             const woundWidth = CONFIG.wound.width;
 
-            // Bottom wall (solid)
+            // Bottom wall (solid) - with bounce and collision filter
             const bottomWall = Bodies.rectangle(width / 2, height - thickness / 2, width, thickness, {
                 isStatic: true,
                 render: { fillStyle: color },
-                label: 'wall'
+                label: 'wall',
+                restitution: 0.8, // Higher restitution for stronger bounce
+                friction: 0.1,
+                collisionFilter: {
+                    category: 0x0004, // Wall category
+                    mask: 0xFFFFFFFF // Collide with everything
+                }
             });
 
-            // Top wall - Left segment
+            // Top wall - Left segment - with bounce and collision filter
             const leftWallWidth = woundX - woundWidth / 2;
             const topWallLeft = Bodies.rectangle(leftWallWidth / 2, thickness / 2, leftWallWidth, thickness, {
                 isStatic: true,
                 render: { fillStyle: color },
-                label: 'wall'
+                label: 'wall',
+                restitution: 0.8, // Higher restitution for stronger bounce
+                friction: 0.1,
+                collisionFilter: {
+                    category: 0x0004, // Wall category
+                    mask: 0xFFFFFFFF // Collide with everything
+                }
             });
 
-            // Top wall - Right segment
+            // Top wall - Right segment - with bounce and collision filter
             const rightWallStart = woundX + woundWidth / 2;
             const rightWallWidth = width - rightWallStart;
             const topWallRight = Bodies.rectangle(rightWallStart + rightWallWidth / 2, thickness / 2, rightWallWidth, thickness, {
                 isStatic: true,
                 render: { fillStyle: color },
-                label: 'wall'
+                label: 'wall',
+                restitution: 0.8, // Higher restitution for stronger bounce
+                friction: 0.1,
+                collisionFilter: {
+                    category: 0x0004, // Wall category
+                    mask: 0xFFFFFFFF // Collide with everything
+                }
             });
 
             // Wound edge markers (left and right edges of wound)
-            const woundEdgeLeft = Bodies.rectangle(woundX - woundWidth / 2, thickness / 2, 4, thickness + 10, {
+            const woundEdgeLeft = Bodies.rectangle(woundX - woundWidth / 2, thickness / 2, 6, thickness + 10, {
                 isStatic: true,
                 render: { fillStyle: '#F87171' },
                 label: 'woundEdge',
-                isSensor: false
+                isSensor: false,
+                restitution: 0.8, // Higher restitution for stronger bounce
+                friction: 0.1,
+                collisionFilter: {
+                    category: 0x0004, // Wall category
+                    mask: 0xFFFFFFFF // Collide with everything
+                }
             });
 
-            const woundEdgeRight = Bodies.rectangle(woundX + woundWidth / 2, thickness / 2, 4, thickness + 10, {
+            const woundEdgeRight = Bodies.rectangle(woundX + woundWidth / 2, thickness / 2, 6, thickness + 10, {
                 isStatic: true,
                 render: { fillStyle: '#F87171' },
                 label: 'woundEdge',
-                isSensor: false
+                isSensor: false,
+                restitution: 0.8, // Higher restitution for stronger bounce
+                friction: 0.1,
+                collisionFilter: {
+                    category: 0x0004, // Wall category
+                    mask: 0xFFFFFFFF // Collide with everything
+                }
             });
 
             Composite.add(engine.world, [bottomWall, topWallLeft, topWallRight, woundEdgeLeft, woundEdgeRight]);
+            
+            // Create invisible anchor platelets on each side of the wound
+            createInvisibleAnchorPlatelets(woundX, woundWidth, thickness);
+        }
+        
+        function createInvisibleAnchorPlatelets(woundX, woundWidth, wallThickness) {
+            const adhesionLineY = 18; // Same Y position as the adhesion line
+            const woundLeft = woundX - woundWidth / 2;
+            const woundRight = woundX + woundWidth / 2;
+            
+            // Left anchor platelet - positioned just outside the left edge of the wound
+            const leftAnchorX = woundLeft - 15;
+            const leftAnchor = Bodies.circle(leftAnchorX, adhesionLineY + 6, 4, {
+                isStatic: true,
+                render: { fillStyle: 'transparent', visible: false },
+                label: 'platelet',
+                isStuck: true,
+                isAnchor: true // Mark as anchor platelet
+            });
+            
+            // Right anchor platelet - positioned just outside the right edge of the wound
+            const rightAnchorX = woundRight + 15;
+            const rightAnchor = Bodies.circle(rightAnchorX, adhesionLineY + 6, 4, {
+                isStatic: true,
+                render: { fillStyle: 'transparent', visible: false },
+                label: 'platelet',
+                isStuck: true,
+                isAnchor: true // Mark as anchor platelet
+            });
+            
+            Composite.add(engine.world, [leftAnchor, rightAnchor]);
+            
+            // Add to stuck platelets list so they can form fibrin connections
+            const leftAnchorData = {
+                body: leftAnchor,
+                constraint: null,
+                hasFibrin: false,
+                fibrinConnections: [],
+                isAnchor: true
+            };
+            
+            const rightAnchorData = {
+                body: rightAnchor,
+                constraint: null,
+                hasFibrin: false,
+                fibrinConnections: [],
+                isAnchor: true
+            };
+            
+            state.stuckPlatelets.push(leftAnchorData, rightAnchorData);
+            
+            // Try to form fibrin connections from anchor platelets after a delay
+            setTimeout(() => {
+                if (state.stuckPlatelets.includes(leftAnchorData)) {
+                    tryFormFibrin(leftAnchorData);
+                }
+                if (state.stuckPlatelets.includes(rightAnchorData)) {
+                    tryFormFibrin(rightAnchorData);
+                }
+            }, 200);
         }
 
         function createParticle(type) {
@@ -798,12 +1227,17 @@
                     body = Bodies.circle(x, y, 4, {
                         render: { fillStyle: '#F1F5F9' },
                         label: 'platelet',
-                        restitution: 0.3,
+                        restitution: 0.5, // Increased for better wall bounce
                         friction: 0.1,
                         frictionAir: 0.02,
                         density: 0.001,
                         isSticky: true,
-                        isStuck: false
+                        isStuck: false,
+                        collisionFilter: {
+                            group: 0,
+                            category: 0x0001,
+                            mask: 0x0002 | 0x0004 // Collide with fibrin barriers and walls
+                        }
                     });
                     break;
 
@@ -811,10 +1245,15 @@
                     body = Bodies.circle(x, y, 6, {
                         render: { fillStyle: '#EF4444' },
                         label: 'rbc',
-                        restitution: 0.5,
+                        restitution: 0.8, // Higher restitution for better bounce
                         friction: 0.05,
                         frictionAir: 0.01,
-                        density: 0.0008
+                        density: 0.0008,
+                        collisionFilter: {
+                            group: 0,
+                            category: 0x0001, // RBC category
+                            mask: 0x0002 | 0x0004 // Collide with fibrin barriers and walls
+                        }
                     });
                     break;
 
@@ -822,10 +1261,15 @@
                     body = Bodies.circle(x, y, 10, {
                         render: { fillStyle: '#E3F2FD' },
                         label: 'wbc',
-                        restitution: 0.3,
+                        restitution: 0.7, // Higher restitution for better bounce
                         friction: 0.1,
                         frictionAir: 0.03,
-                        density: 0.002
+                        density: 0.002,
+                        collisionFilter: {
+                            group: 0,
+                            category: 0x0001, // WBC category
+                            mask: 0x0002 | 0x0004 // Collide with fibrin barriers and walls
+                        }
                     });
                     break;
             }
@@ -839,24 +1283,49 @@
         }
 
         function startParticleSpawning() {
-            spawnInterval = setInterval(() => {
-                if (state.allBodies.length >= CONFIG.particles.maxCount) return;
-
-                const conditionConfig = CONFIG.conditions[state.condition];
-                const plateletRatio = conditionConfig.plateletRatio;
-
-                for (let i = 0; i < CONFIG.particles.spawnRate; i++) {
-                    const rand = Math.random();
+            // Clear any existing interval
+            if (spawnInterval) {
+                cancelAnimationFrame(spawnInterval);
+            }
+            
+            lastSpawnTime = performance.now();
+            
+            // Use requestAnimationFrame with time-based spawning for consistent rate
+            function spawnLoop(currentTime) {
+                if (state.allBodies.length < CONFIG.particles.maxCount) {
+                    const elapsed = currentTime - lastSpawnTime;
                     
-                    if (rand < plateletRatio) {
-                        createParticle('platelet');
-                    } else if (rand < plateletRatio + CONFIG.particles.rbcRatio) {
-                        createParticle('rbc');
-                    } else {
-                        createParticle('wbc');
+                    // Spawn particles at fixed interval regardless of FPS
+                    if (elapsed >= SPAWN_INTERVAL_MS) {
+                        const conditionConfig = CONFIG.conditions[state.condition];
+                        const plateletRatio = conditionConfig.plateletRatio;
+                        
+                        // Apply spawn rate multiplier for conditions like thrombocytopenia
+                        const spawnMultiplier = conditionConfig.spawnRateMultiplier || 1.0;
+                        const spawnCount = Math.max(1, Math.floor(CONFIG.particles.spawnRate * spawnMultiplier));
+
+                        for (let i = 0; i < spawnCount; i++) {
+                            if (state.allBodies.length >= CONFIG.particles.maxCount) break;
+                            
+                            const rand = Math.random();
+                            
+                            if (rand < plateletRatio) {
+                                createParticle('platelet');
+                            } else if (rand < plateletRatio + CONFIG.particles.rbcRatio) {
+                                createParticle('rbc');
+                            } else {
+                                createParticle('wbc');
+                            }
+                        }
+                        
+                        lastSpawnTime = currentTime;
                     }
                 }
-            }, 100);
+                
+                spawnInterval = requestAnimationFrame(spawnLoop);
+            }
+            
+            spawnInterval = requestAnimationFrame(spawnLoop);
         }
 
         function applyForces() {
@@ -870,7 +1339,46 @@
             const adhesionLineThreshold = 14; // How close to trigger adhesion check
 
             state.allBodies.forEach(body => {
-                if (body.isStuck) return;
+                // Skip stuck platelets and static bodies
+                if (body.isStuck || body.isStatic) return;
+
+                // Prevent particles from passing through walls by checking bounds
+                const { width, height } = CONFIG.canvas;
+                const wallThickness = CONFIG.wall.thickness;
+                const particleRadius = body.circleRadius || (body.label === 'rbc' ? 6 : body.label === 'wbc' ? 10 : 4);
+                
+                // Check bottom wall
+                if (body.position.y > height - wallThickness - particleRadius) {
+                    Body.setPosition(body, {
+                        x: body.position.x,
+                        y: height - wallThickness - particleRadius - 0.1
+                    });
+                    Body.setVelocity(body, {
+                        x: body.velocity.x,
+                        y: Math.min(0, body.velocity.y * -0.8) // Bounce up
+                    });
+                }
+                
+                // Check top walls (left and right segments)
+                const woundX = CONFIG.wound.x;
+                const woundWidth = CONFIG.wound.width;
+                const woundLeft = woundX - woundWidth / 2;
+                const woundRight = woundX + woundWidth / 2;
+                
+                if (body.position.y < wallThickness + particleRadius) {
+                    // Check if particle is in wound area
+                    if (body.position.x < woundLeft || body.position.x > woundRight) {
+                        // Outside wound - push back from top wall
+                        Body.setPosition(body, {
+                            x: body.position.x,
+                            y: wallThickness + particleRadius + 0.1
+                        });
+                        Body.setVelocity(body, {
+                            x: body.velocity.x,
+                            y: Math.max(0, body.velocity.y * -0.8) // Bounce down
+                        });
+                    }
+                }
 
                 // Laminar flow force (right)
                 Body.applyForce(body, body.position, {
@@ -892,6 +1400,92 @@
                     }
                 }
 
+                // FIBRIN NET BOUNCE - Make RBCs and WBCs bounce off fibrin network
+                if ((body.label === 'rbc' || body.label === 'wbc') && state.fibrinConstraints.length > 0) {
+                    const cellRadius = body.label === 'rbc' ? 6 : 10;
+                    const bounceThreshold = cellRadius + 6; // Increased detection threshold
+                    const bounceStrength = body.label === 'rbc' ? 0.008 : 0.012; // Much stronger bounce force
+                    const cellPos = body.position;
+                    
+                    // Only check fibrin near the wound area for performance
+                    const woundLeft = CONFIG.wound.x - CONFIG.wound.width / 2 - 30;
+                    const woundRight = CONFIG.wound.x + CONFIG.wound.width / 2 + 30;
+                    
+                    if (cellPos.x >= woundLeft && cellPos.x <= woundRight && cellPos.y < 120) {
+                        for (let i = 0; i < state.fibrinConstraints.length; i++) {
+                            const fibrin = state.fibrinConstraints[i];
+                            const pointA = fibrin.pointA.position;
+                            const pointB = fibrin.pointB.position;
+                            
+                            if (!pointA || !pointB) continue;
+                            
+                            // Quick bounds check - skip if fibrin line is far from cell
+                            const minX = Math.min(pointA.x, pointB.x);
+                            const maxX = Math.max(pointA.x, pointB.x);
+                            const minY = Math.min(pointA.y, pointB.y);
+                            const maxY = Math.max(pointA.y, pointB.y);
+                            
+                            if (cellPos.x < minX - bounceThreshold || cellPos.x > maxX + bounceThreshold ||
+                                cellPos.y < minY - bounceThreshold || cellPos.y > maxY + bounceThreshold) {
+                                continue;
+                            }
+                            
+                            // Calculate distance from cell to fibrin line segment
+                            const lineVec = Vector.sub(pointB, pointA);
+                            const lineLength = Vector.magnitude(lineVec);
+                            
+                            if (lineLength < 0.1) continue; // Skip very short lines
+                            
+                            const toCell = Vector.sub(cellPos, pointA);
+                            const lineLengthSq = lineLength * lineLength;
+                            const t = Math.max(0, Math.min(1, Vector.dot(toCell, lineVec) / lineLengthSq));
+                            const closestPoint = Vector.add(pointA, Vector.mult(lineVec, t));
+                            const distVec = Vector.sub(cellPos, closestPoint);
+                            const distance = Vector.magnitude(distVec);
+                            const bounceThresholdSq = bounceThreshold * bounceThreshold;
+                            const distanceSq = distance * distance;
+                            
+                            // If cell is close to fibrin line, apply strong bounce force
+                            if (distanceSq < bounceThresholdSq && distance > 0.1) {
+                                // Normalize distance vector to get bounce direction
+                                const bounceDir = {
+                                    x: distVec.x / distance,
+                                    y: distVec.y / distance
+                                };
+                                
+                                // Calculate velocity component towards the line
+                                const velocityDot = body.velocity.x * bounceDir.x + body.velocity.y * bounceDir.y;
+                                
+                                // Only apply bounce if moving towards the line
+                                if (velocityDot < 0) {
+                                    // Strong bounce force - much stronger when very close
+                                    const proximityFactor = 1 - (distance / bounceThreshold);
+                                    const bounceForce = bounceStrength * proximityFactor * proximityFactor; // Quadratic for stronger effect
+                                    
+                                    Body.applyForce(body, body.position, {
+                                        x: bounceDir.x * bounceForce * body.mass * 10,
+                                        y: bounceDir.y * bounceForce * body.mass * 10
+                                    });
+                                    
+                                    // Invert velocity component towards the line (strong bounce)
+                                    const bounceFactor = 0.8 + (proximityFactor * 0.2); // 0.8 to 1.0
+                                    Body.setVelocity(body, {
+                                        x: body.velocity.x - bounceDir.x * velocityDot * bounceFactor,
+                                        y: body.velocity.y - bounceDir.y * velocityDot * bounceFactor
+                                    });
+                                    
+                                    // Push cell away from the line
+                                    const pushDistance = (bounceThreshold - distance) * 0.3;
+                                    Body.setPosition(body, {
+                                        x: body.position.x + bounceDir.x * pushDistance,
+                                        y: body.position.y + bounceDir.y * pushDistance
+                                    });
+                                }
+                            }
+                        }
+                    }
+                }
+
                 // INVISIBLE ADHESION LINE - Check if platelet crosses the invisible line
                 if (body.label === 'platelet' && !body.isStuck) {
                     const inWoundZone = body.position.x > woundLeft && body.position.x < woundRight;
@@ -902,14 +1496,38 @@
                         const canStick = state.treatmentApplied ? true : conditionConfig.canStick;
                         const stickProb = state.treatmentApplied ? 0.85 : conditionConfig.stickProbability * 0.4;
 
-                        if (canStick && Math.random() < stickProb) {
-                            // Stick to the invisible line
-                            stickPlateletToLine(body, adhesionLineY);
-                        } else if (state.condition === 'vwd' && !state.treatmentApplied) {
-                            // von Willebrand - platelet bounces off
+                        // Check platelet function first
+                        if (!state.treatmentApplied && Math.random() > conditionConfig.plateletFunction) {
+                            // Platelet dysfunction - bounce off
+                            const bounceFactor = conditionConfig.plateletBounceFactor || 0.7;
                             body.restitution = 0.9;
                             Body.setVelocity(body, {
-                                x: body.velocity.x * 0.5,
+                                x: body.velocity.x * bounceFactor,
+                                y: Math.abs(body.velocity.y) * 1.5 + 1
+                            });
+                            return;
+                        }
+                        
+                        const adhesionStrength = state.treatmentApplied ? 0.85 : conditionConfig.adhesionStrength * 0.4;
+                        
+                        if (canStick && Math.random() < adhesionStrength) {
+                            // Stick to the invisible line
+                            stickPlateletToLine(body, adhesionLineY, conditionConfig);
+                        } else if (!state.treatmentApplied && conditionConfig.adhesionRetryChance) {
+                            // Retry adhesion chance
+                            setTimeout(() => {
+                                if (!body.isStuck && Math.random() < conditionConfig.adhesionRetryChance) {
+                                    if (canStick && Math.random() < adhesionStrength) {
+                                        stickPlateletToLine(body, adhesionLineY, conditionConfig);
+                                    }
+                                }
+                            }, 100);
+                        } else {
+                            // Platelet bounces off
+                            const bounceFactor = conditionConfig.plateletBounceFactor || 0.7;
+                            body.restitution = 0.9;
+                            Body.setVelocity(body, {
+                                x: body.velocity.x * bounceFactor,
                                 y: Math.abs(body.velocity.y) * 1.5 + 1
                             });
                         }
@@ -917,12 +1535,14 @@
                 }
             });
 
-            // For hemophilia - apply extra force to dislodge weakly attached platelets
-            if (state.condition === 'hemophilia' && !state.treatmentApplied) {
+            // For hemophilia and conditions with unstable fibrin - apply extra force to dislodge weakly attached platelets
+            const conditionConfig = CONFIG.conditions[state.condition];
+            if ((state.condition === 'hemophilia' || state.condition === 'hemophiliaSevere' || 
+                 conditionConfig.fibrinStability < 0.5) && !state.treatmentApplied) {
                 state.stuckPlatelets.forEach(platelet => {
-                    if (!platelet.hasFibrin) {
-                        // Gradually increase dislodge force
-                        const dislodgeForce = 0.00015;
+                    if (!platelet.hasFibrin || platelet.fibrinConnections.length === 0) {
+                        // Gradually increase dislodge force for platelets without fibrin support
+                        const dislodgeForce = 0.00015 * (1 - conditionConfig.fibrinStability);
                         Body.applyForce(platelet.body, platelet.body.position, {
                             x: 0,
                             y: -dislodgeForce * platelet.body.mass * (1 + Math.random())
@@ -932,23 +1552,29 @@
             }
         }
 
-        function stickPlateletToLine(platelet, lineY) {
+        function stickPlateletToLine(platelet, lineY, conditionConfig) {
             if (platelet.isStuck) return;
             
             platelet.isStuck = true;
-            platelet.render.fillStyle = '#E2E8F0';
+            
+            // Apply visual effects based on condition
+            const visualEffects = conditionConfig.visualEffects || CONFIG.conditions.normal.visualEffects;
+            platelet.render.fillStyle = visualEffects.plateletColor || '#E2E8F0';
             
             // Stop movement and position at the line
             Body.setVelocity(platelet, { x: 0, y: 0 });
             const stickY = lineY + 6;
             Body.setPosition(platelet, { x: platelet.position.x, y: stickY });
             
-            // Create constraint to the line (static point)
+            // Make platelet completely static so it doesn't move
+            Body.setStatic(platelet, true);
+            
+            // Create constraint to the line (static point) - maximum stiffness
             const constraint = Constraint.create({
                 bodyA: platelet,
                 pointB: { x: platelet.position.x, y: stickY },
-                stiffness: 0.95,
-                damping: 0.6,
+                stiffness: 1.0, // Maximum stiffness
+                damping: 1.0, // Maximum damping
                 length: 0,
                 render: { visible: false }
             });
@@ -959,46 +1585,93 @@
                 body: platelet,
                 constraint: constraint,
                 hasFibrin: false,
-                fibrinConnections: []
+                fibrinConnections: [],
+                condition: state.condition
             };
 
             state.stuckPlatelets.push(plateletData);
 
-            // Try to form fibrin after a short delay
+            // Try to form fibrin after delay if specified
+            const delay = conditionConfig.fibrinFormationDelay || 150;
             setTimeout(() => {
                 if (state.stuckPlatelets.includes(plateletData)) {
                     tryFormFibrin(plateletData);
+                    
+                    // Also try to form fibrin from nearby anchor platelets
+                    state.stuckPlatelets.forEach(other => {
+                        if (other.isAnchor && other.body) {
+                            const dist = Vector.magnitude(Vector.sub(plateletData.body.position, other.body.position));
+                            if (dist < 80) {
+                                tryFormFibrin(other);
+                            }
+                        }
+                    });
                 }
-            }, 150);
+            }, delay);
         }
 
         function cleanupParticles() {
             const toRemove = [];
+            const woundX = CONFIG.wound.x;
+            const woundWidth = CONFIG.wound.width;
+            const woundLeft = woundX - woundWidth / 2;
+            const woundRight = woundX + woundWidth / 2;
 
-            state.allBodies.forEach(body => {
+            // Optimized cleanup: iterate backwards for better performance when removing
+            for (let i = state.allBodies.length - 1; i >= 0; i--) {
+                const body = state.allBodies[i];
+                const px = body.position.x;
+                const py = body.position.y;
+                
                 // Remove particles that exit right or top (blood loss)
-                if (body.position.x > CONFIG.canvas.width + 20 || body.position.y < -30) {
+                if (px > CONFIG.canvas.width + 20 || py < -30) {
                     toRemove.push(body);
-                    
-                    // Count blood loss (only for particles exiting through wound)
-                    if (body.position.y < -30) {
-                        state.bloodLoss++;
-                    }
+                    if (py < -30) state.bloodLoss++;
+                }
+                // Remove particles that exit through the wound (upward)
+                else if (py < 10 && px >= woundLeft - 5 && px <= woundRight + 5) {
+                    toRemove.push(body);
+                    state.bloodLoss++;
                 }
                 // Remove particles way off screen
-                if (body.position.y > CONFIG.canvas.height + 50 || body.position.x < -100) {
+                else if (py > CONFIG.canvas.height + 50 || px < -100) {
                     toRemove.push(body);
                 }
-            });
+            }
 
+            // Optimized removal: use Map for faster lookups
+            const bodySet = new Set(toRemove);
+            
             toRemove.forEach(body => {
+                // Remove associated constraints if it's a stuck platelet
+                const plateletIndex = state.stuckPlatelets.findIndex(p => p.body === body);
+                if (plateletIndex !== -1) {
+                    const plateletData = state.stuckPlatelets[plateletIndex];
+                    
+                    // Remove fibrin constraints connected to this platelet (iterate backwards)
+                    for (let i = state.fibrinConstraints.length - 1; i >= 0; i--) {
+                        const fibrin = state.fibrinConstraints[i];
+                        if (fibrin.pointA === body || fibrin.pointB === body) {
+                            removeFibrinConnection(fibrin);
+                        }
+                    }
+                    
+                    // Remove platelet constraint
+                    if (plateletData.constraint) {
+                        Composite.remove(engine.world, plateletData.constraint);
+                    }
+                    
+                    // Remove from stuck platelets list (but not anchor platelets)
+                    if (!plateletData.isAnchor) {
+                        state.stuckPlatelets.splice(plateletIndex, 1);
+                    }
+                }
+                
                 Composite.remove(engine.world, body);
-                state.allBodies = state.allBodies.filter(b => b !== body);
-                state.stuckPlatelets = state.stuckPlatelets.filter(p => p.body !== body);
             });
-
-            calculateClotPercentage();
-            updateUI();
+            
+            // Remove from allBodies array (more efficient)
+            state.allBodies = state.allBodies.filter(b => !bodySet.has(b));
         }
 
         function setupCollisionEvents() {
@@ -1017,8 +1690,21 @@
             if (platelet.label !== 'platelet' || platelet.isStuck) return;
 
             const conditionConfig = CONFIG.conditions[state.condition];
+            
+            // Check platelet function first
+            if (!state.treatmentApplied && Math.random() > conditionConfig.plateletFunction) {
+                // Platelet dysfunction - bounce off
+                const bounceFactor = conditionConfig.plateletBounceFactor || 0.7;
+                platelet.restitution = 0.9;
+                Body.setVelocity(platelet, {
+                    x: platelet.velocity.x * bounceFactor,
+                    y: Math.abs(platelet.velocity.y) * 1.5 + 2
+                });
+                return;
+            }
+
             const canStick = state.treatmentApplied ? true : conditionConfig.canStick;
-            const stickProb = state.treatmentApplied ? 0.95 : conditionConfig.stickProbability;
+            const adhesionStrength = state.treatmentApplied ? 0.95 : conditionConfig.adhesionStrength;
 
             // Check if collision is with wound edge or stuck platelet
             const isWoundEdge = other.label === 'woundEdge';
@@ -1030,13 +1716,37 @@
                 const woundRight = CONFIG.wound.x + CONFIG.wound.width / 2;
                 
                 if (platelet.position.x >= woundLeft - 20 && platelet.position.x <= woundRight + 20 && platelet.position.y < 45) {
-                    if (canStick && Math.random() < stickProb) {
-                        stickPlatelet(platelet, other);
-                    } else if (state.condition === 'vwd' && !state.treatmentApplied) {
-                        // von Willebrand - platelet bounces off
+                    // Check aggregation rate for platelet-to-platelet adhesion
+                    if (isStuckPlatelet) {
+                        const aggregationRate = state.treatmentApplied ? 0.9 : conditionConfig.aggregationRate;
+                        if (Math.random() > aggregationRate) {
+                            // Failed aggregation
+                            platelet.restitution = 0.9;
+                            Body.setVelocity(platelet, {
+                                x: platelet.velocity.x * 0.8,
+                                y: Math.abs(platelet.velocity.y) * 1.2 + 1
+                            });
+                            return;
+                        }
+                    }
+                    
+                    if (canStick && Math.random() < adhesionStrength) {
+                        stickPlatelet(platelet, other, conditionConfig);
+                    } else if (!state.treatmentApplied && conditionConfig.adhesionRetryChance) {
+                        // Retry adhesion chance
+                        setTimeout(() => {
+                            if (!platelet.isStuck && Math.random() < conditionConfig.adhesionRetryChance) {
+                                if (canStick && Math.random() < adhesionStrength) {
+                                    stickPlatelet(platelet, other, conditionConfig);
+                                }
+                            }
+                        }, 100);
+                    } else {
+                        // Platelet bounces off
+                        const bounceFactor = conditionConfig.plateletBounceFactor || 0.7;
                         platelet.restitution = 0.9;
                         Body.setVelocity(platelet, {
-                            x: platelet.velocity.x,
+                            x: platelet.velocity.x * bounceFactor,
                             y: Math.abs(platelet.velocity.y) * 2 + 2
                         });
                     }
@@ -1044,20 +1754,28 @@
             }
         }
 
-        function stickPlatelet(platelet, anchor) {
-            platelet.isStuck = true;
-            platelet.render.fillStyle = '#E2E8F0';
+        function stickPlatelet(platelet, anchor, conditionConfig) {
+            if (platelet.isStuck) return;
             
-            // Slow down and "stick"
+            platelet.isStuck = true;
+            
+            // Apply visual effects based on condition
+            const visualEffects = conditionConfig.visualEffects || CONFIG.conditions.normal.visualEffects;
+            platelet.render.fillStyle = visualEffects.plateletColor || '#E2E8F0';
+            
+            // Stop movement completely
             Body.setVelocity(platelet, { x: 0, y: 0 });
             
-            // Create constraint to anchor point
+            // Make platelet completely static so it doesn't move
+            Body.setStatic(platelet, true);
+            
+            // Create constraint to anchor point - maximum stiffness
             const constraint = Constraint.create({
                 bodyA: platelet,
                 pointB: anchor.isStatic ? { x: anchor.position.x, y: anchor.position.y } : null,
                 bodyB: anchor.isStatic ? null : anchor,
-                stiffness: 0.8,
-                damping: 0.5,
+                stiffness: 1.0, // Maximum stiffness
+                damping: 1.0, // Maximum damping
                 length: 0,
                 render: { visible: false }
             });
@@ -1068,15 +1786,19 @@
                 body: platelet,
                 constraint: constraint,
                 hasFibrin: false,
-                fibrinConnections: []
+                fibrinConnections: [],
+                condition: state.condition
             };
 
             state.stuckPlatelets.push(plateletData);
 
-            // Try to form fibrin
+            // Try to form fibrin with delay if specified
+            const delay = conditionConfig.fibrinFormationDelay || 100;
             setTimeout(() => {
-                tryFormFibrin(plateletData);
-            }, 100);
+                if (state.stuckPlatelets.includes(plateletData)) {
+                    tryFormFibrin(plateletData);
+                }
+            }, delay);
         }
 
         function tryFormFibrin(plateletData) {
@@ -1084,43 +1806,273 @@
             const canFormFibrin = state.treatmentApplied ? true : conditionConfig.canFormFibrin;
 
             if (!canFormFibrin) return;
+            
+            // Check fibrin formation rate
+            const fibrinFormationRate = state.treatmentApplied ? 1.0 : conditionConfig.fibrinFormationRate;
+            if (Math.random() > fibrinFormationRate) {
+                return; // Failed to form fibrin this time
+            }
+            
+            // Limit total fibrin connections
+            if (state.fibrinConstraints.length >= CONFIG.fibrin.maxConnections) return;
+            
+            // Limit connections per platelet
+            if (plateletData.fibrinConnections.length >= CONFIG.fibrin.maxConnectionsPerPlatelet) return;
+            
+            // Check max cluster size for thrombasthenia
+            if (conditionConfig.maxPlateletClusterSize) {
+                const nearbyCount = state.stuckPlatelets.filter(p => {
+                    const dx = p.body.position.x - plateletData.body.position.x;
+                    const dy = p.body.position.y - plateletData.body.position.y;
+                    return (dx * dx + dy * dy) < 400 && p.fibrinConnections.length > 0;
+                }).length;
+                if (nearbyCount >= conditionConfig.maxPlateletClusterSize) {
+                    return; // Cannot form larger clusters
+                }
+            }
 
             const platelet = plateletData.body;
-            const searchRadius = 60;
+            const searchRadius = 90; // Increased search radius for more separated connections
+            const plateletX = platelet.position.x;
+            const plateletY = platelet.position.y;
 
-            // Find nearby stuck platelets
-            state.stuckPlatelets.forEach(other => {
-                if (other.body === platelet) return;
-                if (plateletData.fibrinConnections.includes(other.body.id)) return;
+            // Find nearby stuck platelets (optimized with early exit)
+            for (let i = 0; i < state.stuckPlatelets.length; i++) {
+                const other = state.stuckPlatelets[i];
+                if (other.body === platelet) continue;
+                if (plateletData.fibrinConnections.includes(other.body.id)) continue;
+                
+                // Limit connections per other platelet too
+                if (other.fibrinConnections.length >= CONFIG.fibrin.maxConnectionsPerPlatelet) continue;
 
-                const dist = Vector.magnitude(Vector.sub(platelet.position, other.body.position));
+                // Quick distance check using squared distance (avoid sqrt)
+                const dx = other.body.position.x - plateletX;
+                const dy = other.body.position.y - plateletY;
+                const distSq = dx * dx + dy * dy;
+                const searchRadiusSq = searchRadius * searchRadius;
+                const minDistanceSq = 400; // Increased minimum distance: 20^2 = 400 (was 5^2 = 25)
 
-                if (dist < searchRadius && dist > 5) {
-                    // Create fibrin constraint
+                if (distSq < searchRadiusSq && distSq > minDistanceSq) {
+                    const dist = Math.sqrt(distSq);
+                    
+                    // Get fibrin stability from condition
+                    const fibrinStability = state.treatmentApplied ? 1.0 : conditionConfig.fibrinStability;
+                    const visualEffects = conditionConfig.visualEffects || CONFIG.conditions.normal.visualEffects;
+                    
+                    // Create fibrin constraint with stability-based properties
                     const fibrinConstraint = Constraint.create({
                         bodyA: platelet,
                         bodyB: other.body,
-                        stiffness: 0.9,
-                        damping: 0.3,
+                        stiffness: 0.9 * fibrinStability,
+                        damping: 0.3 * (2 - fibrinStability),
                         length: dist * 0.8,
                         render: { visible: false }
                     });
 
                     Composite.add(engine.world, fibrinConstraint);
 
-                    state.fibrinConstraints.push({
+                    // Create physical body for fibrin barrier (thin rectangle)
+                    const midX = (platelet.position.x + other.body.position.x) / 2;
+                    const midY = (platelet.position.y + other.body.position.y) / 2;
+                    const angle = Math.atan2(
+                        other.body.position.y - platelet.position.y,
+                        other.body.position.x - platelet.position.x
+                    );
+                    
+                    // Create a thin rectangular body as barrier
+                    const fibrinBody = Bodies.rectangle(midX, midY, dist, 4, {
+                        isStatic: true, // Static so it acts as a solid barrier
+                        render: { 
+                            fillStyle: 'transparent', // Invisible, we render it separately
+                            visible: false
+                        },
+                        label: 'fibrinBarrier',
+                        restitution: 0.9 * fibrinStability, // Stability affects bounce
+                        friction: 0.1,
+                        collisionFilter: {
+                            group: 0,
+                            category: 0x0002, // Separate category for fibrin
+                            mask: 0x0001 // Only collide with RBCs and WBCs
+                        }
+                    });
+                    
+                    Body.setAngle(fibrinBody, angle);
+                    Composite.add(engine.world, fibrinBody);
+
+                    const fibrinData = {
                         constraint: fibrinConstraint,
                         pointA: platelet,
                         pointB: other.body,
-                        glowing: state.treatmentApplied
-                    });
+                        body: fibrinBody,
+                        glowing: state.treatmentApplied,
+                        stability: fibrinStability,
+                        decayRate: conditionConfig.fibrinDecayRate || 0,
+                        visualColor: visualEffects.fibrinColor,
+                        opacity: visualEffects.fibrinOpacity || 1.0,
+                        createdAt: Date.now()
+                    };
+                    
+                    state.fibrinConstraints.push(fibrinData);
+                    state.fibrinBodies.push(fibrinBody);
 
                     plateletData.fibrinConnections.push(other.body.id);
                     plateletData.hasFibrin = true;
                     other.fibrinConnections.push(platelet.id);
                     other.hasFibrin = true;
+                    
+                    // Schedule fibrin decay if condition has decay rate
+                    if (conditionConfig.fibrinDecayRate > 0 && !state.treatmentApplied) {
+                        scheduleFibrinDecay(fibrinData, conditionConfig.fibrinDecayRate);
+                    }
+                    
+                    // Stop if we've reached the limit
+                    if (state.fibrinConstraints.length >= CONFIG.fibrin.maxConnections) break;
                 }
+            }
+            
+            // Check if wound is sealed after forming new fibrin connection
+            checkWoundSealed();
+        }
+        
+        function scheduleFibrinDecay(fibrinData, decayRate) {
+            // Decay fibrin over time based on decay rate
+            const decayInterval = setInterval(() => {
+                if (!state.fibrinConstraints.includes(fibrinData)) {
+                    clearInterval(decayInterval);
+                    return;
+                }
+                
+                // Reduce stability over time
+                fibrinData.stability -= decayRate * 0.1;
+                
+                if (fibrinData.stability <= 0.1 || Math.random() < decayRate) {
+                    // Remove unstable fibrin
+                    removeFibrinConnection(fibrinData);
+                    clearInterval(decayInterval);
+                } else {
+                    // Update constraint properties based on stability
+                    fibrinData.constraint.stiffness = 0.9 * fibrinData.stability;
+                    fibrinData.constraint.damping = 0.3 * (2 - fibrinData.stability);
+                }
+            }, 2000); // Check every 2 seconds
+        }
+        
+        function removeFibrinConnection(fibrinData) {
+            // Remove from world
+            Composite.remove(engine.world, fibrinData.constraint);
+            if (fibrinData.body) {
+                Composite.remove(engine.world, fibrinData.body);
+                state.fibrinBodies = state.fibrinBodies.filter(b => b !== fibrinData.body);
+            }
+            
+            // Remove from arrays
+            state.fibrinConstraints = state.fibrinConstraints.filter(f => f !== fibrinData);
+            
+            // Update platelet connections
+            const plateletA = state.stuckPlatelets.find(p => p.body === fibrinData.pointA);
+            const plateletB = state.stuckPlatelets.find(p => p.body === fibrinData.pointB);
+            
+            if (plateletA) {
+                plateletA.fibrinConnections = plateletA.fibrinConnections.filter(id => id !== fibrinData.pointB.id);
+                plateletA.hasFibrin = plateletA.fibrinConnections.length > 0;
+            }
+            if (plateletB) {
+                plateletB.fibrinConnections = plateletB.fibrinConnections.filter(id => id !== fibrinData.pointA.id);
+                plateletB.hasFibrin = plateletB.fibrinConnections.length > 0;
+            }
+        }
+        
+        function checkWoundSealed() {
+            if (state.hemostasisAchieved) return; // Already sealed
+            
+            const woundX = CONFIG.wound.x;
+            const woundWidth = CONFIG.wound.width;
+            const woundLeft = woundX - woundWidth / 2;
+            const woundRight = woundX + woundWidth / 2;
+            const woundCenterY = 24; // Y position where platelets stick
+            
+            // Find platelets on the left side of the wound (including anchor platelets)
+            const leftSidePlatelets = state.stuckPlatelets.filter(p => {
+                const px = p.body.position.x;
+                const py = p.body.position.y;
+                // Include anchor platelets or platelets near left edge
+                return (p.isAnchor && px < woundLeft) || (px < woundLeft + 30 && Math.abs(py - woundCenterY) < 20);
             });
+            
+            // Find platelets on the right side of the wound (including anchor platelets)
+            const rightSidePlatelets = state.stuckPlatelets.filter(p => {
+                const px = p.body.position.x;
+                const py = p.body.position.y;
+                // Include anchor platelets or platelets near right edge
+                return (p.isAnchor && px > woundRight) || (px > woundRight - 30 && Math.abs(py - woundCenterY) < 20);
+            });
+            
+            if (leftSidePlatelets.length === 0 || rightSidePlatelets.length === 0) {
+                return; // Need platelets on both sides
+            }
+            
+            // Check if there's a path from left to right through fibrin connections
+            for (let i = 0; i < leftSidePlatelets.length; i++) {
+                const leftPlatelet = leftSidePlatelets[i];
+                if (hasPathToRight(leftPlatelet, rightSidePlatelets, new Set())) {
+                    // Wound is sealed!
+                    state.hemostasisAchieved = true;
+                    state.clotPercentage = 100;
+                    document.getElementById('hemostasis-indicator').classList.add('visible');
+                    document.getElementById('wound-label').classList.add('healed');
+                    document.getElementById('wound-label').innerHTML = '✓ Lesión Sellada';
+                    updateUI();
+                    return;
+                }
+            }
+        }
+        
+        function hasPathToRight(currentPlatelet, rightSidePlatelets, visited) {
+            // Check if current platelet is on the right side
+            const woundX = CONFIG.wound.x;
+            const woundWidth = CONFIG.wound.width;
+            const woundRight = CONFIG.wound.x + CONFIG.wound.width / 2;
+            
+            if (currentPlatelet.body.position.x > woundRight - 20) {
+                return true; // Reached right side
+            }
+            
+            // Mark as visited
+            visited.add(currentPlatelet.body.id);
+            
+            // Check all fibrin connections from this platelet
+            for (let i = 0; i < state.fibrinConstraints.length; i++) {
+                const fibrin = state.fibrinConstraints[i];
+                let connectedPlatelet = null;
+                
+                // Find which platelet is connected to current one
+                if (fibrin.pointA === currentPlatelet.body) {
+                    connectedPlatelet = state.stuckPlatelets.find(p => p.body === fibrin.pointB);
+                } else if (fibrin.pointB === currentPlatelet.body) {
+                    connectedPlatelet = state.stuckPlatelets.find(p => p.body === fibrin.pointA);
+                }
+                
+                if (connectedPlatelet && !visited.has(connectedPlatelet.body.id)) {
+                    // Check if this connection crosses the wound area
+                    const px1 = currentPlatelet.body.position.x;
+                    const px2 = connectedPlatelet.body.position.x;
+                    const woundLeft = woundX - woundWidth / 2;
+                    const woundRight = woundX + woundWidth / 2;
+                    
+                    // Connection crosses wound if one point is left and other is right
+                    if ((px1 < woundLeft && px2 > woundRight) || (px2 < woundLeft && px1 > woundRight)) {
+                        // Direct crossing found
+                        return true;
+                    }
+                    
+                    // Continue searching through this connection
+                    if (hasPathToRight(connectedPlatelet, rightSidePlatelets, visited)) {
+                        return true;
+                    }
+                }
+            }
+            
+            return false;
         }
 
         function renderFibrin(event) {
@@ -1135,39 +2087,68 @@
                 ctx.fillRect(woundLeft, 0, woundWidth, 22);
             }
             
-            // Render fibrin connections - no shadows for performance
+            // Render fibrin connections - optimized for performance with condition-based colors
             if (state.fibrinConstraints.length > 0) {
-                ctx.strokeStyle = state.treatmentApplied ? '#39FF14' : '#00E676';
-                ctx.lineWidth = state.treatmentApplied ? 2 : 1.5;
-                ctx.beginPath();
-                
-                state.fibrinConstraints.forEach(fibrin => {
+                for (let i = 0; i < state.fibrinConstraints.length; i++) {
+                    const fibrin = state.fibrinConstraints[i];
                     const pointA = fibrin.pointA.position;
                     const pointB = fibrin.pointB.position;
-                    ctx.moveTo(pointA.x, pointA.y);
-                    ctx.lineTo(pointB.x, pointB.y);
-                });
-                
-                ctx.stroke();
+                    
+                    // Only draw if both points are still valid
+                    if (pointA && pointB) {
+                        // Use condition-specific color and opacity
+                        const color = fibrin.visualColor || (state.treatmentApplied ? '#39FF14' : '#00E676');
+                        const opacity = fibrin.opacity !== undefined ? fibrin.opacity : 1.0;
+                        const lineWidth = fibrin.glowing ? 2.5 : (state.treatmentApplied ? 2 : 1.5);
+                        
+                        // Set color with opacity
+                        const rgb = hexToRgb(color);
+                        ctx.strokeStyle = `rgba(${rgb.r}, ${rgb.g}, ${rgb.b}, ${opacity})`;
+                        ctx.lineWidth = lineWidth * (fibrin.stability || 1.0); // Thinner if unstable
+                        
+                        ctx.beginPath();
+                        ctx.moveTo(pointA.x, pointA.y);
+                        ctx.lineTo(pointB.x, pointB.y);
+                        ctx.stroke();
+                    }
+                }
             }
+        }
+        
+        function hexToRgb(hex) {
+            const result = /^#?([a-f\d]{2})([a-f\d]{2})([a-f\d]{2})$/i.exec(hex);
+            return result ? {
+                r: parseInt(result[1], 16),
+                g: parseInt(result[2], 16),
+                b: parseInt(result[3], 16)
+            } : { r: 0, g: 230, b: 118 };
         }
 
         function calculateClotPercentage() {
             const woundLeft = CONFIG.wound.x - CONFIG.wound.width / 2;
             const woundWidth = CONFIG.wound.width;
 
-            // Create coverage map
-            const segments = 30;
+            // Optimized coverage calculation
+            const segments = 20; // Reduced from 30 for better performance
             const segmentWidth = woundWidth / segments;
             let coveredSegments = 0;
+            const coverageThreshold = 15 * 15; // Squared distance for comparison
+
+            // Pre-filter platelets that are actually in the wound area
+            const relevantPlatelets = state.stuckPlatelets.filter(p => {
+                const px = p.body.position.x;
+                const py = p.body.position.y;
+                return px >= woundLeft - 20 && px <= woundLeft + woundWidth + 20 && py < 35;
+            });
 
             for (let i = 0; i < segments; i++) {
                 const segmentX = woundLeft + (i + 0.5) * segmentWidth;
                 
-                // Check if any stuck platelet covers this segment
-                const covered = state.stuckPlatelets.some(p => {
-                    const dx = Math.abs(p.body.position.x - segmentX);
-                    return dx < 15 && p.body.position.y < 35;
+                // Check if any stuck platelet covers this segment (optimized)
+                const covered = relevantPlatelets.some(p => {
+                    const dx = p.body.position.x - segmentX;
+                    const dy = p.body.position.y - 18; // Center Y of wound
+                    return (dx * dx + dy * dy) < coverageThreshold;
                 });
 
                 if (covered) coveredSegments++;
@@ -1175,7 +2156,12 @@
 
             state.clotPercentage = Math.min(100, Math.round((coveredSegments / segments) * 100));
 
-            // Check for hemostasis
+            // Check if wound is sealed by fibrin network crossing left to right
+            if (!state.hemostasisAchieved) {
+                checkWoundSealed();
+            }
+            
+            // Fallback: Check for hemostasis by coverage percentage
             if (state.clotPercentage >= 85 && !state.hemostasisAchieved) {
                 state.hemostasisAchieved = true;
                 document.getElementById('hemostasis-indicator').classList.add('visible');
@@ -1228,17 +2214,38 @@
             btn.disabled = true;
 
             // Apply treatment effects based on condition
-            if (state.condition === 'hemophilia') {
-                // Form fibrin on all existing stuck platelets
-                state.stuckPlatelets.forEach(plateletData => {
-                    if (!plateletData.hasFibrin) {
-                        tryFormFibrin(plateletData);
-                    }
-                });
-                // Make all fibrin glow
-                state.fibrinConstraints.forEach(f => f.glowing = true);
-            } else if (state.condition === 'vwd') {
-                // Now platelets can stick - handled by the canStick check
+            const condition = CONFIG.conditions[state.condition];
+            
+            switch(state.condition) {
+                case 'hemophilia':
+                case 'hemophiliaSevere':
+                    // Factor VIII/IX replacement - enables fibrin formation
+                    applyFactorReplacement();
+                    break;
+                    
+                case 'vwd':
+                    // Desmopresina or vWF concentrate - improves platelet adhesion
+                    applyVWFReplacement();
+                    break;
+                    
+                case 'thrombocytopenia':
+                    // Platelet transfusion - increases platelet count
+                    applyPlateletTransfusion();
+                    break;
+                    
+                case 'thrombasthenia':
+                    // Platelet transfusion - provides functional platelets
+                    applyPlateletTransfusion();
+                    break;
+                    
+                case 'anticoagulated':
+                    // Vitamin K or PCC - reverses anticoagulation
+                    reverseAnticoagulation();
+                    break;
+                    
+                default:
+                    // Generic treatment - improves all parameters
+                    applyGenericTreatment();
             }
 
             // For all conditions, try to form additional fibrin connections
@@ -1249,6 +2256,83 @@
             }, 200);
 
             updateUI();
+        }
+        
+        function applyFactorReplacement() {
+            // Factor VIII/IX replacement for hemophilia
+            // Gradually improves fibrin formation rate
+            const condition = CONFIG.conditions[state.condition];
+            const targetRate = 0.9;
+            
+            // Form fibrin on all existing stuck platelets immediately
+            state.stuckPlatelets.forEach(plateletData => {
+                if (!plateletData.hasFibrin) {
+                    tryFormFibrin(plateletData);
+                }
+            });
+            
+            // Make all fibrin stable and glowing
+            state.fibrinConstraints.forEach(f => {
+                f.glowing = true;
+                f.stability = 1.0;
+                f.decayRate = 0;
+                f.visualColor = '#39FF14';
+                f.opacity = 1.0;
+            });
+        }
+        
+        function applyVWFReplacement() {
+            // Desmopresina or vWF concentrate for von Willebrand disease
+            // Improves platelet adhesion and function
+            const condition = CONFIG.conditions[state.condition];
+            
+            // Update visual effects - platelets return to normal color
+            state.stuckPlatelets.forEach(platelet => {
+                platelet.body.render.fillStyle = '#F1F5F9';
+            });
+            
+            // Improve adhesion for new platelets (handled by canStick check)
+        }
+        
+        function applyPlateletTransfusion() {
+            // Platelet transfusion for thrombocytopenia/thrombasthenia
+            // Temporarily increases platelet spawn rate
+            const condition = CONFIG.conditions[state.condition];
+            const originalRatio = condition.plateletRatio;
+            
+            // Increase platelet ratio temporarily
+            condition.plateletRatio = Math.min(0.35, originalRatio * 3);
+            
+            // Spawn extra platelets immediately
+            for (let i = 0; i < 25; i++) {
+                if (state.allBodies.length < CONFIG.particles.maxCount) {
+                    createParticle('platelet');
+                }
+            }
+            
+            // Restore after 10 seconds
+            setTimeout(() => {
+                condition.plateletRatio = originalRatio;
+            }, 10000);
+        }
+        
+        function reverseAnticoagulation() {
+            // Vitamin K or Prothrombin Complex Concentrate (PCC)
+            // Improves fibrin stability and formation
+            state.fibrinConstraints.forEach(f => {
+                f.stability = Math.min(1.0, f.stability + 0.3);
+                f.decayRate = 0;
+                f.visualColor = '#00E676';
+                f.opacity = 1.0;
+            });
+        }
+        
+        function applyGenericTreatment() {
+            // Generic treatment - improves all parameters slightly
+            state.fibrinConstraints.forEach(f => {
+                f.stability = Math.min(1.0, f.stability + 0.2);
+                f.glowing = true;
+            });
         }
 
         function setCondition(condition) {
