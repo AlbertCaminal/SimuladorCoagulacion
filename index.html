@@ -1250,6 +1250,13 @@
         let frameCount = 0;
         const CLEANUP_INTERVAL = 5; // Cleanup every 5 frames (más frecuente para mejor limpieza)
         const UI_UPDATE_INTERVAL = 5; // Update UI every 5 frames
+        
+        // Fixed timestep loop variables - garantizar velocidad constante independiente del FPS
+        let physicsLoopId = null;
+        let renderLoopId = null;
+        let lastPhysicsTime = 0;
+        const FIXED_TIMESTEP = 1000 / 60; // 16.67ms = 60 FPS fijo para física
+        let accumulatedTime = 0;
 
         // Matter.js Setup
         let engine, render, runner;
@@ -1310,9 +1317,10 @@
                 Events.off(render, 'afterRender');
                 Render.stop(render);
             }
-            if (runner) {
-                Runner.stop(runner);
-            }
+            // No necesitamos detener el runner porque usamos nuestro propio loop
+            // if (runner) {
+            //     Runner.stop(runner);
+            // }
             
             // Reset canvas
             const canvas = document.getElementById('simulation-canvas');
@@ -1384,12 +1392,12 @@
                     if (state.simulationRunning) {
                         const wasRunning = state.simulationRunning;
                         state.simulationRunning = false;
-                        Runner.stop(runner);
                         initSimulation();
                         if (wasRunning) {
                             setTimeout(() => {
                                 state.simulationRunning = true;
-                                Runner.run(runner, engine);
+                                lastPhysicsTime = 0;
+                                accumulatedTime = 0;
                             }, 100);
                         }
                     }
@@ -1421,15 +1429,71 @@
             // Configurar el engine para usar timestep fijo
             engine.timing.timeScale = 1.0; // Asegurar que el timeScale sea 1.0
             
+            // Crear Runner pero NO ejecutarlo automáticamente
+            // Usaremos nuestro propio loop con timestep fijo garantizado
             runner = Runner.create({
-                delta: 1000 / 60, // Fixed timestep: 16.67ms = 60 FPS
+                delta: FIXED_TIMESTEP,
                 isFixed: true,
-                enabled: true
+                enabled: false // Deshabilitar el loop automático
             });
             
-            // NO iniciar automáticamente - esperar botón de inicio
-            // Runner.run(runner, engine);
-            Render.run(render);
+            // Loop de renderizado independiente (puede ejecutarse a cualquier FPS)
+            function renderLoop() {
+                if (render) {
+                    Render.world(render);
+                }
+                renderLoopId = requestAnimationFrame(renderLoop);
+            }
+            
+            // Iniciar el loop de renderizado (siempre activo)
+            renderLoop();
+            
+            // Loop de física con timestep fijo (solo se ejecuta cuando simulationRunning = true)
+            function physicsLoop(currentTime) {
+                if (!state.simulationRunning) {
+                    physicsLoopId = requestAnimationFrame(physicsLoop);
+                    return;
+                }
+                
+                // Calcular tiempo transcurrido desde el último frame
+                if (lastPhysicsTime === 0) {
+                    lastPhysicsTime = currentTime;
+                }
+                
+                const deltaTime = currentTime - lastPhysicsTime;
+                lastPhysicsTime = currentTime;
+                
+                // Acumular tiempo y ejecutar pasos de física a intervalos fijos
+                accumulatedTime += deltaTime;
+                
+                // Ejecutar tantos pasos de física como sean necesarios para mantener timestep fijo
+                const maxSteps = 5; // Limitar pasos por frame para evitar "spiral of death"
+                let stepsExecuted = 0;
+                
+                while (accumulatedTime >= FIXED_TIMESTEP && stepsExecuted < maxSteps) {
+                    // Ejecutar un paso de física con timestep fijo
+                    Engine.update(engine, FIXED_TIMESTEP);
+                    accumulatedTime -= FIXED_TIMESTEP;
+                    stepsExecuted++;
+                }
+                
+                // Si acumulamos demasiado tiempo, resetear para evitar lag
+                if (accumulatedTime > FIXED_TIMESTEP * 5) {
+                    accumulatedTime = 0;
+                }
+                
+                physicsLoopId = requestAnimationFrame(physicsLoop);
+            }
+            
+            // Iniciar el loop de física (siempre activo, pero solo procesa cuando simulationRunning = true)
+            // Resetear variables de tiempo
+            lastPhysicsTime = 0;
+            accumulatedTime = 0;
+            
+            // Iniciar el loop de física
+            if (!physicsLoopId) {
+                physicsLoopId = requestAnimationFrame(physicsLoop);
+            }
             
             // Estado inicial: simulación no corriendo
             state.simulationRunning = false;
@@ -1909,7 +1973,9 @@
             if (!state.simulationRunning) {
                 // Iniciar simulación
                 state.simulationRunning = true;
-                Runner.run(runner, engine);
+                // No usar Runner.run() - usamos nuestro propio loop con timestep fijo
+                lastPhysicsTime = 0;
+                accumulatedTime = 0;
                 const startBtn = document.getElementById('start-btn');
                 startBtn.textContent = '⏸ Pausar Simulación';
                 startBtn.classList.add('paused');
@@ -1917,7 +1983,7 @@
             } else {
                 // Pausar simulación
                 state.simulationRunning = false;
-                Runner.stop(runner);
+                // No usar Runner.stop() - usamos nuestro propio loop
                 const startBtn = document.getElementById('start-btn');
                 startBtn.textContent = '▶ Reanudar Simulación';
                 startBtn.classList.remove('paused');
@@ -3479,7 +3545,9 @@
             if (!state.simulationRunning) {
                 // Iniciar simulación
                 state.simulationRunning = true;
-                Runner.run(runner, engine);
+                // No usar Runner.run() - usamos nuestro propio loop con timestep fijo
+                lastPhysicsTime = 0;
+                accumulatedTime = 0;
                 const startBtn = document.getElementById('start-btn');
                 startBtn.textContent = '⏸ Pausar Simulación';
                 startBtn.classList.add('paused');
@@ -3487,7 +3555,7 @@
             } else {
                 // Pausar simulación
                 state.simulationRunning = false;
-                Runner.stop(runner);
+                // No usar Runner.stop() - usamos nuestro propio loop
                 const startBtn = document.getElementById('start-btn');
                 startBtn.textContent = '▶ Reanudar Simulación';
                 startBtn.classList.remove('paused');
@@ -3531,7 +3599,7 @@
             // Reset button
             document.getElementById('reset-btn').addEventListener('click', () => {
                 state.simulationRunning = false;
-                if (runner) Runner.stop(runner);
+                // No necesitamos detener el runner porque usamos nuestro propio loop
                 initSimulation();
                 updateWizardStep(1);
                 if (startBtn) {
