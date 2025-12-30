@@ -105,7 +105,7 @@
 
         /* Main Container */
         .main-container {
-            max-width: 1200px;
+            max-width: 1400px;
             margin: 0 auto;
             padding: 24px;
         }
@@ -122,7 +122,7 @@
             box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.25), 
                         0 0 0 1px rgba(255,255,255,0.05);
             overflow: hidden;
-            max-width: 1100px;
+            max-width: 1300px;
             margin: 0 auto;
         }
 
@@ -198,6 +198,9 @@
 
         #simulation-canvas {
             display: block;
+            width: 100%;
+            height: 300px;
+            max-width: 100%;
         }
 
         /* FPS Counter */
@@ -234,7 +237,7 @@
             display: grid;
             grid-template-columns: 1fr 1fr;
             gap: 24px;
-            max-width: 1100px;
+            max-width: 1300px;
             margin: 0 auto;
         }
 
@@ -677,21 +680,156 @@
         }
 
         /* Responsive */
+        @media (max-width: 1024px) {
+            .main-container {
+                max-width: 100%;
+                padding: 16px;
+            }
+            
+            .viewer-container {
+                max-width: 100%;
+            }
+            
+            .control-panel {
+                max-width: 100%;
+                grid-template-columns: 1fr;
+            }
+        }
+        
         @media (max-width: 768px) {
+            .main-container {
+                padding: 12px;
+            }
+            
             .control-panel {
                 grid-template-columns: 1fr;
+                gap: 16px;
             }
             
             .header {
                 padding: 12px 16px;
+                flex-direction: column;
+                gap: 12px;
             }
             
-            .header h1 {
-                font-size: 1.2rem;
+            .header-title h1 {
+                font-size: 1.1rem;
             }
             
-            .main-container {
+            .header-icon {
+                width: 32px;
+                height: 32px;
+            }
+            
+            .viewer-container {
+                border-radius: 12px;
+            }
+            
+            .panel-card {
                 padding: 16px;
+            }
+            
+            .panel-title {
+                font-size: 0.7rem;
+                margin-bottom: 12px;
+            }
+            
+            .condition-btn, .treatment-btn, .start-btn, .reset-btn {
+                padding: 10px 16px;
+                font-size: 0.875rem;
+            }
+            
+            .fps-counter {
+                font-size: 0.65rem;
+                padding: 4px 8px;
+                top: 8px;
+                left: 8px;
+            }
+            
+            #spawn-interval-counter {
+                font-size: 0.65rem;
+                padding: 4px 8px;
+                top: 32px;
+                left: 8px;
+                max-width: calc(100% - 16px);
+                word-break: break-word;
+            }
+            
+            .label-wound {
+                font-size: 0.65rem;
+                padding: 4px 8px;
+                top: 8px;
+                right: 8px;
+            }
+            
+            .treatment-indicator, .hemostasis-achieved {
+                font-size: 0.875rem;
+                padding: 8px 16px;
+            }
+            
+            .legend {
+                flex-wrap: wrap;
+                gap: 8px;
+                padding: 12px;
+            }
+            
+            .legend-item {
+                font-size: 0.75rem;
+            }
+            
+            .wizard-step {
+                padding: 8px 12px;
+                font-size: 0.875rem;
+            }
+        }
+        
+        @media (max-width: 480px) {
+            .main-container {
+                padding: 8px;
+            }
+            
+            .header {
+                padding: 8px 12px;
+            }
+            
+            .header-title h1 {
+                font-size: 1rem;
+            }
+            
+            .viewer-container {
+                border-radius: 8px;
+            }
+            
+            .panel-card {
+                padding: 12px;
+            }
+            
+            .condition-btn, .treatment-btn, .start-btn, .reset-btn {
+                padding: 8px 12px;
+                font-size: 0.8rem;
+            }
+            
+            .fps-counter, #spawn-interval-counter {
+                font-size: 0.6rem;
+                padding: 3px 6px;
+            }
+            
+            #spawn-interval-counter {
+                top: 28px;
+            }
+            
+            .legend {
+                padding: 8px;
+                gap: 6px;
+            }
+            
+            .legend-item {
+                font-size: 0.7rem;
+            }
+            
+            .wizard-step {
+                padding: 6px 10px;
+                font-size: 0.8rem;
             }
         }
 
@@ -730,6 +868,7 @@
                     ✓ Hemostasia Lograda
                 </div>
                 <div class="fps-counter" id="fps-counter">FPS: --</div>
+                <div class="fps-counter" id="spawn-interval-counter" style="top: 40px;">Spawn: -- ms</div>
                 <canvas id="simulation-canvas"></canvas>
             </div>
             <div class="legend">
@@ -844,7 +983,7 @@
         // Simulation Configuration
         const CONFIG = {
             canvas: {
-                width: 1100,
+                width: 1300,
                 height: 300
             },
             wound: {
@@ -857,8 +996,8 @@
                 color: '#FDA4AF'
             },
             physics: {
-                flowForce: 0.0003,
-                suctionForce: 0.0012,
+                flowForce: 0.0004,
+                suctionForce: 0.0015, // Aumentado para hacer la succión más fuerte
                 suctionRadius: 180
             },
             particles: {
@@ -871,6 +1010,9 @@
             fibrin: {
                 maxConnections: 200, // Limit fibrin connections to prevent performance issues
                 maxConnectionsPerPlatelet: 8 // Limit connections per platelet
+            },
+            stuckPlatelets: {
+                maxCount: 80 // Límite máximo de plaquetas pegadas para mantener rendimiento
             },
             conditions: {
                 normal: {
@@ -1100,11 +1242,13 @@
         // Spawn timing for fixed interval
         let spawnInterval = null;
         let lastSpawnTime = 0;
+        let spawnIntervalCounter = null;
+        let actualSpawnIntervals = []; // Array para calcular el intervalo promedio
         const SPAWN_INTERVAL_MS = 100; // Fixed spawn interval in milliseconds
         
         // Performance optimization: frame counters for throttling
         let frameCount = 0;
-        const CLEANUP_INTERVAL = 10; // Cleanup every 10 frames
+        const CLEANUP_INTERVAL = 5; // Cleanup every 5 frames (más frecuente para mejor limpieza)
         const UI_UPDATE_INTERVAL = 5; // Update UI every 5 frames
 
         // Matter.js Setup
@@ -1112,11 +1256,22 @@
 
         function initSimulation() {
             // Clear spawn interval
-            if (spawnInterval) {
-                cancelAnimationFrame(spawnInterval);
+            if (spawnInterval !== null) {
+                clearInterval(spawnInterval);
                 spawnInterval = null;
             }
+            if (spawnIntervalCounter !== null) {
+                clearInterval(spawnIntervalCounter);
+                spawnIntervalCounter = null;
+            }
+            
             lastSpawnTime = 0;
+            actualSpawnIntervals = [];
+            spawnStats = {
+                lastSpawnCount: 0,
+                totalSpawned: 0,
+                spawnHistory: []
+            };
 
             // Reset state
             state = {
@@ -1187,15 +1342,66 @@
 
             // Create renderer using existing canvas
             const canvasEl = document.getElementById('simulation-canvas');
-            canvasEl.width = CONFIG.canvas.width;
-            canvasEl.height = CONFIG.canvas.height;
+            
+            // Guardar el ancho original del canvas
+            const originalCanvasWidth = CONFIG.canvas.width;
+            const fixedCanvasHeight = CONFIG.canvas.height; // 300px fijo
+            
+            // Ajustar tamaño del canvas según el tamaño de la pantalla
+            // Mantener altura fija, solo ajustar ancho
+            const updateCanvasSize = () => {
+                const container = canvasEl.parentElement;
+                const containerWidth = container.clientWidth;
+                const maxWidth = Math.min(originalCanvasWidth, containerWidth - 32); // 32px de padding
+                
+                // Mantener altura fija, solo ajustar ancho
+                canvasEl.width = maxWidth;
+                canvasEl.height = fixedCanvasHeight;
+                
+                // Actualizar CONFIG para que la física use el nuevo tamaño
+                CONFIG.canvas.width = maxWidth;
+                CONFIG.canvas.height = fixedCanvasHeight;
+                
+                // Mantener la herida siempre centrada
+                CONFIG.wound.x = maxWidth / 2;
+                
+                // Si el engine ya existe, necesitamos recrear las paredes con el nuevo tamaño
+                if (engine && state.simulationRunning === false) {
+                    // Solo recrear si la simulación no está corriendo
+                    // Las paredes se recrearán en el siguiente initSimulation
+                }
+            };
+            
+            updateCanvasSize();
+            
+            // Actualizar tamaño cuando cambia el tamaño de la ventana
+            let resizeTimeout;
+            window.addEventListener('resize', () => {
+                clearTimeout(resizeTimeout);
+                resizeTimeout = setTimeout(() => {
+                    updateCanvasSize();
+                    // Si la simulación está corriendo, reiniciar para aplicar los cambios
+                    if (state.simulationRunning) {
+                        const wasRunning = state.simulationRunning;
+                        state.simulationRunning = false;
+                        Runner.stop(runner);
+                        initSimulation();
+                        if (wasRunning) {
+                            setTimeout(() => {
+                                state.simulationRunning = true;
+                                Runner.run(runner, engine);
+                            }, 100);
+                        }
+                    }
+                }, 250);
+            });
             
             render = Render.create({
                 canvas: canvasEl,
                 engine: engine,
                 options: {
-                    width: CONFIG.canvas.width,
-                    height: CONFIG.canvas.height,
+                    width: canvasEl.width,
+                    height: canvasEl.height,
                     wireframes: false,
                     background: '#0F172A'
                 }
@@ -1262,6 +1468,8 @@
                 // Throttle expensive operations
                 if (frameCount % CLEANUP_INTERVAL === 0) {
                     cleanupParticles();
+                    // También limpiar plaquetas pegadas antiguas periódicamente
+                    cleanupOldStuckPlatelets();
                 }
                 if (frameCount % UI_UPDATE_INTERVAL === 0) {
                     calculateClotPercentage();
@@ -1278,6 +1486,12 @@
             
             // Start FPS counter
             startFPSCounter();
+            
+            // Inicializar contador de intervalo de spawn
+            const spawnElement = document.getElementById('spawn-interval-counter');
+            if (spawnElement) {
+                spawnElement.textContent = `Spawn: -- ms | Último: 0 | Promedio: 0 | Total: 0/${CONFIG.particles.maxCount}`;
+            }
 
             // Update UI
             updateUI();
@@ -1561,56 +1775,120 @@
             return body;
         }
 
+        // Variables para tracking de spawn
+        let spawnStats = {
+            lastSpawnCount: 0,
+            totalSpawned: 0,
+            spawnHistory: [] // Últimos 10 conteos de spawn
+        };
+
         function startParticleSpawning() {
             // Clear any existing interval
-            if (spawnInterval) {
-                cancelAnimationFrame(spawnInterval);
+            if (spawnInterval !== null) {
+                clearInterval(spawnInterval);
+                spawnInterval = null;
+            }
+            if (spawnIntervalCounter !== null) {
+                clearInterval(spawnIntervalCounter);
+                spawnIntervalCounter = null;
             }
             
             lastSpawnTime = performance.now();
+            actualSpawnIntervals = [];
+            spawnStats = {
+                lastSpawnCount: 0,
+                totalSpawned: 0,
+                spawnHistory: []
+            };
             
-            // Use requestAnimationFrame with time-based spawning for consistent rate
-            function spawnLoop(currentTime) {
-                // Solo spawnear si la simulación está corriendo y la herida no está sellada
-                if (!state.simulationRunning || state.hemostasisAchieved) {
-                    spawnInterval = requestAnimationFrame(spawnLoop);
+            // Use setInterval for absolute precision - this is the most reliable method
+            spawnInterval = setInterval(() => {
+                // Solo spawnear si la simulación está corriendo
+                if (!state.simulationRunning) {
                     return;
                 }
                 
-                if (state.allBodies.length < CONFIG.particles.maxCount) {
-                    const elapsed = currentTime - lastSpawnTime;
+                const currentTime = performance.now();
+                const actualInterval = currentTime - lastSpawnTime;
+                
+                // Registrar el intervalo real para el contador
+                actualSpawnIntervals.push(actualInterval);
+                if (actualSpawnIntervals.length > 20) {
+                    actualSpawnIntervals.shift(); // Mantener solo los últimos 20
+                }
+                
+                let spawnedThisCycle = 0;
+                
+                // Contar solo partículas móviles (no pegadas) para el límite de spawn
+                const mobileBodies = state.allBodies.filter(b => {
+                    return !state.stuckPlatelets.some(p => p.body === b);
+                });
+                
+                if (mobileBodies.length < CONFIG.particles.maxCount) {
+                    const conditionConfig = CONFIG.conditions[state.condition];
+                    const plateletRatio = conditionConfig.plateletRatio;
                     
-                    // Spawn particles at fixed interval regardless of FPS
-                    if (elapsed >= SPAWN_INTERVAL_MS) {
-                        const conditionConfig = CONFIG.conditions[state.condition];
-                        const plateletRatio = conditionConfig.plateletRatio;
-                        
-                        // Apply spawn rate multiplier for conditions like thrombocytopenia
-                        const spawnMultiplier = conditionConfig.spawnRateMultiplier || 1.0;
-                        const spawnCount = Math.max(1, Math.floor(CONFIG.particles.spawnRate * spawnMultiplier));
+                    // Apply spawn rate multiplier for conditions like thrombocytopenia
+                    const spawnMultiplier = conditionConfig.spawnRateMultiplier || 1.0;
+                    const spawnCount = Math.max(1, Math.floor(CONFIG.particles.spawnRate * spawnMultiplier));
 
-                        for (let i = 0; i < spawnCount; i++) {
-                            if (state.allBodies.length >= CONFIG.particles.maxCount) break;
-                            
-                            const rand = Math.random();
-                            
-                            if (rand < plateletRatio) {
-                                createParticle('platelet');
-                            } else if (rand < plateletRatio + CONFIG.particles.rbcRatio) {
-                                createParticle('rbc');
-                            } else {
-                                createParticle('wbc');
-                            }
-                        }
+                    for (let i = 0; i < spawnCount; i++) {
+                        // Verificar límite con partículas móviles actualizadas
+                        const currentMobileCount = state.allBodies.filter(b => {
+                            return !state.stuckPlatelets.some(p => p.body === b);
+                        }).length;
+                        if (currentMobileCount >= CONFIG.particles.maxCount) break;
                         
-                        lastSpawnTime = currentTime;
+                        const rand = Math.random();
+                        
+                        if (rand < plateletRatio) {
+                            createParticle('platelet');
+                            spawnedThisCycle++;
+                        } else if (rand < plateletRatio + CONFIG.particles.rbcRatio) {
+                            createParticle('rbc');
+                            spawnedThisCycle++;
+                        } else {
+                            createParticle('wbc');
+                            spawnedThisCycle++;
+                        }
                     }
                 }
                 
-                spawnInterval = requestAnimationFrame(spawnLoop);
-            }
+                // Registrar estadísticas de spawn
+                spawnStats.lastSpawnCount = spawnedThisCycle;
+                spawnStats.totalSpawned += spawnedThisCycle;
+                spawnStats.spawnHistory.push(spawnedThisCycle);
+                if (spawnStats.spawnHistory.length > 10) {
+                    spawnStats.spawnHistory.shift();
+                }
+                
+                lastSpawnTime = currentTime;
+            }, SPAWN_INTERVAL_MS);
             
-            spawnInterval = requestAnimationFrame(spawnLoop);
+            // Contador visual del intervalo de spawn
+            spawnIntervalCounter = setInterval(() => {
+                if (actualSpawnIntervals.length > 0) {
+                    const avgInterval = actualSpawnIntervals.reduce((a, b) => a + b, 0) / actualSpawnIntervals.length;
+                    const lastInterval = actualSpawnIntervals[actualSpawnIntervals.length - 1];
+                    const avgSpawnCount = spawnStats.spawnHistory.length > 0 
+                        ? (spawnStats.spawnHistory.reduce((a, b) => a + b, 0) / spawnStats.spawnHistory.length).toFixed(1)
+                        : '0';
+                    
+                    const spawnElement = document.getElementById('spawn-interval-counter');
+                    if (spawnElement) {
+                        spawnElement.textContent = `Spawn: ${Math.round(lastInterval)}ms | Último: ${spawnStats.lastSpawnCount} | Promedio: ${avgSpawnCount} | Total: ${state.allBodies.length}/${CONFIG.particles.maxCount}`;
+                        // Color coding: verde si está cerca del intervalo objetivo, amarillo si está un poco desviado, rojo si está muy desviado
+                        spawnElement.classList.remove('good', 'medium', 'low');
+                        if (Math.abs(lastInterval - SPAWN_INTERVAL_MS) < 5) {
+                            spawnElement.classList.add('good');
+                        } else if (Math.abs(lastInterval - SPAWN_INTERVAL_MS) < 20) {
+                            spawnElement.classList.add('medium');
+                        } else {
+                            spawnElement.classList.add('low');
+                        }
+                    }
+                }
+            }, 500); // Actualizar cada 500ms
         }
         
         function toggleSimulation() {
@@ -1708,14 +1986,29 @@
                 });
 
                 // Suction force (only under the wound) - scaled by timestep
-                if (body.position.x > woundLeft - 50 && body.position.x < woundRight + 50) {
+                // Desplazar la succión hacia la izquierda
+                const suctionOffset = -15; // Desplazamiento hacia la izquierda
+                const suctionLeft = woundLeft + suctionOffset;
+                const suctionRight = woundRight + suctionOffset;
+                
+                if (body.position.x > suctionLeft - 50 && body.position.x < suctionRight + 50) {
                     const distanceToWound = Math.abs(body.position.y - 20);
 
-                    if (body.position.x > woundLeft && body.position.x < woundRight && body.position.y < 150) {
+                    if (body.position.x > suctionLeft && body.position.x < suctionRight && body.position.y < 250) {
                         // Direct suction upward
-                        const suctionStrength = CONFIG.physics.suctionForce * (1 - distanceToWound / 150);
+                        const suctionStrength = CONFIG.physics.suctionForce * (1 - distanceToWound / 230);
+                        
+                        // Añadir componente horizontal hacia la izquierda
+                        // Más fuerte cuanto más arriba y más a la izquierda esté la partícula
+                        const normalizedY = (body.position.y - 20) / 230; // 0 = arriba, 1 = abajo
+                        const normalizedX = (body.position.x - suctionLeft) / woundWidth; // 0 = izquierda, 1 = derecha
+                        
+                        // Componente horizontal hacia la izquierda (más fuerte arriba y a la izquierda)
+                        // Invertimos normalizedY y normalizedX para que sea más fuerte arriba e izquierda
+                        const horizontalSuction = (1 - normalizedY) * (1 - normalizedX) * CONFIG.physics.suctionForce * 0.3;
+                        
                         Body.applyForce(body, body.position, {
-                            x: 0,
+                            x: -horizontalSuction * body.mass * timeScale, // Hacia la izquierda
                             y: -suctionStrength * body.mass * timeScale
                         });
                     }
@@ -1924,10 +2217,15 @@
                 constraint: constraint,
                 hasFibrin: false,
                 fibrinConnections: [],
-                condition: state.condition
+                condition: state.condition,
+                stuckAt: Date.now(), // Timestamp para identificar las más antiguas
+                isAnchor: false
             };
 
             state.stuckPlatelets.push(plateletData);
+            
+            // Limitar el número de plaquetas pegadas para mantener rendimiento
+            cleanupOldStuckPlatelets();
             
             // Ocultar cartel cuando hay plaquetas pegadas
             const woundLabel = document.getElementById('wound-label');
@@ -1961,6 +2259,76 @@
             }
         }
 
+        function cleanupOldStuckPlatelets() {
+            const maxStuckPlatelets = CONFIG.stuckPlatelets.maxCount;
+            
+            // Si no excedemos el límite, no hacer nada
+            if (state.stuckPlatelets.length <= maxStuckPlatelets) {
+                return;
+            }
+            
+            const woundX = CONFIG.wound.x;
+            const woundWidth = CONFIG.wound.width;
+            const woundLeft = woundX - woundWidth / 2;
+            const woundRight = woundX + woundWidth / 2;
+            const woundAreaMargin = 100; // Margen alrededor de la herida para considerar "relevante"
+            
+            // Ordenar plaquetas pegadas por timestamp (más antiguas primero)
+            // Pero excluir las anchor platelets y las que están cerca de la herida
+            const plateletsToConsider = state.stuckPlatelets
+                .filter(p => !p.isAnchor) // No eliminar anchor platelets
+                .map(p => ({
+                    data: p,
+                    distance: Math.abs(p.body.position.x - woundX),
+                    isNearWound: p.body.position.x >= woundLeft - woundAreaMargin && 
+                                p.body.position.x <= woundRight + woundAreaMargin &&
+                                p.body.position.y >= 20 && p.body.position.y <= 100
+                }))
+                .sort((a, b) => {
+                    // Priorizar eliminar las que están lejos de la herida
+                    if (a.isNearWound && !b.isNearWound) return 1;
+                    if (!a.isNearWound && b.isNearWound) return -1;
+                    // Si ambas están cerca o lejos, ordenar por timestamp (más antiguas primero)
+                    return (a.data.stuckAt || 0) - (b.data.stuckAt || 0);
+                });
+            
+            // Calcular cuántas necesitamos eliminar
+            const toRemove = state.stuckPlatelets.length - maxStuckPlatelets;
+            
+            // Eliminar las más antiguas que están lejos de la herida
+            for (let i = 0; i < toRemove && i < plateletsToConsider.length; i++) {
+                const plateletData = plateletsToConsider[i].data;
+                
+                // Eliminar constraints de fibrina conectados
+                for (let j = state.fibrinConstraints.length - 1; j >= 0; j--) {
+                    const fibrin = state.fibrinConstraints[j];
+                    if (fibrin.pointA === plateletData.body || fibrin.pointB === plateletData.body) {
+                        removeFibrinConnection(fibrin);
+                    }
+                }
+                
+                // Eliminar constraint de la plaqueta
+                if (plateletData.constraint) {
+                    Composite.remove(engine.world, plateletData.constraint);
+                }
+                
+                // Eliminar el body
+                Composite.remove(engine.world, plateletData.body);
+                
+                // Eliminar de la lista
+                const index = state.stuckPlatelets.indexOf(plateletData);
+                if (index > -1) {
+                    state.stuckPlatelets.splice(index, 1);
+                }
+                
+                // Eliminar de allBodies
+                const bodyIndex = state.allBodies.indexOf(plateletData.body);
+                if (bodyIndex > -1) {
+                    state.allBodies.splice(bodyIndex, 1);
+                }
+            }
+        }
+
         function cleanupParticles() {
             const toRemove = [];
             const woundX = CONFIG.wound.x;
@@ -1974,19 +2342,28 @@
                 const px = body.position.x;
                 const py = body.position.y;
                 
-                // Remove particles that exit right or top (blood loss)
-                if (px > CONFIG.canvas.width + 20 || py < -30) {
-                    toRemove.push(body);
-                    if (py < -30) state.bloodLoss++;
-                }
-                // Remove particles that exit through the wound (upward)
-                else if (py < 10 && px >= woundLeft - 5 && px <= woundRight + 5) {
-                    toRemove.push(body);
-                    state.bloodLoss++;
-                }
-                // Remove particles way off screen
-                else if (py > CONFIG.canvas.height + 50 || px < -100) {
-                    toRemove.push(body);
+                // Solo eliminar partículas móviles (no pegadas) en la limpieza básica
+                const isStuck = state.stuckPlatelets.some(p => p.body === body);
+                
+                if (!isStuck) {
+                    // Remove particles that exit right (eliminar cuando salen completamente del canvas)
+                    if (px > CONFIG.canvas.width + 20) {
+                        toRemove.push(body);
+                    }
+                    // Remove particles that exit top (blood loss)
+                    else if (py < -20) {
+                        toRemove.push(body);
+                        state.bloodLoss++;
+                    }
+                    // Remove particles that exit through the wound (upward)
+                    else if (py < 10 && px >= woundLeft - 5 && px <= woundRight + 5) {
+                        toRemove.push(body);
+                        state.bloodLoss++;
+                    }
+                    // Remove particles way off screen (bottom or left)
+                    else if (py > CONFIG.canvas.height + 20 || px < -30) {
+                        toRemove.push(body);
+                    }
                 }
             }
 
@@ -2023,6 +2400,47 @@
             
             // Remove from allBodies array (more efficient)
             state.allBodies = state.allBodies.filter(b => !bodySet.has(b));
+            
+            // Limpieza agresiva: eliminar partículas que están cerca del borde derecho
+            // Esto asegura que las partículas se eliminen antes de llegar al límite máximo
+            const aggressiveCleanupThreshold = CONFIG.particles.maxCount * 0.7; // 70% del límite (105 partículas)
+            if (state.allBodies.length > aggressiveCleanupThreshold) {
+                const additionalToRemove = [];
+                
+                for (let i = state.allBodies.length - 1; i >= 0; i--) {
+                    const body = state.allBodies[i];
+                    if (!body || !body.position) continue;
+                    
+                    const px = body.position.x;
+                    const py = body.position.y;
+                    
+                    // Solo eliminar partículas móviles (no pegadas)
+                    const isStuck = state.stuckPlatelets.some(p => p.body === body);
+                    if (isStuck) continue;
+                    
+                    // Eliminar partículas que están muy cerca del borde derecho (dentro de 30px del final)
+                    if (px > CONFIG.canvas.width - 30) {
+                        additionalToRemove.push(body);
+                    }
+                    // También eliminar partículas que están muy abajo (fuera de la vista útil)
+                    else if (py > CONFIG.canvas.height - 10) {
+                        additionalToRemove.push(body);
+                    }
+                }
+                
+                // Eliminar las partículas adicionales encontradas
+                additionalToRemove.forEach(body => {
+                    try {
+                        Composite.remove(engine.world, body);
+                        const index = state.allBodies.indexOf(body);
+                        if (index > -1) {
+                            state.allBodies.splice(index, 1);
+                        }
+                    } catch (e) {
+                        // Ignorar errores si el body ya fue eliminado
+                    }
+                });
+            }
         }
 
         function setupCollisionEvents() {
@@ -2190,10 +2608,15 @@
                 constraint: constraint,
                 hasFibrin: false,
                 fibrinConnections: [],
-                condition: state.condition
+                condition: state.condition,
+                stuckAt: Date.now(), // Timestamp para identificar las más antiguas
+                isAnchor: false
             };
 
             state.stuckPlatelets.push(plateletData);
+            
+            // Limitar el número de plaquetas pegadas para mantener rendimiento
+            cleanupOldStuckPlatelets();
             
             // Ocultar cartel cuando hay plaquetas pegadas
             const woundLabel = document.getElementById('wound-label');
