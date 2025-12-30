@@ -1403,18 +1403,30 @@
                     width: canvasEl.width,
                     height: canvasEl.height,
                     wireframes: false,
-                    background: '#0F172A'
+                    background: '#0F172A',
+                    // Desacoplar el renderer del timestep de la física
+                    // El renderer se actualiza a su propio ritmo, pero la física siempre usa timestep fijo
+                    pixelRatio: window.devicePixelRatio || 1
                 }
             });
+            
+            // Asegurar que el engine siempre use timestep fijo
+            engine.timing.timeScale = 1.0;
+            engine.timing.timestamp = 0;
 
             // Create vessel walls
             createVesselWalls();
 
             // Start engine and renderer with fixed timestep
+            // Configurar el engine para usar timestep fijo
+            engine.timing.timeScale = 1.0; // Asegurar que el timeScale sea 1.0
+            
             runner = Runner.create({
-                delta: 1000 / 60, // Fixed timestep: 60 FPS equivalent
-                isFixed: true
+                delta: 1000 / 60, // Fixed timestep: 16.67ms = 60 FPS
+                isFixed: true,
+                enabled: true
             });
+            
             // NO iniciar automáticamente - esperar botón de inicio
             // Runner.run(runner, engine);
             Render.run(render);
@@ -1432,14 +1444,16 @@
             frameCount = 0;
             
             // Update loop for forces - use fixed timestep for frame-independent forces
+            // Con isFixed: true, el Runner ejecuta pasos de física a intervalos fijos
+            // Cada paso siempre es de 16.67ms, independientemente del FPS del renderer
             Events.on(engine, 'beforeUpdate', () => {
                 // Solo actualizar si la simulación está corriendo
                 if (!state.simulationRunning) return;
                 
                 frameCount++;
-                // Use fixed timestep (16.67ms = 60 FPS) - Runner with isFixed ensures this is consistent
-                // Even if FPS drops, Runner will execute multiple steps to maintain fixed timestep
-                const timestep = 16.67; // milliseconds (1000/60)
+                // Con isFixed: true, cada paso del engine es exactamente delta (16.67ms)
+                // No necesitamos calcular timeScale porque siempre es 1.0
+                const timestep = runner.delta; // Usar el delta real del Runner (16.67ms)
                 applyForces(timestep);
                 
                 // Update fibrin barrier positions to follow platelets (every 3 frames for performance)
@@ -1933,9 +1947,12 @@
             const adhesionLineY = 23; // Y position of the invisible line
             const adhesionLineThreshold = 14; // How close to trigger adhesion check
             
-            // Normalize timestep to 60 FPS (16.67ms) for consistent force application
-            // timestep is in milliseconds, convert to seconds and normalize
-            const timeScale = timestep / 16.67; // Scale factor: 1.0 at 60 FPS
+            // IMPORTANTE: Con Runner.isFixed = true y delta = 16.67ms,
+            // el timestep siempre es constante independientemente del FPS del renderer.
+            // El Runner ejecuta pasos de física a intervalos fijos, y cada paso siempre es de 16.67ms.
+            // Por lo tanto, timeScale siempre debe ser 1.0 para mantener velocidad constante.
+            // NO escalamos por el timestep real porque ya está fijo en 16.67ms.
+            const timeScale = 1.0; // Siempre 1.0 porque el timestep es fijo
 
             state.allBodies.forEach(body => {
                 // Skip stuck platelets and static bodies
