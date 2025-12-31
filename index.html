@@ -209,50 +209,67 @@
         /* Control Panel */
         .control-panel {
             display: grid;
-            grid-template-columns: 1fr 1fr;
-            gap: 24px;
+            grid-template-columns: 0.6fr 1.4fr;
+            gap: 16px;
             max-width: 1300px;
             margin: 0 auto;
         }
 
         .panel-card {
             background: white;
-            border-radius: 16px;
-            padding: 24px;
+            border-radius: 10px;
+            padding: 12px;
             box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 
                         0 2px 4px -1px rgba(0, 0, 0, 0.06);
             border: 1px solid #E2E8F0;
+            max-height: calc(100vh - 150px);
+            overflow-y: auto;
+        }
+        
+        .panel-card:first-child {
+            padding: 10px;
+        }
+        
+        .panel-card:last-child {
+            display: flex;
+            flex-direction: column;
         }
         
         .controls-metrics-container {
             display: flex;
-            gap: 24px;
+            gap: 12px;
             align-items: flex-start;
-            margin-top: 20px;
+            margin-top: 8px;
         }
         
         .controls-section {
-            flex: 1;
+            flex: 0 0 280px;
             display: flex;
             flex-direction: column;
-            gap: 12px;
+            gap: 6px;
         }
         
         .metrics-section {
             flex: 1;
-            min-width: 300px;
+            min-width: 0;
+            max-height: calc(100vh - 200px);
+            overflow-y: auto;
         }
 
         .panel-title {
-            font-size: 0.75rem;
+            font-size: 0.7rem;
             font-weight: 600;
             text-transform: uppercase;
             letter-spacing: 0.5px;
             color: #64748B;
-            margin-bottom: 16px;
+            margin-bottom: 10px;
             display: flex;
             align-items: center;
-            gap: 8px;
+            gap: 6px;
+        }
+        
+        .panel-card:first-child .panel-title {
+            margin-bottom: 8px;
         }
 
         .panel-title svg {
@@ -265,20 +282,20 @@
         .condition-grid {
             display: grid;
             grid-template-columns: repeat(2, 1fr);
-            gap: 12px;
+            gap: 8px;
         }
         
         @media (min-width: 1200px) {
             .condition-grid {
-                grid-template-columns: repeat(4, 1fr);
+                grid-template-columns: repeat(2, 1fr);
             }
         }
 
         .condition-btn {
             background: #F8FAFC;
             border: 2px solid #E2E8F0;
-            border-radius: 12px;
-            padding: 16px;
+            border-radius: 8px;
+            padding: 10px;
             cursor: pointer;
             transition: all 0.2s;
             text-align: left;
@@ -300,38 +317,38 @@
 
         .condition-name {
             font-weight: 600;
-            font-size: 0.95rem;
+            font-size: 0.8rem;
             color: #1E293B;
-            margin-bottom: 4px;
+            margin-bottom: 3px;
         }
 
         .condition-desc {
-            font-size: 0.75rem;
+            font-size: 0.65rem;
             color: #64748B;
-            line-height: 1.4;
+            line-height: 1.3;
         }
 
         /* Metrics Panel */
         .metrics-grid {
             display: grid;
             grid-template-columns: repeat(2, 1fr);
-            gap: 16px;
-            margin-bottom: 20px;
+            gap: 8px;
+            margin-bottom: 8px;
         }
 
         .metric-box {
             background: #F8FAFC;
-            border-radius: 12px;
-            padding: 16px;
+            border-radius: 6px;
+            padding: 8px;
             text-align: center;
             border: 1px solid #E2E8F0;
         }
 
         .metric-value {
-            font-size: 2.5rem;
+            font-size: 1.75rem;
             font-weight: 800;
             line-height: 1;
-            margin-bottom: 4px;
+            margin-bottom: 2px;
         }
 
         .metric-value.blood-loss {
@@ -343,18 +360,18 @@
         }
 
         .metric-label {
-            font-size: 0.75rem;
+            font-size: 0.7rem;
             color: #64748B;
             font-weight: 500;
         }
 
         /* Progress Bar */
         .clot-progress-bar {
-            height: 8px;
+            height: 5px;
             background: #E2E8F0;
-            border-radius: 4px;
+            border-radius: 3px;
             overflow: hidden;
-            margin-bottom: 20px;
+            margin-bottom: 8px;
         }
 
         .clot-progress-fill {
@@ -363,6 +380,250 @@
             border-radius: 4px;
             transition: width 0.3s;
             width: 0%;
+        }
+
+        /* Gráficos en tiempo real */
+        .charts-container {
+            margin-top: 8px;
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 6px;
+        }
+
+        .chart-panel {
+            background: white;
+            border-radius: 6px;
+            padding: 6px;
+            border: 1px solid #E2E8F0;
+            box-shadow: 0 1px 2px rgba(0,0,0,0.05);
+        }
+
+        .chart-title {
+            font-size: 0.65rem;
+            font-weight: 600;
+            color: #1E293B;
+            margin-bottom: 4px;
+            display: flex;
+            align-items: center;
+            gap: 4px;
+        }
+
+        .chart-canvas {
+            width: 100%;
+            height: 70px;
+            border-radius: 4px;
+        }
+
+        /* Métricas avanzadas expandidas */
+        .advanced-metrics {
+            margin-top: 8px;
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 6px;
+        }
+
+        .advanced-metric {
+            background: #F8FAFC;
+            padding: 6px;
+            border-radius: 4px;
+            border: 1px solid #E2E8F0;
+        }
+
+        .advanced-metric-label {
+            font-size: 0.6rem;
+            color: #64748B;
+            margin-bottom: 2px;
+        }
+
+        .advanced-metric-value {
+            font-size: 0.875rem;
+            font-weight: 700;
+            color: #1E293B;
+        }
+
+        /* Controles de velocidad */
+        .simulation-controls {
+            display: flex;
+            gap: 6px;
+            margin-bottom: 10px;
+            flex-wrap: wrap;
+        }
+
+        .speed-control {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            padding: 6px 10px;
+            background: #F8FAFC;
+            border-radius: 6px;
+            border: 1px solid #E2E8F0;
+        }
+
+        .speed-control label {
+            font-size: 0.7rem;
+            color: #64748B;
+            font-weight: 500;
+        }
+
+        .speed-slider {
+            width: 80px;
+            height: 3px;
+            border-radius: 2px;
+            background: #E2E8F0;
+            outline: none;
+            -webkit-appearance: none;
+            appearance: none;
+        }
+
+        .speed-slider::-webkit-slider-thumb {
+            -webkit-appearance: none;
+            appearance: none;
+            width: 14px;
+            height: 14px;
+            border-radius: 50%;
+            background: #3B82F6;
+            cursor: pointer;
+        }
+
+        .speed-slider::-moz-range-thumb {
+            width: 14px;
+            height: 14px;
+            border-radius: 50%;
+            background: #3B82F6;
+            cursor: pointer;
+            border: none;
+        }
+
+        /* Tooltips educativos */
+        .tooltip-container {
+            position: relative;
+            display: inline-block;
+        }
+
+        .tooltip-trigger {
+            cursor: help;
+            color: #3B82F6;
+            text-decoration: underline;
+            text-decoration-style: dotted;
+        }
+
+        .tooltip {
+            position: absolute;
+            bottom: 100%;
+            left: 50%;
+            transform: translateX(-50%);
+            margin-bottom: 8px;
+            padding: 12px 16px;
+            background: #1E293B;
+            color: white;
+            border-radius: 8px;
+            font-size: 0.875rem;
+            line-height: 1.5;
+            max-width: 300px;
+            z-index: 1000;
+            opacity: 0;
+            pointer-events: none;
+            transition: opacity 0.2s;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.3);
+        }
+
+        .tooltip::after {
+            content: '';
+            position: absolute;
+            top: 100%;
+            left: 50%;
+            transform: translateX(-50%);
+            border: 6px solid transparent;
+            border-top-color: #1E293B;
+        }
+
+        .tooltip.visible {
+            opacity: 1;
+            pointer-events: auto;
+        }
+
+        /* Panel educativo expandible */
+        .educational-panel {
+            margin-top: 8px;
+            background: #F8FAFC;
+            border-radius: 6px;
+            border: 1px solid #E2E8F0;
+            overflow: hidden;
+        }
+
+        .educational-panel-header {
+            padding: 6px 8px;
+            background: #EFF6FF;
+            border-bottom: 1px solid #E2E8F0;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            user-select: none;
+        }
+
+        .educational-panel-header:hover {
+            background: #DBEAFE;
+        }
+
+        .educational-panel-title {
+            font-weight: 600;
+            font-size: 0.7rem;
+            color: #1E293B;
+            display: flex;
+            align-items: center;
+            gap: 4px;
+        }
+
+        .educational-panel-content {
+            padding: 8px;
+            display: none;
+            max-height: 300px;
+            overflow-y: auto;
+        }
+
+        .educational-panel.expanded .educational-panel-content {
+            display: block;
+        }
+
+        .educational-section {
+            margin-bottom: 8px;
+        }
+
+        .educational-section h4 {
+            font-size: 0.75rem;
+            font-weight: 600;
+            color: #1E293B;
+            margin-bottom: 4px;
+        }
+
+        .educational-section p {
+            font-size: 0.65rem;
+            color: #475569;
+            line-height: 1.4;
+            margin-bottom: 4px;
+        }
+
+        .coagulation-cascade {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
+            gap: 6px;
+            margin-top: 6px;
+        }
+
+        .cascade-step {
+            background: white;
+            padding: 6px;
+            border-radius: 4px;
+            border: 1px solid #E2E8F0;
+            font-size: 0.65rem;
+        }
+
+        .cascade-step-title {
+            font-weight: 600;
+            color: #3B82F6;
+            margin-bottom: 2px;
+            font-size: 0.7rem;
         }
 
         /* Treatment Button */
@@ -408,37 +669,41 @@
 
         /* Simulation Wizard */
         .simulation-wizard {
-            padding: 16px;
+            width: 100%;
+            padding: 8px;
             background: #F8FAFC;
-            border-radius: 12px;
+            border-radius: 6px;
             border: 1px solid #E2E8F0;
+            margin-bottom: 8px;
+            display: flex;
+            flex-direction: column;
+            gap: 4px;
         }
 
         .wizard-step {
             display: flex;
             align-items: center;
-            gap: 12px;
-            padding: 12px;
-            margin-bottom: 8px;
-            border-radius: 8px;
+            gap: 6px;
+            padding: 6px 8px;
+            border-radius: 4px;
             opacity: 0.5;
-            transition: all 0.3s;
+            transition: all 0.2s;
         }
 
         .wizard-step.active {
             opacity: 1;
             background: #E0F2FE;
-            border: 2px solid #0EA5E9;
+            border: 1px solid #0EA5E9;
         }
 
         .wizard-step.completed {
-            opacity: 0.8;
+            opacity: 0.7;
             background: #D1FAE5;
         }
 
         .step-number {
-            width: 32px;
-            height: 32px;
+            width: 18px;
+            height: 18px;
             border-radius: 50%;
             background: #CBD5E1;
             color: white;
@@ -446,7 +711,7 @@
             align-items: center;
             justify-content: center;
             font-weight: 700;
-            font-size: 0.875rem;
+            font-size: 0.6rem;
             flex-shrink: 0;
         }
 
@@ -460,34 +725,41 @@
 
         .step-content {
             flex: 1;
+            min-width: 0;
         }
 
         .step-title {
             font-weight: 600;
             color: #1E293B;
-            font-size: 0.875rem;
-            margin-bottom: 2px;
+            font-size: 0.7rem;
+            margin-bottom: 1px;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
         }
 
         .step-desc {
-            font-size: 0.75rem;
+            font-size: 0.6rem;
             color: #64748B;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
         }
 
         /* Start Button */
         .start-btn {
             width: 100%;
-            padding: 14px;
+            padding: 10px;
             background: linear-gradient(135deg, #10B981 0%, #059669 100%);
             color: white;
             border: none;
-            border-radius: 10px;
-            font-size: 1rem;
+            border-radius: 8px;
+            font-size: 0.875rem;
             font-weight: 600;
             cursor: pointer;
             transition: all 0.2s;
-            margin-top: 12px;
-            box-shadow: 0 4px 14px rgba(16, 185, 129, 0.3);
+            margin-top: 8px;
+            box-shadow: 0 2px 8px rgba(16, 185, 129, 0.3);
         }
 
         .start-btn:hover:not(:disabled) {
@@ -507,16 +779,16 @@
         /* Reset Button */
         .reset-btn {
             width: 100%;
-            padding: 12px;
+            padding: 10px;
             background: transparent;
             color: #64748B;
             border: 2px solid #E2E8F0;
-            border-radius: 10px;
-            font-size: 0.875rem;
+            border-radius: 8px;
+            font-size: 0.8rem;
             font-weight: 500;
             cursor: pointer;
             transition: all 0.2s;
-            margin-top: 12px;
+            margin-top: 8px;
         }
 
         .reset-btn:hover {
@@ -868,11 +1140,31 @@
                 <canvas id="simulation-canvas"></canvas>
             </div>
             <div class="legend">
-                <div class="legend-item"><div class="legend-dot platelet"></div> Plaquetas</div>
-                <div class="legend-item"><div class="legend-dot rbc"></div> Glóbulos Rojos</div>
-                <div class="legend-item"><div class="legend-dot wbc"></div> Glóbulos Blancos</div>
-                <div class="legend-item"><div class="legend-dot fibrin"></div> Red de Fibrina</div>
-                <div class="legend-item"><div class="legend-dot vwf"></div> Factor von Willebrand</div>
+                <div class="legend-item tooltip-container">
+                    <div class="legend-dot platelet"></div> 
+                    <span class="tooltip-trigger">Plaquetas</span>
+                    <div class="tooltip">Células sanguíneas pequeñas que se adhieren a la herida y forman el tapón inicial. Se activan al contacto con el colágeno expuesto.</div>
+                </div>
+                <div class="legend-item tooltip-container">
+                    <div class="legend-dot rbc"></div> 
+                    <span class="tooltip-trigger">Glóbulos Rojos</span>
+                    <div class="tooltip">Eritrocitos que transportan oxígeno. No participan directamente en la coagulación pero pueden quedar atrapados en el coágulo.</div>
+                </div>
+                <div class="legend-item tooltip-container">
+                    <div class="legend-dot wbc"></div> 
+                    <span class="tooltip-trigger">Glóbulos Blancos</span>
+                    <div class="tooltip">Leucocitos que participan en la respuesta inmune. Pueden ayudar en la limpieza de la herida.</div>
+                </div>
+                <div class="legend-item tooltip-container">
+                    <div class="legend-dot fibrin"></div> 
+                    <span class="tooltip-trigger">Red de Fibrina</span>
+                    <div class="tooltip">Proteína formada a partir del fibrinógeno por acción de la trombina. Crea una malla que refuerza el tapón plaquetario.</div>
+                </div>
+                <div class="legend-item tooltip-container">
+                    <div class="legend-dot vwf"></div> 
+                    <span class="tooltip-trigger">Factor von Willebrand</span>
+                    <div class="tooltip">Proteína que media la adhesión de las plaquetas al colágeno expuesto. Esencial para el inicio de la hemostasia.</div>
+                </div>
             </div>
         </section>
 
@@ -919,34 +1211,33 @@
             </div>
 
             <div class="panel-card">
-                <!-- Simulation Wizard -->
-                <div class="simulation-wizard">
-                    <div class="wizard-step active" data-step="1">
-                        <div class="step-number">1</div>
-                        <div class="step-content">
-                            <div class="step-title">Selecciona condición</div>
-                            <div class="step-desc">Elige una condición clínica arriba</div>
-                        </div>
-                    </div>
-                    <div class="wizard-step" data-step="2">
-                        <div class="step-number">2</div>
-                        <div class="step-content">
-                            <div class="step-title">Configura parámetros</div>
-                            <div class="step-desc">Opcional: ajusta tratamiento</div>
-                        </div>
-                    </div>
-                    <div class="wizard-step" data-step="3">
-                        <div class="step-number">3</div>
-                        <div class="step-content">
-                            <div class="step-title">Inicia simulación</div>
-                            <div class="step-desc">Presiona el botón Iniciar</div>
-                        </div>
-                    </div>
-                </div>
-                
                 <!-- Botones y Métricas en layout horizontal -->
                 <div class="controls-metrics-container">
                     <div class="controls-section">
+                        <!-- Simulation Wizard -->
+                        <div class="simulation-wizard">
+                            <div class="wizard-step active" data-step="1">
+                                <div class="step-number">1</div>
+                                <div class="step-content">
+                                    <div class="step-title">Selecciona condición</div>
+                                    <div class="step-desc">Elige una condición clínica arriba</div>
+                                </div>
+                            </div>
+                            <div class="wizard-step" data-step="2">
+                                <div class="step-number">2</div>
+                                <div class="step-content">
+                                    <div class="step-title">Configura parámetros</div>
+                                    <div class="step-desc">Opcional: ajusta tratamiento</div>
+                                </div>
+                            </div>
+                            <div class="wizard-step" data-step="3">
+                                <div class="step-number">3</div>
+                                <div class="step-content">
+                                    <div class="step-title">Inicia simulación</div>
+                                    <div class="step-desc">Presiona el botón Iniciar</div>
+                                </div>
+                            </div>
+                        </div>
                         <button class="start-btn" id="start-btn">▶ Iniciar Simulación</button>
                         <button class="treatment-btn" id="treatment-btn">
                             <svg viewBox="0 0 24 24"><path d="M11.15,15.18L9.73,13.77L11.15,12.35L12.56,13.77L13.97,12.35L12.56,10.94L13.97,9.53L15.39,10.94L16.8,9.53L13.97,6.7L6.9,13.77L9.73,16.6L11.15,15.18M3.08,9.27L9.73,2.62L11.15,4.03L4.5,10.69L3.08,9.27M20.92,14.73L14.27,21.38L12.85,19.97L19.5,13.31L20.92,14.73Z"/></svg>
@@ -972,6 +1263,103 @@
                 </div>
                 <div class="clot-progress-bar">
                     <div class="clot-progress-fill" id="clot-bar"></div>
+                </div>
+                
+                <!-- Controles de velocidad -->
+                <div class="simulation-controls">
+                    <div class="speed-control">
+                        <label>Velocidad:</label>
+                        <input type="range" class="speed-slider" id="speed-slider" min="0.25" max="2" step="0.25" value="1">
+                        <span id="speed-value">1x</span>
+                    </div>
+                </div>
+                
+                <!-- Métricas avanzadas -->
+                <div class="advanced-metrics">
+                    <div class="advanced-metric">
+                        <div class="advanced-metric-label">Tiempo hasta cierre de herida</div>
+                        <div class="advanced-metric-value" id="first-adhesion-time">--</div>
+                    </div>
+                    <div class="advanced-metric">
+                        <div class="advanced-metric-label">Velocidad formación fibrina</div>
+                        <div class="advanced-metric-value" id="fibrin-rate">0/min</div>
+                    </div>
+                    <div class="advanced-metric">
+                        <div class="advanced-metric-label">Densidad del coágulo</div>
+                        <div class="advanced-metric-value" id="clot-density">0</div>
+                    </div>
+                    <div class="advanced-metric">
+                        <div class="advanced-metric-label">Tasa de agregación</div>
+                        <div class="advanced-metric-value" id="aggregation-rate">0%</div>
+                    </div>
+                </div>
+                
+                <!-- Gráficos en tiempo real -->
+                <div class="charts-container">
+                    <div class="chart-panel">
+                        <div class="chart-title">
+                            <span>📈</span> Evolución del Cierre de la Herida
+                        </div>
+                        <canvas class="chart-canvas" id="clot-chart"></canvas>
+                    </div>
+                    <div class="chart-panel">
+                        <div class="chart-title">
+                            <span>🩸</span> Pérdida Sanguínea Acumulada
+                        </div>
+                        <canvas class="chart-canvas" id="blood-loss-chart"></canvas>
+                    </div>
+                    <div class="chart-panel">
+                        <div class="chart-title">
+                            <span>🕸️</span> Formación de Red de Fibrina
+                        </div>
+                        <canvas class="chart-canvas" id="fibrin-chart"></canvas>
+                    </div>
+                </div>
+                
+                <!-- Panel educativo expandible -->
+                <div class="educational-panel" id="educational-panel">
+                    <div class="educational-panel-header" id="educational-toggle">
+                        <div class="educational-panel-title">
+                            <span>📚</span> Información Educativa
+                        </div>
+                        <span id="educational-arrow">▼</span>
+                    </div>
+                    <div class="educational-panel-content">
+                        <div class="educational-section">
+                            <h4>Condición Actual: <span id="current-condition-name">Normal</span></h4>
+                            <p id="current-condition-desc">Coagulación fisiológica normal - Todos los factores funcionan correctamente</p>
+                        </div>
+                        <div class="educational-section">
+                            <h4>Cascada de Coagulación</h4>
+                            <p>La coagulación sanguínea es un proceso complejo que involucra múltiples factores:</p>
+                            <div class="coagulation-cascade">
+                                <div class="cascade-step">
+                                    <div class="cascade-step-title">Vía Intrínseca</div>
+                                    <div>Factores XII, XI, IX, VIII</div>
+                                </div>
+                                <div class="cascade-step">
+                                    <div class="cascade-step-title">Vía Extrínseca</div>
+                                    <div>Factor VII + Factor Tisular</div>
+                                </div>
+                                <div class="cascade-step">
+                                    <div class="cascade-step-title">Vía Común</div>
+                                    <div>Factores X, V, II (Trombina)</div>
+                                </div>
+                                <div class="cascade-step">
+                                    <div class="cascade-step-title">Formación de Fibrina</div>
+                                    <div>Fibrinógeno → Fibrina</div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="educational-section">
+                            <h4>Proceso de Hemostasia</h4>
+                            <p><strong>1. Vasoconstricción:</strong> Los vasos se contraen para reducir el flujo sanguíneo.</p>
+                            <p><strong>2. Adhesión Plaquetaria:</strong> Las plaquetas se adhieren al colágeno expuesto usando el factor von Willebrand.</p>
+                            <p><strong>3. Agregación Plaquetaria:</strong> Las plaquetas se unen entre sí formando un tapón primario.</p>
+                            <p><strong>4. Coagulación:</strong> La cascada de coagulación forma fibrina que refuerza el tapón.</p>
+                            <p><strong>5. Retracción:</strong> El coágulo se contrae y estabiliza.</p>
+                        </div>
+                    </div>
                 </div>
                     </div>
                 </div>
@@ -1239,7 +1627,27 @@
             showOintment: false,
             fibrinFormationStarted: false, // Secuencia: plaquetas primero, luego malla
             simulationRunning: false, // Control manual de simulación
-            currentStep: 1 // Paso actual del wizard
+            currentStep: 1, // Paso actual del wizard
+            // Métricas avanzadas
+            startTime: null,
+            firstAdhesionTime: null,
+            woundClosureTime: null,
+            fibrinFormationRate: 0,
+            clotDensity: 0,
+            totalPlateletsSpawned: 0,
+            failedAdhesions: 0,
+            aggregationRate: 0,
+            // Datos históricos para gráficos
+            history: {
+                time: [],
+                clotPercentage: [],
+                bloodLoss: [],
+                fibrinConnections: [],
+                stuckPlatelets: []
+            },
+            // Controles de velocidad
+            timeScale: 1.0,
+            isPaused: false
         };
 
         // Spawn timing for fixed interval
@@ -1260,14 +1668,16 @@
         let lastPhysicsTime = 0;
         const FIXED_TIMESTEP = 1000 / 60; // 16.67ms = 60 FPS fijo para física
         let accumulatedTime = 0;
+        let accumulatedSimulationTime = 0; // Tiempo de simulación acumulado (ajustado por timeScale)
+        let lastSimulationTimeUpdate = 0; // Última vez que se actualizó el tiempo de simulación
 
         // Matter.js Setup
         let engine, render, runner;
 
         function initSimulation() {
-            // Clear spawn interval
+            // Clear spawn timeout
             if (spawnInterval !== null) {
-                clearInterval(spawnInterval);
+                clearTimeout(spawnInterval);
                 spawnInterval = null;
             }
             // spawnIntervalCounter removido
@@ -1280,7 +1690,7 @@
                 spawnHistory: []
             };
 
-            // Reset state
+            // Reset state (preservar propiedades nuevas)
             state = {
                 condition: state.condition,
                 treatmentApplied: false,
@@ -1291,7 +1701,30 @@
                 fibrinConstraints: [],
                 fibrinBodies: [],
                 allBodies: [],
-                showOintment: false
+                showOintment: false,
+                fibrinFormationStarted: false,
+                simulationRunning: false,
+                currentStep: state.currentStep || 1,
+                // Métricas avanzadas
+                startTime: null,
+                firstAdhesionTime: null,
+                woundClosureTime: null,
+                fibrinFormationRate: 0,
+                clotDensity: 0,
+                totalPlateletsSpawned: 0,
+                failedAdhesions: 0,
+                aggregationRate: 0,
+                // Datos históricos para gráficos
+                history: {
+                    time: [],
+                    clotPercentage: [],
+                    bloodLoss: [],
+                    fibrinConnections: [],
+                    stuckPlatelets: []
+                },
+                // Controles de velocidad
+                timeScale: state.timeScale || 1.0,
+                isPaused: false
             };
 
             // FPS counter removed
@@ -1465,13 +1898,33 @@
                 // Acumular tiempo y ejecutar pasos de física a intervalos fijos
                 accumulatedTime += deltaTime;
                 
+                // Acumular tiempo de simulación ajustado por timeScale (solo cuando está corriendo y no pausada)
+                if (!state.isPaused && state.simulationRunning) {
+                    const timeScale = state.timeScale || 1.0;
+                    accumulatedSimulationTime += deltaTime * timeScale;
+                }
+                
                 // Ejecutar tantos pasos de física como sean necesarios para mantener timestep fijo
+                // Ajustar el número de pasos según timeScale para acelerar la simulación
+                const timeScale = state.timeScale || 1.0;
                 const maxSteps = 5; // Limitar pasos por frame para evitar "spiral of death"
                 let stepsExecuted = 0;
                 
+                // Ejecutar múltiples pasos según timeScale, pero mantener timestep fijo
+                // Esto acelera la simulación sin afectar la estabilidad física
+                const stepsToExecute = Math.max(1, Math.ceil(timeScale));
+                
                 while (accumulatedTime >= FIXED_TIMESTEP && stepsExecuted < maxSteps) {
-                    // Ejecutar un paso de física con timestep fijo
-                    Engine.update(engine, FIXED_TIMESTEP);
+                    // Solo ejecutar física si no está pausada
+                    if (!state.isPaused && state.simulationRunning) {
+                        // Ejecutar múltiples pasos de física con timestep fijo para acelerar la simulación
+                        // En lugar de escalar el timestep, ejecutamos más pasos por iteración
+                        // Esto mantiene la física estable pero acelera la simulación
+                        for (let i = 0; i < stepsToExecute; i++) {
+                            Engine.update(engine, FIXED_TIMESTEP);
+                        }
+                    }
+                    // Restar el tiempo correspondiente a los pasos ejecutados
                     accumulatedTime -= FIXED_TIMESTEP;
                     stepsExecuted++;
                 }
@@ -1510,14 +1963,13 @@
             // Con isFixed: true, el Runner ejecuta pasos de física a intervalos fijos
             // Cada paso siempre es de 16.67ms, independientemente del FPS del renderer
             Events.on(engine, 'beforeUpdate', () => {
-                // Solo actualizar si la simulación está corriendo
-                if (!state.simulationRunning) return;
+                // Solo actualizar si la simulación está corriendo y no está pausada
+                if (!state.simulationRunning || state.isPaused) return;
                 
                 frameCount++;
-                // Con isFixed: true, cada paso del engine es exactamente delta (16.67ms)
-                // No necesitamos calcular timeScale porque siempre es 1.0
-                const timestep = runner.delta; // Usar el delta real del Runner (16.67ms)
-                applyForces(timestep);
+                // Aplicar fuerzas con timestep fijo (el timeScale se maneja ejecutando múltiples pasos de física)
+                // Esto asegura que las fuerzas de adhesión funcionen correctamente independientemente de la velocidad
+                applyForces(runner.delta);
                 
                 // Update fibrin barrier positions to follow platelets (every 3 frames for performance)
                 if (frameCount % 3 === 0 && state.fibrinConstraints.length > 0) {
@@ -1734,6 +2186,8 @@
                             mask: 0x0002 | 0x0004 // Collide with fibrin barriers and walls
                         }
                     });
+                    // Rastrear plaquetas spawnadas
+                    state.totalPlateletsSpawned++;
                     break;
 
                 case 'rbc':
@@ -1794,9 +2248,9 @@
         };
 
         function startParticleSpawning() {
-            // Clear any existing interval
+            // Clear any existing timeout
             if (spawnInterval !== null) {
-                clearInterval(spawnInterval);
+                clearTimeout(spawnInterval);
                 spawnInterval = null;
             }
             // spawnIntervalCounter removido
@@ -1809,8 +2263,8 @@
                 spawnHistory: []
             };
             
-            // Use setInterval for absolute precision - this is the most reliable method
-            spawnInterval = setInterval(() => {
+            // Función para spawnear partículas
+            const spawnParticles = () => {
                 // Solo spawnear si la simulación está corriendo
                 if (!state.simulationRunning) {
                     return;
@@ -1871,7 +2325,28 @@
                 }
                 
                 lastSpawnTime = currentTime;
-            }, SPAWN_INTERVAL_MS);
+            };
+            
+            // Función recursiva que ajusta el intervalo según timeScale
+            const scheduleNextSpawn = () => {
+                if (!state.simulationRunning) return;
+                
+                // Asegurar que timeScale tenga un valor válido (por defecto 1.0)
+                const timeScale = state.timeScale && state.timeScale > 0 ? state.timeScale : 1.0;
+                
+                // Calcular intervalo ajustado según velocidad (mayor velocidad = menor intervalo)
+                const adjustedInterval = SPAWN_INTERVAL_MS / timeScale;
+                
+                spawnInterval = setTimeout(() => {
+                    spawnParticles();
+                    scheduleNextSpawn(); // Programar siguiente spawn con nuevo intervalo
+                }, adjustedInterval);
+            };
+            
+            // Iniciar el ciclo de spawn solo si la simulación está corriendo
+            if (state.simulationRunning) {
+                scheduleNextSpawn();
+            }
             
             // Contador de spawn removido
         }
@@ -1880,20 +2355,39 @@
             if (!state.simulationRunning) {
                 // Iniciar simulación
                 state.simulationRunning = true;
+                state.isPaused = false;
+                state.startTime = Date.now();
+                state.firstAdhesionTime = null;
+                state.woundClosureTime = null;
+                state.totalPlateletsSpawned = 0;
+                state.history = { time: [], clotPercentage: [], bloodLoss: [], fibrinConnections: [], stuckPlatelets: [] };
                 // No usar Runner.run() - usamos nuestro propio loop con timestep fijo
                 lastPhysicsTime = 0;
                 accumulatedTime = 0;
+                
+                // Asegurar que timeScale tenga un valor válido
+                if (!state.timeScale || state.timeScale <= 0) {
+                    state.timeScale = 1.0;
+                }
+                
+                // Reiniciar el spawn para asegurar que funcione
+                startParticleSpawning();
+                
                 const startBtn = document.getElementById('start-btn');
-                startBtn.textContent = '⏸ Pausar Simulación';
-                startBtn.classList.add('paused');
+                if (startBtn) {
+                    startBtn.textContent = '⏸ Pausar Simulación';
+                    startBtn.classList.add('paused');
+                }
                 updateWizardStep(3);
             } else {
                 // Pausar simulación
                 state.simulationRunning = false;
                 // No usar Runner.stop() - usamos nuestro propio loop
                 const startBtn = document.getElementById('start-btn');
-                startBtn.textContent = '▶ Reanudar Simulación';
-                startBtn.classList.remove('paused');
+                if (startBtn) {
+                    startBtn.textContent = '▶ Reanudar Simulación';
+                    startBtn.classList.remove('paused');
+                }
             }
         }
         
@@ -1917,8 +2411,9 @@
             const woundRight = woundX + woundWidth / 2;
             
             // Invisible adhesion line parameters - positioned at wound opening
-            const adhesionLineY = 23; // Y position of the invisible line
-            const adhesionLineThreshold = 14; // How close to trigger adhesion check
+            const adhesionLineY = 23; // Y position center of the adhesion zone
+            const adhesionLineThreshold = 25; // Width of adhesion zone (más ancho para efecto de profundidad)
+            const adhesionDetectionThreshold = 8; // Umbral más estricto para detectar adhesión (solo cuando está muy cerca)
             
             // IMPORTANTE: Con Runner.isFixed = true y delta = 16.67ms,
             // el timestep siempre es constante independientemente del FPS del renderer.
@@ -2113,12 +2608,16 @@
                 // INVISIBLE ADHESION LINE - Check if platelet crosses the invisible line
                 if (body.label === 'platelet' && !body.isStuck) {
                     const inWoundZone = body.position.x > woundLeft && body.position.x < woundRight;
-                    const nearAdhesionLine = Math.abs(body.position.y - adhesionLineY) < adhesionLineThreshold;
+                    // Usar umbral más estricto para detectar adhesión (solo cuando está muy cerca del centro)
+                    const distanceFromCenter = Math.abs(body.position.y - adhesionLineY);
+                    const nearAdhesionLine = distanceFromCenter < adhesionLineThreshold; // Área amplia para variación
+                    const veryCloseToCenter = distanceFromCenter < 8; // Solo adherir cuando está muy cerca del centro
 
-                    if (inWoundZone && nearAdhesionLine) {
+                    if (inWoundZone && nearAdhesionLine && veryCloseToCenter) {
                         const conditionConfig = CONFIG.conditions[state.condition];
                         const canStick = state.treatmentApplied ? true : conditionConfig.canStick;
-                        const stickProb = state.treatmentApplied ? 0.85 : conditionConfig.stickProbability * 0.4;
+                        // Reducir probabilidad base de adhesión
+                        const stickProb = state.treatmentApplied ? 0.7 : conditionConfig.stickProbability * 0.3;
 
                         // Check platelet function first
                         if (!state.treatmentApplied && Math.random() > conditionConfig.plateletFunction) {
@@ -2132,9 +2631,20 @@
                             return;
                         }
                         
-                        const adhesionStrength = state.treatmentApplied ? 0.85 : conditionConfig.adhesionStrength * 0.4;
+                        // Fuerza de adhesión ajustada (un poco más alta que antes)
+                        const baseAdhesionStrength = state.treatmentApplied ? 0.5 : conditionConfig.adhesionStrength * 0.2;
                         
-                        if (canStick && Math.random() < adhesionStrength) {
+                        // Añadir factor de distancia: más cerca del centro = mayor probabilidad
+                        // Solo adherir si está muy cerca del centro (dentro de 6px)
+                        const distanceFactor = Math.max(0.3, 1 - (distanceFromCenter / 6)); // Factor moderado
+                        const finalAdhesionStrength = baseAdhesionStrength * distanceFactor;
+                        
+                        // Añadir factor de velocidad: plaquetas más lentas tienen mayor probabilidad
+                        const speed = Math.sqrt(body.velocity.x * body.velocity.x + body.velocity.y * body.velocity.y);
+                        const speedFactor = Math.max(0.5, 1 - (speed / 0.4)); // Factor de velocidad moderado
+                        const finalAdhesionWithSpeed = finalAdhesionStrength * speedFactor;
+                        
+                        if (canStick && Math.random() < finalAdhesionWithSpeed) {
                             // Stick to the invisible line
                             stickPlateletToLine(body, adhesionLineY, conditionConfig);
                         } else if (!state.treatmentApplied && conditionConfig.adhesionRetryChance) {
@@ -2185,15 +2695,26 @@
             const visualEffects = conditionConfig.visualEffects || CONFIG.conditions.normal.visualEffects;
             platelet.render.fillStyle = visualEffects.plateletColor || '#808080';
             
-            // Stop movement and position at the line
+            // Stop movement and position within the adhesion zone (efecto de profundidad)
             Body.setVelocity(platelet, { x: 0, y: 0 });
-            const stickY = lineY + 6;
+            // Variar la posición Y dentro del área de adhesión para crear profundidad
+            // Las plaquetas pueden adherirse en un rango simétrico alrededor de la línea central
+            const adhesionZoneHalfWidth = 12; // Mitad del ancho del área de adhesión
+            const adhesionZoneTop = lineY - adhesionZoneHalfWidth;
+            const adhesionZoneBottom = lineY + adhesionZoneHalfWidth;
+            // Posición aleatoria dentro del área de adhesión, con distribución normal centrada
+            // Usar la posición actual de la plaqueta como referencia, pero limitada al área de adhesión
+            const currentY = platelet.position.y;
+            const targetY = Math.max(adhesionZoneTop, Math.min(adhesionZoneBottom, currentY));
+            // Añadir pequeña variación aleatoria para efecto de profundidad
+            const randomVariation = (Math.random() - 0.5) * 4; // Variación de ±2 píxeles
+            const stickY = Math.max(adhesionZoneTop, Math.min(adhesionZoneBottom, targetY + randomVariation));
             Body.setPosition(platelet, { x: platelet.position.x, y: stickY });
             
             // Make platelet completely static so it doesn't move
             Body.setStatic(platelet, true);
             
-            // Create constraint to the line (static point) - maximum stiffness
+            // Create constraint to the adhesion point - maximum stiffness
             const constraint = Constraint.create({
                 bodyA: platelet,
                 pointB: { x: platelet.position.x, y: stickY },
@@ -2217,6 +2738,11 @@
 
             state.stuckPlatelets.push(plateletData);
 
+            // Rastrear primera adhesión
+            if (!state.firstAdhesionTime && state.startTime) {
+                state.firstAdhesionTime = Date.now();
+            }
+
             // Limitar el número de plaquetas pegadas para mantener rendimiento
             cleanupOldStuckPlatelets();
             
@@ -2228,12 +2754,15 @@
 
             // Secuencia: plaquetas primero, luego malla
             // Activar formación de fibrina solo después de umbral de plaquetas
-            const minPlateletsForFibrin = 3;
+            // Con tratamiento, reducir el umbral mínimo de plaquetas
+            const minPlateletsForFibrin = state.treatmentApplied ? 2 : 3;
             if (state.stuckPlatelets.length >= minPlateletsForFibrin) {
                 state.fibrinFormationStarted = true;
                 
                 // Try to form fibrin after delay if specified
-                const delay = conditionConfig.fibrinFormationDelay || 150;
+                // Con tratamiento, reducir significativamente el delay
+                const baseDelay = conditionConfig.fibrinFormationDelay || 150;
+                const delay = state.treatmentApplied ? Math.max(50, baseDelay * 0.3) : baseDelay;
             setTimeout(() => {
                 if (state.stuckPlatelets.includes(plateletData)) {
                     tryFormFibrin(plateletData);
@@ -2608,6 +3137,11 @@
 
             state.stuckPlatelets.push(plateletData);
 
+            // Rastrear primera adhesión
+            if (!state.firstAdhesionTime && state.startTime) {
+                state.firstAdhesionTime = Date.now();
+            }
+
             // Limitar el número de plaquetas pegadas para mantener rendimiento
             cleanupOldStuckPlatelets();
             
@@ -2619,17 +3153,20 @@
 
             // Secuencia: plaquetas primero, luego malla
             // Activar formación de fibrina solo después de umbral de plaquetas
-            const minPlateletsForFibrin = 3;
+            // Con tratamiento, reducir el umbral mínimo de plaquetas
+            const minPlateletsForFibrin = state.treatmentApplied ? 2 : 3;
             if (state.stuckPlatelets.length >= minPlateletsForFibrin) {
                 state.fibrinFormationStarted = true;
                 
                 // Try to form fibrin with delay if specified
-                const delay = conditionConfig.fibrinFormationDelay || 100;
+                // Con tratamiento, reducir significativamente el delay
+                const baseDelay = conditionConfig.fibrinFormationDelay || 100;
+                const delay = state.treatmentApplied ? Math.max(50, baseDelay * 0.3) : baseDelay;
             setTimeout(() => {
                     if (state.stuckPlatelets.includes(plateletData)) {
                 tryFormFibrin(plateletData);
                     }
-                }, delay);
+}, delay);
             }
         }
 
@@ -2674,7 +3211,9 @@
             // When fibrin is weaker, platelets must be closer to form connections
             // Strong fibrin (1.0): can connect up to 90px away, minimum 20px
             // Weak fibrin (0.3): can connect up to 40px away, minimum 8px
-            const maxSearchRadius = 40 + (fibrinStability * 50); // 40-90px range
+            // Con tratamiento, aumentar el radio de búsqueda para formar conexiones más fácilmente
+            const baseMaxSearchRadius = 40 + (fibrinStability * 50); // 40-90px range
+            const maxSearchRadius = state.treatmentApplied ? baseMaxSearchRadius * 1.3 : baseMaxSearchRadius; // 30% más con tratamiento
             const minDistance = 8 + (fibrinStability * 12); // 8-20px range
             const minDistanceSq = minDistance * minDistance;
             
@@ -2890,6 +3429,10 @@
                     // Wound is sealed!
                     state.hemostasisAchieved = true;
                     state.clotPercentage = 100;
+                    // Capturar el momento del cierre de la herida (tiempo de simulación acumulado)
+                    if (!state.woundClosureTime && state.startTime) {
+                        state.woundClosureTime = accumulatedSimulationTime / 1000; // Guardar tiempo de simulación en segundos
+                    }
                     document.getElementById('hemostasis-indicator').classList.add('visible');
                     const woundLabel = document.getElementById('wound-label');
                     woundLabel.classList.add('healed', 'hidden'); // Ocultar cuando está sellada
@@ -3220,40 +3763,42 @@
             const woundWidth = CONFIG.wound.width;
             const woundLeft = woundX - woundWidth / 2;
             const woundRight = woundX + woundWidth / 2;
-            const woundCenterY = 29; // Y position where platelets stick
+            const adhesionLineY = 23; // Centro del área de adhesión (debe coincidir con el área de adhesión)
+            const adhesionZoneHalfWidth = 12; // Mitad del ancho del área de adhesión
             
             // Render ointment layer when treatment is applied - ultra simple for performance
             if (state.showOintment) {
                 ctx.fillStyle = 'rgba(59, 130, 246, 0.35)';
-                ctx.fillRect(woundLeft, 0, woundWidth, 32);
+                ctx.fillRect(woundLeft, adhesionLineY - adhesionZoneHalfWidth, woundWidth, adhesionZoneHalfWidth * 2);
             }
             
-            // Calcular opacidad de la malla morada basada en densidad de plaquetas pegadas
+            // Calcular opacidad de la malla morada basada en densidad de plaquetas pegadas en el área de adhesión
             const stuckPlateletsInWound = state.stuckPlatelets.filter(p => {
                 const px = p.body.position.x;
                 const py = p.body.position.y;
                 return px >= woundLeft - 20 && px <= woundRight + 20 && 
-                       py >= woundCenterY - 15 && py <= woundCenterY + 15;
+                       py >= adhesionLineY - adhesionZoneHalfWidth && py <= adhesionLineY + adhesionZoneHalfWidth;
             }).length;
             
             const maxPlatelets = 20; // Máximo esperado de plaquetas en la herida
             // La malla morada empieza muy transparente (0.05) y se opaca progresivamente hasta 0.9
             const meshOpacity = Math.min(0.9, 0.05 + (stuckPlateletsInWound / maxPlatelets) * 0.85);
             
-            // Ajustar posición Y de la malla morada para que esté más abajo
-            const meshY = woundCenterY - 2;
+            // Área de la malla morada coincide con el área de adhesión
+            const meshTopY = adhesionLineY - adhesionZoneHalfWidth;
+            const meshHeight = adhesionZoneHalfWidth * 2; // Altura total del área de adhesión
             
-            // Renderizar malla morada horizontal en la zona de la herida que se opaca progresivamente
-            // Solo esta línea horizontal es morada - las cuerdas son blancas
+            // Renderizar malla morada horizontal en la zona de adhesión que se opaca progresivamente
+            // Solo esta área horizontal es morada - las cuerdas son verdes
             if (state.fibrinFormationStarted && stuckPlateletsInWound > 0) {
                 ctx.fillStyle = `rgba(157, 78, 221, ${meshOpacity})`; // Morado #9D4EDD
-                ctx.fillRect(woundLeft, meshY, woundWidth, 10); // Aumentado de 4 a 6px
+                ctx.fillRect(woundLeft, meshTopY, woundWidth, meshHeight);
             }
             
             // Overlay verde cuando está sellada
             if (state.hemostasisAchieved) {
                 ctx.fillStyle = 'rgba(34, 197, 94, 0.3)'; // Verde semitransparente
-                ctx.fillRect(woundLeft, meshY - 3, woundWidth, 10);
+                ctx.fillRect(woundLeft, meshTopY, woundWidth, meshHeight);
             }
             
             // Render fibrin connections (cuerdas) - optimized for performance
@@ -3491,8 +4036,11 @@
             let coveredSegments = 0;
             const coverageThreshold = 15 * 15; // Squared distance for comparison
 
-            // Pre-filter platelets that are actually in the wound area
+            // Pre-filter platelets that are actually in the wound area (exclude anchor platelets)
             const relevantPlatelets = state.stuckPlatelets.filter(p => {
+                // Excluir plaquetas anchor del cálculo
+                if (p.isAnchor) return false;
+                
                 const px = p.body.position.x;
                 const py = p.body.position.y;
                 return px >= woundLeft - 20 && px <= woundLeft + woundWidth + 20 && 
@@ -3546,7 +4094,256 @@
                 statusDot.className = 'status-dot';
                 statusText.textContent = 'Simulación activa';
             }
+            
+            // Actualizar métricas avanzadas solo si la herida no está cerrada
+            if (!state.hemostasisAchieved) {
+                updateAdvancedMetrics();
+                updateCharts();
+            }
         }
+        
+        function updateAdvancedMetrics() {
+            // Calcular tiempo de simulación (ajustado por timeScale)
+            const simulationTimeSeconds = accumulatedSimulationTime / 1000;
+            
+            // Tiempo hasta cierre de herida
+            const el = document.getElementById('first-adhesion-time');
+            if (state.hemostasisAchieved && state.woundClosureTime !== null && state.startTime) {
+                // Mostrar el tiempo de simulación cuando se cerró la herida (ya está en segundos de simulación)
+                if (el) el.textContent = state.woundClosureTime.toFixed(1) + 's';
+            } else if (state.startTime && !state.hemostasisAchieved) {
+                // Mostrar tiempo de simulación transcurrido mientras la herida está abierta
+                if (el) el.textContent = simulationTimeSeconds.toFixed(1) + 's';
+            } else {
+                // Sin datos aún
+                if (el) el.textContent = '--';
+            }
+            
+            // Detener actualización de otras métricas si la herida está cerrada
+            if (state.hemostasisAchieved) return;
+            
+            // Velocidad de formación de fibrina (conexiones por minuto)
+            if (simulationTimeSeconds > 0) {
+                const fibrinPerMinute = (state.fibrinConstraints.length / simulationTimeSeconds) * 60;
+                const el = document.getElementById('fibrin-rate');
+                if (el) el.textContent = fibrinPerMinute.toFixed(1) + '/min';
+            }
+            
+            // Densidad del coágulo (plaquetas por área de herida)
+            const woundArea = CONFIG.wound.width * CONFIG.wound.height;
+            const clotDensity = woundArea > 0 ? (state.stuckPlatelets.length / woundArea * 1000).toFixed(1) : 0;
+            const el1 = document.getElementById('clot-density');
+            if (el1) el1.textContent = clotDensity;
+            
+            // Tasa de agregación (plaquetas pegadas / total spawnadas)
+            const aggregationRate = state.totalPlateletsSpawned > 0 
+                ? ((state.stuckPlatelets.length / state.totalPlateletsSpawned) * 100).toFixed(1) 
+                : 0;
+            const el2 = document.getElementById('aggregation-rate');
+            if (el2) el2.textContent = aggregationRate + '%';
+        }
+        
+        // Gráficos en tiempo real usando Canvas
+        const chartConfigs = {
+            clot: { color: '#10B981', label: 'Cierre (%)' },
+            bloodLoss: { color: '#DC2626', label: 'Pérdida' },
+            fibrin: { color: '#9D4EDD', label: 'Conexiones' }
+        };
+        
+        function initCharts() {
+            // Esperar a que los elementos existan
+            setTimeout(() => {
+                const chartIds = ['clot-chart', 'blood-loss-chart', 'fibrin-chart'];
+                chartIds.forEach(chartId => {
+                    const canvas = document.getElementById(chartId);
+                    if (!canvas) return;
+                    const ctx = canvas.getContext('2d');
+                    if (canvas.offsetWidth > 0 && canvas.offsetHeight > 0) {
+                        canvas.width = canvas.offsetWidth * 2; // Retina display
+                        canvas.height = canvas.offsetHeight * 2;
+                        ctx.scale(2, 2);
+                    }
+                });
+            }, 100);
+        }
+        
+        function updateCharts() {
+            // Añadir nuevos datos al historial solo si la simulación está corriendo y no está cerrada
+            if (state.simulationRunning && !state.hemostasisAchieved && state.startTime) {
+                // Usar tiempo de simulación (ajustado por timeScale) en lugar de tiempo real
+                const simulationTimeSeconds = accumulatedSimulationTime / 1000;
+                
+                // Añadir datos al historial (cada segundo de simulación)
+                const lastTime = state.history.time[state.history.time.length - 1] || 0;
+                if (simulationTimeSeconds - lastTime >= 1) {
+                    // Obtener pérdida sanguínea directamente del DOM
+                    const bloodLossEl = document.getElementById('blood-loss');
+                    const currentBloodLoss = bloodLossEl ? parseInt(bloodLossEl.textContent) || 0 : 0;
+                    
+                    state.history.time.push(simulationTimeSeconds);
+                    state.history.clotPercentage.push(state.clotPercentage);
+                    state.history.bloodLoss.push(currentBloodLoss);
+                    state.history.fibrinConnections.push(state.fibrinConstraints.length);
+                    state.history.stuckPlatelets.push(state.stuckPlatelets.length);
+                    
+                    // Limitar historial a últimos 60 segundos
+                    const maxHistory = 60;
+                    if (state.history.time.length > maxHistory) {
+                        state.history.time.shift();
+                        state.history.clotPercentage.shift();
+                        state.history.bloodLoss.shift();
+                        state.history.fibrinConnections.shift();
+                        state.history.stuckPlatelets.shift();
+                    }
+                }
+            }
+            
+            // Preparar datos para gráficos con el valor actual añadido
+            let clotData = [...state.history.clotPercentage];
+            let bloodLossData = [...state.history.bloodLoss];
+            let fibrinData = [...state.history.fibrinConnections];
+            
+            // Si la simulación está corriendo, añadir el valor actual al final para actualización en tiempo real
+            if (state.simulationRunning && !state.hemostasisAchieved && state.startTime) {
+                clotData.push(state.clotPercentage);
+                
+                // Obtener pérdida sanguínea actual del DOM
+                const bloodLossEl = document.getElementById('blood-loss');
+                const currentBloodLoss = bloodLossEl ? parseInt(bloodLossEl.textContent) || 0 : 0;
+                bloodLossData.push(currentBloodLoss);
+                
+                fibrinData.push(state.fibrinConstraints.length);
+            }
+            
+            // Dibujar gráficos siempre con datos actualizados en tiempo real
+            drawChart('clot-chart', clotData, chartConfigs.clot, 100);
+            drawChart('blood-loss-chart', bloodLossData, chartConfigs.bloodLoss, null);
+            drawChart('fibrin-chart', fibrinData, chartConfigs.fibrin, null);
+        }
+        
+        function drawChart(chartId, data, config, maxValue) {
+            const canvas = document.getElementById(chartId);
+            if (!canvas) {
+                console.warn('Canvas not found:', chartId);
+                return;
+            }
+            
+            // Asegurar que el canvas esté inicializado
+            if (canvas.width === 0 || canvas.height === 0) {
+                const ctx = canvas.getContext('2d');
+                canvas.width = canvas.offsetWidth * 2 || 200;
+                canvas.height = canvas.offsetHeight * 2 || 140;
+                ctx.scale(2, 2);
+            }
+            
+            const ctx = canvas.getContext('2d');
+            const width = canvas.width / 2;
+            const height = canvas.height / 2;
+            
+            // Limpiar canvas
+            ctx.clearRect(0, 0, width, height);
+            
+            // Si no hay datos, mostrar gráfico vacío con mensaje
+            if (!data || data.length === 0) {
+                ctx.fillStyle = '#94A3B8';
+                ctx.font = '10px Inter';
+                ctx.textAlign = 'center';
+                ctx.fillText('Sin datos', width / 2, height / 2);
+                return;
+            }
+            
+            // Encontrar valores min/max
+            const dataMax = maxValue !== null ? maxValue : Math.max(...data, 1);
+            const dataMin = 0;
+            const range = dataMax - dataMin || 1;
+            
+            // Configurar estilo
+            ctx.strokeStyle = config.color;
+            ctx.fillStyle = config.color;
+            ctx.lineWidth = 2;
+            
+            // Dibujar línea
+            ctx.beginPath();
+            const stepX = width / Math.max(data.length - 1, 1);
+            
+            data.forEach((value, index) => {
+                const x = index * stepX;
+                const y = height - ((value - dataMin) / range) * height;
+                
+                if (index === 0) {
+                    ctx.moveTo(x, y);
+                } else {
+                    ctx.lineTo(x, y);
+                }
+            });
+            ctx.stroke();
+            
+            // Relleno bajo la línea
+            ctx.lineTo(width, height);
+            ctx.lineTo(0, height);
+            ctx.closePath();
+            ctx.globalAlpha = 0.2;
+            ctx.fill();
+            ctx.globalAlpha = 1.0;
+            
+            // Etiquetas
+            ctx.fillStyle = '#64748B';
+            ctx.font = '10px Inter';
+            ctx.textAlign = 'right';
+            ctx.fillText(dataMax.toFixed(0), width - 4, 12);
+            ctx.textAlign = 'left';
+            ctx.fillText(config.label, 4, 12);
+        }
+        
+        // Controles de velocidad
+        function setupSpeedControls() {
+            const speedSlider = document.getElementById('speed-slider');
+            const speedValue = document.getElementById('speed-value');
+            
+            if (speedSlider) {
+                speedSlider.addEventListener('input', (e) => {
+                    state.timeScale = parseFloat(e.target.value);
+                    if (speedValue) speedValue.textContent = state.timeScale + 'x';
+                    
+                    // Reiniciar el spawn para aplicar el nuevo intervalo
+                    if (state.simulationRunning && !state.isPaused) {
+                        startParticleSpawning();
+                    }
+                });
+            }
+        }
+        
+        // Panel educativo
+        function setupEducationalPanel() {
+            const toggle = document.getElementById('educational-toggle');
+            const panel = document.getElementById('educational-panel');
+            const arrow = document.getElementById('educational-arrow');
+            
+            if (toggle) {
+                toggle.addEventListener('click', () => {
+                    panel.classList.toggle('expanded');
+                    if (arrow) arrow.textContent = panel.classList.contains('expanded') ? '▲' : '▼';
+                });
+            }
+        }
+        
+        // Tooltips
+        function setupTooltips() {
+            const triggers = document.querySelectorAll('.tooltip-trigger');
+            
+            triggers.forEach(trigger => {
+                const tooltip = trigger.parentElement.querySelector('.tooltip');
+                
+                trigger.addEventListener('mouseenter', () => {
+                    if (tooltip) tooltip.classList.add('visible');
+                });
+                
+                trigger.addEventListener('mouseleave', () => {
+                    if (tooltip) tooltip.classList.remove('visible');
+                });
+            });
+        }
+        
 
         function applyTreatment() {
             if (state.treatmentApplied) return;
@@ -3606,11 +4403,22 @@
             }
 
             // For all conditions, try to form additional fibrin connections
-            setTimeout(() => {
-                state.stuckPlatelets.forEach(plateletData => {
-                    tryFormFibrin(plateletData);
-                });
-            }, 200);
+            // Con tratamiento, intentar formar fibrina más frecuentemente
+            const retryInterval = state.treatmentApplied ? 100 : 200;
+            const maxRetries = state.treatmentApplied ? 5 : 3;
+            
+            let retryCount = 0;
+            const tryFormFibrinRepeatedly = () => {
+                if (retryCount < maxRetries && !state.hemostasisAchieved) {
+                    state.stuckPlatelets.forEach(plateletData => {
+                        tryFormFibrin(plateletData);
+                    });
+                    retryCount++;
+                    setTimeout(tryFormFibrinRepeatedly, retryInterval);
+                }
+            };
+            
+            setTimeout(tryFormFibrinRepeatedly, retryInterval);
 
             updateUI();
         }
@@ -3701,6 +4509,13 @@
             document.querySelectorAll('.condition-btn').forEach(btn => {
                 btn.classList.toggle('active', btn.dataset.condition === condition);
             });
+            
+            // Actualizar panel educativo
+            const conditionConfig = CONFIG.conditions[condition];
+            const conditionNameEl = document.getElementById('current-condition-name');
+            const conditionDescEl = document.getElementById('current-condition-desc');
+            if (conditionNameEl) conditionNameEl.textContent = conditionConfig.name;
+            if (conditionDescEl) conditionDescEl.textContent = conditionConfig.description;
 
             // Reset simulation
             initSimulation();
@@ -3721,20 +4536,39 @@
             if (!state.simulationRunning) {
                 // Iniciar simulación
                 state.simulationRunning = true;
+                state.isPaused = false;
+                state.startTime = Date.now();
+                state.firstAdhesionTime = null;
+                state.woundClosureTime = null;
+                state.totalPlateletsSpawned = 0;
+                state.history = { time: [], clotPercentage: [], bloodLoss: [], fibrinConnections: [], stuckPlatelets: [] };
                 // No usar Runner.run() - usamos nuestro propio loop con timestep fijo
                 lastPhysicsTime = 0;
                 accumulatedTime = 0;
+                
+                // Asegurar que timeScale tenga un valor válido
+                if (!state.timeScale || state.timeScale <= 0) {
+                    state.timeScale = 1.0;
+                }
+                
+                // Reiniciar el spawn para asegurar que funcione
+                startParticleSpawning();
+                
                 const startBtn = document.getElementById('start-btn');
-                startBtn.textContent = '⏸ Pausar Simulación';
-                startBtn.classList.add('paused');
+                if (startBtn) {
+                    startBtn.textContent = '⏸ Pausar Simulación';
+                    startBtn.classList.add('paused');
+                }
                 updateWizardStep(3);
             } else {
                 // Pausar simulación
                 state.simulationRunning = false;
                 // No usar Runner.stop() - usamos nuestro propio loop
                 const startBtn = document.getElementById('start-btn');
-                startBtn.textContent = '▶ Reanudar Simulación';
-                startBtn.classList.remove('paused');
+                if (startBtn) {
+                    startBtn.textContent = '▶ Reanudar Simulación';
+                    startBtn.classList.remove('paused');
+                }
             }
         }
         
@@ -3775,6 +4609,7 @@
             // Reset button
             document.getElementById('reset-btn').addEventListener('click', () => {
                 state.simulationRunning = false;
+                state.isPaused = false;
                 // No necesitamos detener el runner porque usamos nuestro propio loop
                 initSimulation();
                 updateWizardStep(1);
@@ -3784,6 +4619,12 @@
                     startBtn.disabled = false;
                 }
             });
+            
+            // Inicializar controles avanzados
+            initCharts();
+            setupSpeedControls();
+            setupEducationalPanel();
+            setupTooltips();
             
             // Inicializar wizard
             updateWizardStep(1);
