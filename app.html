@@ -1,4 +1,4 @@
-﻿<!DOCTYPE html>
+<!DOCTYPE html>
 <html lang="es">
   <head>
     <meta charset="UTF-8" />
@@ -1155,46 +1155,20 @@
 
         // Mostrar feedback
         show(feedback) {
-          const container = document.getElementById("contextual-feedback");
-          const icon = document.getElementById("feedback-icon");
-          const title = document.getElementById("feedback-title");
-          const content = document.getElementById("feedback-content");
-
-          if (!container || !icon || !title || !content) return;
-
-          // Limpiar timeout anterior si existe
-          if (this.autoHideTimeout) {
-            clearTimeout(this.autoHideTimeout);
-            this.autoHideTimeout = null;
-          }
-
-          // Actualizar contenido
-          icon.textContent = feedback.icon;
-          title.textContent = feedback.title;
-          content.textContent = feedback.message;
-
-          // Mostrar inmediatamente
-          container.classList.remove("entering");
-          container.classList.add("visible", "entering");
-          this.isShowing = true;
-
+          // NO mostrar en el simulador, solo agregar al tablero acumulado
           // Marcar como mostrado
           this.shownFeedbacks.add(feedback.id);
 
           // Agregar al tablero de feedback acumulado
           this.addToFeedbackBoard(feedback);
 
-          // Auto-ocultar
-          if (feedback.autoHide) {
-            this.autoHideTimeout = setTimeout(() => {
-              this.hide();
-            }, feedback.autoHide);
-          }
-
-          // Remover animación de entrada después de que termine
+          // Marcar que estamos mostrando (para evitar mostrar múltiples a la vez)
+          this.isShowing = true;
+          
+          // Resetear el estado después de un breve delay para permitir nuevos feedbacks
           setTimeout(() => {
-            container.classList.remove("entering");
-          }, 400);
+            this.isShowing = false;
+          }, 100);
         },
 
         // Agregar feedback al tablero acumulado
@@ -1294,7 +1268,7 @@
                         </ul>
                         <p>Selecciona una condición para ver cómo afecta al proceso de coagulación.</p>
                     `,
-            highlight: ".condition-grid",
+            highlight: ".conditions-sidebar .panel-card",
             panelPosition: "right",
             action: () => {
               // Resaltar el primer botón de condición
@@ -1335,8 +1309,8 @@
                         </ul>
                         <p>El wizard te guía a través de los pasos necesarios.</p>
                     `,
-            highlight: ".controls-section",
-            panelPosition: "left",
+            highlight: ".simulation-controls-row",
+            panelPosition: "bottom",
           },
           {
             title: "Métricas en Tiempo Real",
@@ -1397,8 +1371,8 @@
                         <p>Expande el panel para aprender más sobre los conceptos científicos.</p>
                         <p><strong>¡Ya estás listo para usar el simulador!</strong></p>
                     `,
-            highlight: ".educational-panel",
-            panelPosition: "bottom",
+            highlight: ".educational-info-column .panel-card",
+            panelPosition: "top",
           },
         ],
 
@@ -5410,15 +5384,11 @@
           });
         }
         
-        // Actualizar contenido educativo inicial
-        updateEducationalContent();
+        // No actualizar contenido educativo inicial - quedará vacío hasta seleccionar condición
       }
 
       // Función para actualizar el contenido educativo completo
       function updateEducationalContent() {
-        const conditionConfig = CONFIG.conditions[state.condition];
-        const educationalContent = conditionConfig.educational || {};
-        
         // Obtener contenedor del panel educativo (mantener para compatibilidad)
         const panelContent = document.querySelector('.educational-panel-content');
         
@@ -5427,6 +5397,20 @@
         
         // Si no hay ningún contenedor, salir
         if (!panelContent && !infoContent) return;
+        
+        // Si no hay condición seleccionada, limpiar el contenido
+        if (!state.condition) {
+          if (infoContent) {
+            infoContent.innerHTML = '';
+          }
+          if (panelContent) {
+            panelContent.innerHTML = '';
+          }
+          return;
+        }
+        
+        const conditionConfig = CONFIG.conditions[state.condition];
+        const educationalContent = conditionConfig.educational || {};
 
         // Crear HTML con toda la información educativa
         let html = `
@@ -6034,6 +6018,13 @@
           state.lastAnnouncedHemostasis = false;
           state.lastAnnouncedTreatment = false;
           state.condition = null;
+          
+          // Limpiar contenido educativo
+          const infoContent = document.getElementById('educational-info-content');
+          if (infoContent) {
+            infoContent.innerHTML = '';
+          }
+          
           // No necesitamos detener el runner porque usamos nuestro propio loop
           initSimulation();
           

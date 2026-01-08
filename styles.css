@@ -312,11 +312,11 @@ body {
 }
 
 .condition-name {
-  font-size: calc(1rem * var(--font-size-scale));
+  font-size: calc(0.9rem * var(--font-size-scale));
 }
 
 .condition-desc {
-  font-size: calc(0.8rem * var(--font-size-scale));
+  font-size: calc(0.75rem * var(--font-size-scale));
 }
 
 .step-title {
@@ -364,11 +364,11 @@ body {
 }
 
 .advanced-metric-value {
-  font-size: calc(0.875rem * var(--font-size-scale));
+  font-size: calc(0.9rem * var(--font-size-scale));
 }
 
 .chart-title {
-  font-size: calc(0.65rem * var(--font-size-scale));
+  font-size: calc(0.7rem * var(--font-size-scale));
 }
 
 .educational-section h4 {
@@ -648,6 +648,7 @@ body {
 html {
   height: 100%;
   width: 100%;
+  overflow-x: hidden;
 }
 
 body {
@@ -660,6 +661,9 @@ body {
   height: 100%;
   color: #1e293b;
   position: relative;
+  overflow-x: hidden;
+  width: 100%;
+  max-width: 100%;
 }
 
 body::before {
@@ -811,14 +815,19 @@ body::before {
   padding: 0;
   position: relative;
   z-index: 1;
+  width: 100%;
+  overflow-x: hidden;
 }
 
 /* Layout principal de tres columnas */
 .simulator-layout {
   display: grid;
-  grid-template-columns: 420px 1fr 420px;
+  grid-template-columns: minmax(280px, 380px) minmax(0, 1fr) minmax(280px, 380px);
   gap: 24px;
   align-items: start;
+  width: 100%;
+  max-width: 100%;
+  overflow-x: hidden;
 }
 
 /* Simulation Viewer */
@@ -827,6 +836,8 @@ body::before {
   display: flex;
   flex-direction: column;
   gap: 16px;
+  min-width: 0;
+  width: 100%;
 }
 
 /* Contenedor de botones de control debajo del simulador */
@@ -929,25 +940,25 @@ body::before {
   background: rgba(255, 255, 255, 0.95);
   backdrop-filter: blur(8px);
   border-radius: 8px;
-  padding: 12px 16px;
+  padding: 10px 14px;
   text-align: center;
   border: 1px solid rgba(255, 255, 255, 0.2);
   box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
-  min-width: 120px;
+  min-width: 110px;
   pointer-events: auto;
 }
 
 .viewer-metrics .metric-value {
-  font-size: calc(2rem * var(--font-size-scale));
+  font-size: calc(1.75rem * var(--font-size-scale));
   font-weight: 800;
   line-height: 1;
-  margin-bottom: 6px;
+  margin-bottom: 5px;
   font-feature-settings: "tnum";
   letter-spacing: -0.5px;
 }
 
 .viewer-metrics .metric-label {
-  font-size: calc(0.8rem * var(--font-size-scale));
+  font-size: calc(0.75rem * var(--font-size-scale));
   color: #64748b;
   font-weight: 500;
 }
@@ -1196,11 +1207,11 @@ body::before {
   background: #ffffff;
   border: 2px solid #e2e8f0;
   border-radius: 8px;
-  padding: 16px;
+  padding: 12px;
   cursor: pointer;
   transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
   text-align: left;
-  min-height: 100px;
+  min-height: 80px;
 }
 
 .condition-btn:hover {
@@ -1295,13 +1306,13 @@ body::before {
 
 .condition-name {
   font-weight: 600;
-  font-size: calc(1rem * var(--font-size-scale));
+  font-size: calc(0.9rem * var(--font-size-scale));
   color: #1e293b;
-  margin-bottom: 6px;
+  margin-bottom: 4px;
 }
 
 .condition-desc {
-  font-size: calc(0.8rem * var(--font-size-scale));
+  font-size: calc(0.75rem * var(--font-size-scale));
   color: #64748b;
   line-height: 1.4;
 }
@@ -1317,13 +1328,13 @@ body::before {
 .metric-box {
   background: #ffffff;
   border-radius: 6px;
-  padding: 8px;
+  padding: 6px;
   text-align: center;
   border: 1px solid #e2e8f0;
 }
 
 .metric-value {
-  font-size: calc(1.75rem * var(--font-size-scale));
+  font-size: calc(1.5rem * var(--font-size-scale));
   font-weight: 800;
   line-height: 1;
   margin-bottom: 2px;
@@ -1345,7 +1356,7 @@ body::before {
 }
 
 .metric-label {
-  font-size: calc(0.7rem * var(--font-size-scale));
+  font-size: calc(0.65rem * var(--font-size-scale));
   color: #64748b;
   font-weight: 500;
 }
@@ -1356,14 +1367,14 @@ body::before {
   margin-top: 8px;
   display: flex;
   flex-direction: column;
-  gap: 12px;
+  gap: 8px;
   width: 100%;
 }
 
 .chart-panel {
   background: #ffffff;
   border-radius: 8px;
-  padding: 12px;
+  padding: 8px;
   border: 1px solid #e2e8f0;
   box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05), 0 2px 6px rgba(0, 0, 0, 0.03);
   transition: box-shadow 0.3s ease;
@@ -1375,19 +1386,19 @@ body::before {
 }
 
 .chart-title {
-  font-size: calc(0.8rem * var(--font-size-scale));
+  font-size: calc(0.7rem * var(--font-size-scale));
   font-weight: 700;
   color: #0f172a;
-  margin-bottom: 8px;
+  margin-bottom: 5px;
   display: flex;
   align-items: center;
-  gap: 6px;
+  gap: 5px;
   letter-spacing: -0.2px;
 }
 
 .chart-canvas {
   width: 100%;
-  height: 180px;
+  height: 140px;
   border-radius: 4px;
 }
 
@@ -1396,24 +1407,24 @@ body::before {
   margin-top: 8px;
   display: grid;
   grid-template-columns: repeat(2, 1fr);
-  gap: 10px;
+  gap: 6px;
 }
 
 .advanced-metric {
   background: #f8fafc;
-  padding: 12px;
+  padding: 8px;
   border-radius: 6px;
   border: 1px solid #e2e8f0;
 }
 
 .advanced-metric-label {
-  font-size: calc(0.7rem * var(--font-size-scale));
+  font-size: calc(0.6rem * var(--font-size-scale));
   color: #64748b;
-  margin-bottom: 6px;
+  margin-bottom: 4px;
 }
 
 .advanced-metric-value {
-  font-size: calc(1.1rem * var(--font-size-scale));
+  font-size: calc(0.9rem * var(--font-size-scale));
   font-weight: 700;
   color: #1e293b;
 }
@@ -1551,11 +1562,7 @@ body::before {
   left: 0;
   right: 0;
   bottom: 0;
-  background: radial-gradient(
-    circle at center,
-    rgba(0, 0, 0, 0.3) 0%,
-    rgba(0, 0, 0, 0.6) 100%
-  );
+  background: transparent;
   z-index: 2000;
   display: none;
   pointer-events: none;
@@ -1573,8 +1580,8 @@ body::before {
   border: 4px solid;
   border-image: linear-gradient(135deg, #752378, #e9630d) 1;
   border-radius: 10px;
-  box-shadow: 0 0 0 9999px rgba(0, 0, 0, 0.5), 0 0 40px rgba(117, 35, 120, 0.8),
-    0 0 80px rgba(233, 99, 13, 0.4), inset 0 0 30px rgba(117, 35, 120, 0.3);
+  box-shadow: 0 0 0 9999px rgba(0, 0, 0, 0.3), 0 0 40px rgba(117, 35, 120, 0.9),
+    0 0 80px rgba(233, 99, 13, 0.6), inset 0 0 30px rgba(117, 35, 120, 0.4);
   z-index: 2001;
   pointer-events: none;
   animation: tutorialPulse 3s ease-in-out infinite;
@@ -1585,14 +1592,14 @@ body::before {
 @keyframes tutorialPulse {
   0%,
   100% {
-    box-shadow: 0 0 0 9999px rgba(0, 0, 0, 0.5),
-      0 0 40px rgba(117, 35, 120, 0.8), 0 0 80px rgba(233, 99, 13, 0.4),
-      inset 0 0 30px rgba(117, 35, 120, 0.3);
+    box-shadow: 0 0 0 9999px rgba(0, 0, 0, 0.3),
+      0 0 40px rgba(117, 35, 120, 0.9), 0 0 80px rgba(233, 99, 13, 0.6),
+      inset 0 0 30px rgba(117, 35, 120, 0.4);
     transform: scale(1);
   }
   50% {
-    box-shadow: 0 0 0 9999px rgba(0, 0, 0, 0.5), 0 0 60px rgba(117, 35, 120, 1),
-      0 0 120px rgba(233, 99, 13, 0.6), inset 0 0 40px rgba(117, 35, 120, 0.5);
+    box-shadow: 0 0 0 9999px rgba(0, 0, 0, 0.35), 0 0 60px rgba(117, 35, 120, 1),
+      0 0 120px rgba(233, 99, 13, 0.8), inset 0 0 40px rgba(117, 35, 120, 0.6);
     transform: scale(1.01);
   }
 }
@@ -1964,12 +1971,13 @@ body::before {
   transition: opacity 0.3s ease, transform 0.3s ease;
   z-index: 50;
   border-left: 3px solid #e9630d;
+  display: none; /* Ocultar completamente - solo se muestran en el tablero acumulado */
 }
 
 .contextual-feedback.visible {
-  opacity: 1;
-  pointer-events: auto;
-  transform: translateX(-50%) translateY(0);
+  display: none; /* Mantener oculto incluso cuando tiene clase visible */
+  opacity: 0;
+  pointer-events: none;
 }
 
 .contextual-feedback.entering {
@@ -2653,15 +2661,22 @@ body::before {
 /* Responsive */
 @media (max-width: 1600px) {
   .simulator-layout {
-    grid-template-columns: 380px 1fr 380px;
+    grid-template-columns: minmax(250px, 320px) minmax(0, 1fr) minmax(250px, 320px);
     gap: 20px;
   }
 }
 
 @media (max-width: 1400px) {
   .simulator-layout {
-    grid-template-columns: 350px 1fr 350px;
+    grid-template-columns: minmax(220px, 300px) minmax(0, 1fr) minmax(220px, 300px);
     gap: 20px;
+  }
+}
+
+@media (max-width: 1200px) {
+  .simulator-layout {
+    grid-template-columns: minmax(200px, 280px) minmax(0, 1fr) minmax(200px, 280px);
+    gap: 16px;
   }
 }
 
@@ -2669,26 +2684,74 @@ body::before {
   .main-container {
     max-width: 100%;
     padding: 0;
+    overflow-x: hidden;
   }
 
   .simulator-layout {
     grid-template-columns: 1fr;
     gap: 20px;
+    width: 100%;
+    max-width: 100%;
+    overflow-x: hidden;
   }
 
   .conditions-sidebar,
   .metrics-sidebar {
     position: static;
     max-height: none;
+    width: 100%;
+    max-width: 100%;
+    overflow-x: hidden;
   }
 
   .conditions-sidebar .panel-card,
   .metrics-sidebar .panel-card {
     max-height: none;
+    width: 100%;
+    max-width: 100%;
+    overflow-x: hidden;
+  }
+
+  .metrics-sidebar .metrics-section {
+    width: 100%;
+    max-width: 100%;
+    overflow-x: hidden;
   }
 
   .viewer-container {
     max-width: 100%;
+    width: 100%;
+    overflow-x: hidden;
+  }
+
+  /* Métricas dentro del simulador - ajustar posición en móviles */
+  .viewer-metrics {
+    position: absolute;
+    right: 8px;
+    top: 8px;
+    transform: none;
+    flex-direction: column;
+    gap: 8px;
+  }
+
+  .viewer-metrics .metric-box {
+    min-width: 100px;
+    padding: 8px 12px;
+  }
+
+  .viewer-metrics .metric-value {
+    font-size: calc(1.2rem * var(--font-size-scale));
+  }
+
+  .viewer-metrics .metric-label {
+    font-size: calc(0.65rem * var(--font-size-scale));
+  }
+
+  .label-wound {
+    top: 8px;
+    right: 8px;
+    font-size: calc(0.7rem * var(--font-size-scale));
+    padding: 6px 12px;
   }
 
   .control-panel {
@@ -2711,6 +2774,50 @@ body::before {
     min-width: auto;
     max-height: none;
     overflow-y: visible;
+    width: 100%;
+    max-width: 100%;
+    overflow-x: hidden;
+  }
+
+  /* Gráficas - asegurar que no se salgan */
+  .charts-container {
+    width: 100%;
+    max-width: 100%;
+    overflow-x: hidden;
+  }
+
+  .chart-panel {
+    width: 100%;
+    max-width: 100%;
+    overflow-x: hidden;
+  }
+
+  .chart-canvas {
+    max-width: 100%;
+  }
+
+  /* Métricas avanzadas - asegurar que no se salgan */
+  .advanced-metrics {
+    width: 100%;
+    max-width: 100%;
+    overflow-x: hidden;
+  }
+
+  /* Sección de información educativa y feedback */
+  .info-feedback-section {
+    grid-template-columns: 1fr;
+    gap: 16px;
+    width: 100%;
+    max-width: 100%;
+    overflow-x: hidden;
+  }
+
+  .educational-info-content,
+  .feedback-board {
+    max-height: 400px;
+    width: 100%;
+    max-width: 100%;
+    overflow-x: hidden;
   }
 }
 
@@ -2721,6 +2828,115 @@ body::before {
 
   .simulator-layout {
     gap: 16px;
+  }
+
+  /* Botones de condición más pequeños en tablets */
+  .condition-btn {
+    padding: 12px;
+    min-height: 80px;
+  }
+
+  .condition-name {
+    font-size: calc(0.9rem * var(--font-size-scale));
+  }
+
+  .condition-desc {
+    font-size: calc(0.75rem * var(--font-size-scale));
+  }
+
+  /* Métricas dentro del simulador - más pequeñas */
+  .viewer-metrics {
+    right: 6px;
+    top: 6px;
+    gap: 6px;
+  }
+
+  .viewer-metrics .metric-box {
+    min-width: 90px;
+    padding: 6px 10px;
+  }
+
+  .viewer-metrics .metric-value {
+    font-size: calc(1rem * var(--font-size-scale));
+  }
+
+  .viewer-metrics .metric-label {
+    font-size: calc(0.6rem * var(--font-size-scale));
+  }
+
+  .label-wound {
+    top: 6px;
+    right: 6px;
+    font-size: calc(0.65rem * var(--font-size-scale));
+    padding: 4px 10px;
+  }
+
+  /* Controles de simulación - apilar verticalmente */
+  .simulation-controls-row {
+    flex-direction: column;
+    gap: 8px;
+    align-items: stretch;
+  }
+
+  .simulation-controls-row .control-btn-large,
+  .simulation-controls-row .control-btn-small {
+    width: 100%;
+    min-width: auto;
+  }
+
+  .simulation-controls-row .treatment-btn.control-btn-large {
+    width: 100%;
+  }
+
+  .simulation-controls-row .control-speed {
+    width: 100%;
+    justify-content: center;
+  }
+
+  /* Wizard - apilar verticalmente */
+  .simulation-wizard {
+    flex-direction: column;
+    gap: 8px;
+  }
+
+  .wizard-arrow {
+    transform: rotate(90deg);
+    margin: 4px 0;
+  }
+
+  .wizard-step {
+    width: 100%;
+  }
+
+  /* Gráficas más pequeñas */
+  .chart-panel {
+    padding: 10px;
+  }
+
+  .chart-canvas {
+    height: 150px;
+  }
+
+  .chart-title {
+    font-size: calc(0.75rem * var(--font-size-scale));
+  }
+
+  /* Métricas avanzadas */
+  .advanced-metrics {
+    grid-template-columns: repeat(2, 1fr);
+    gap: 8px;
+  }
+
+  .advanced-metric {
+    padding: 10px;
+  }
+
+  .advanced-metric-label {
+    font-size: calc(0.65rem * var(--font-size-scale));
+  }
+
+  .advanced-metric-value {
+    font-size: calc(1rem * var(--font-size-scale));
   }
 
   .control-panel {
@@ -2744,9 +2960,33 @@ body::before {
     min-width: auto;
     max-height: none;
     overflow-y: visible;
+    width: 100%;
+    max-width: 100%;
+    overflow-x: hidden;
   }
 
+  /* Gráficas - asegurar que no se salgan */
+  .charts-container {
+    width: 100%;
+    max-width: 100%;
+    overflow-x: hidden;
+  }
+
+  .chart-panel {
+    width: 100%;
+    max-width: 100%;
+    overflow-x: hidden;
+  }
+
+  .chart-canvas {
+    max-width: 100%;
+  }
+
+  /* Métricas avanzadas - asegurar que no se salgan */
   .advanced-metrics {
+    width: 100%;
+    max-width: 100%;
+    overflow-x: hidden;
     grid-template-columns: repeat(2, 1fr);
   }
 
@@ -2796,21 +3036,21 @@ body::before {
     transform: scale(0.98);
   }
 
-  /* Contadores removidos */
-
-  .label-wound {
-    font-size: 0.65rem;
-    padding: 4px 8px;
-    top: auto;
-    bottom: 20px;
-    left: 50%;
-    right: auto;
-    transform: translateX(-50%);
-  }
-
   .treatment-indicator {
     font-size: 0.875rem;
     padding: 8px 16px;
+  }
+
+  /* Sección de información educativa y feedback */
+  .info-feedback-section {
+    grid-template-columns: 1fr;
+    gap: 12px;
+  }
+
+  .educational-info-content,
+  .feedback-board {
+    max-height: 300px;
+    padding: 12px;
   }
 
   .legend {
@@ -2821,24 +3061,6 @@ body::before {
 
   .legend-item {
     font-size: 0.75rem;
-  }
-
-  .wizard-step {
-    padding: 8px 12px;
-    font-size: 0.875rem;
-    transition: all 0.2s ease;
-  }
-}
-
-@media (max-width: 768px) {
-  .info-feedback-section {
-    grid-template-columns: 1fr;
-    gap: 16px;
-  }
-
-  .educational-info-content,
-  .feedback-board {
-    max-height: 300px;
   }
 }
 
@@ -2852,7 +3074,13 @@ body::before {
   }
 
   .header-title h1 {
-    font-size: 1rem;
+    font-size: 0.9rem;
+  }
+
+  .tutorial-start-btn,
+  .accessibility-btn {
+    font-size: calc(0.75rem * var(--font-size-scale));
+    padding: 8px 12px;
   }
 
   /* Transiciones aÃºn mÃ¡s rÃ¡pidas en pantallas muy pequeÃ±as */
@@ -2867,6 +3095,50 @@ body::before {
     -webkit-tap-highlight-color: rgba(233, 99, 13, 0.3);
   }
 
+  /* Botones de condición más pequeños */
+  .condition-btn {
+    padding: 10px;
+    min-height: 70px;
+  }
+
+  .condition-name {
+    font-size: calc(0.85rem * var(--font-size-scale));
+    margin-bottom: 4px;
+  }
+
+  .condition-desc {
+    font-size: calc(0.7rem * var(--font-size-scale));
+    line-height: 1.3;
+  }
+
+  /* Métricas dentro del simulador - aún más pequeñas */
+  .viewer-metrics {
+    right: 4px;
+    top: 4px;
+    gap: 4px;
+  }
+
+  .viewer-metrics .metric-box {
+    min-width: 80px;
+    padding: 4px 8px;
+  }
+
+  .viewer-metrics .metric-value {
+    font-size: calc(0.9rem * var(--font-size-scale));
+    margin-bottom: 2px;
+  }
+
+  .viewer-metrics .metric-label {
+    font-size: calc(0.55rem * var(--font-size-scale));
+  }
+
+  .label-wound {
+    top: 4px;
+    right: 4px;
+    font-size: calc(0.6rem * var(--font-size-scale));
+    padding: 3px 8px;
+  }
+
   .viewer-container {
     border-radius: 8px;
   }
@@ -2875,34 +3147,101 @@ body::before {
     padding: 12px;
   }
 
+  .panel-title {
+    font-size: calc(0.65rem * var(--font-size-scale));
+    margin-bottom: 10px;
+  }
+
   .condition-btn,
   .treatment-btn,
   .start-btn,
   .reset-btn {
-    padding: 8px 12px;
-    font-size: 0.8rem;
+    padding: 10px 14px;
+    font-size: calc(0.8rem * var(--font-size-scale));
   }
 
-  /* Contadores removidos */
+  /* Controles de simulación */
+  .simulation-controls-row {
+    gap: 6px;
+  }
 
-  .label-wound {
-    font-size: 0.6rem;
-    padding: 3px 6px;
-    bottom: 16px;
+  .simulation-controls-row .control-btn-large,
+  .simulation-controls-row .control-btn-small {
+    height: 44px;
+    padding: 10px 14px;
+    font-size: calc(0.8rem * var(--font-size-scale));
+  }
+
+  .simulation-controls-row .treatment-btn.control-btn-large {
+    width: 100%;
+    min-width: auto;
+  }
+
+  /* Wizard */
+  .simulation-wizard {
+    padding: 12px;
+    gap: 6px;
+  }
+
+  .wizard-step {
+    padding: 8px 10px;
+  }
+
+  .step-number {
+    width: 16px;
+    height: 16px;
+    font-size: calc(0.55rem * var(--font-size-scale));
+  }
+
+  .step-title {
+    font-size: calc(0.7rem * var(--font-size-scale));
+  }
+
+  .step-desc {
+    font-size: calc(0.6rem * var(--font-size-scale));
   }
 
   .legend {
     padding: 8px;
     gap: 6px;
+    flex-wrap: wrap;
   }
 
   .legend-item {
-    font-size: 0.7rem;
+    font-size: calc(0.65rem * var(--font-size-scale));
   }
 
-  .wizard-step {
-    padding: 6px 10px;
-    font-size: 0.8rem;
+  /* Gráficas */
+  .chart-panel {
+    padding: 8px;
+  }
+
+  .chart-canvas {
+    height: 120px;
+  }
+
+  .chart-title {
+    font-size: calc(0.7rem * var(--font-size-scale));
+    margin-bottom: 6px;
+  }
+
+  /* Métricas avanzadas */
+  .advanced-metrics {
+    grid-template-columns: repeat(2, 1fr);
+    gap: 6px;
+  }
+
+  .advanced-metric {
+    padding: 8px;
+  }
+
+  .advanced-metric-label {
+    font-size: calc(0.6rem * var(--font-size-scale));
+    margin-bottom: 4px;
+  }
+
+  .advanced-metric-value {
+    font-size: calc(0.9rem * var(--font-size-scale));
   }
 
   .controls-section {
@@ -2925,14 +3264,90 @@ body::before {
   .metrics-section {
     max-height: none;
     overflow-y: visible;
+    width: 100%;
+    max-width: 100%;
+    overflow-x: hidden;
   }
 
+  /* Gráficas - asegurar que no se salgan */
+  .charts-container {
+    width: 100%;
+    max-width: 100%;
+    overflow-x: hidden;
+  }
+
+  .chart-panel {
+    width: 100%;
+    max-width: 100%;
+    overflow-x: hidden;
+  }
+
+  .chart-canvas {
+    max-width: 100%;
+    width: 100% !important;
+  }
+
+  /* Métricas avanzadas - asegurar que no se salgan */
   .advanced-metrics {
-    grid-template-columns: repeat(2, 1fr);
+    width: 100%;
+    max-width: 100%;
+    overflow-x: hidden;
+  }
+
+  .advanced-metric {
+    min-width: 0;
+    overflow: hidden;
   }
 
   .metrics-grid {
     grid-template-columns: repeat(2, 1fr);
+    width: 100%;
+    max-width: 100%;
+    overflow-x: hidden;
+  }
+
+  /* Asegurar que el metrics-sidebar no se salga */
+  .metrics-sidebar {
+    width: 100%;
+    max-width: 100%;
+    overflow-x: hidden;
+  }
+
+  .metrics-sidebar .panel-card {
+    width: 100%;
+    max-width: 100%;
+    overflow-x: hidden;
+  }
+
+  /* Sección de información educativa y feedback */
+  .info-feedback-section {
+    gap: 10px;
+  }
+
+  .educational-info-content,
+  .feedback-board {
+    max-height: 250px;
+    padding: 10px;
+  }
+
+  .educational-info-content h4 {
+    font-size: calc(0.8rem * var(--font-size-scale));
+  }
+
+  .educational-info-content p {
+    font-size: calc(0.75rem * var(--font-size-scale));
+  }
+
+  .feedback-board-item {
+    padding: 10px;
+  }
+
+  .feedback-board-title {
+    font-size: calc(0.75rem * var(--font-size-scale));
+  }
+
+  .feedback-board-item-content {
+    font-size: calc(0.7rem * var(--font-size-scale));
   }
 
   .tutorial-panel {
