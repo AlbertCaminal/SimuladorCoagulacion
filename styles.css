@@ -808,7 +808,7 @@ body::before {
 .main-container {
   max-width: 2200px;
   margin: 0 auto;
-  padding: 24px;
+  padding: 0;
   position: relative;
   z-index: 1;
 }
@@ -1116,12 +1116,13 @@ body::before {
 }
 
 .conditions-sidebar .panel-card {
-  padding: 16px;
+  padding: 0;
 }
 
 .metrics-sidebar .panel-card {
   display: flex;
   flex-direction: column;
+  padding: 0;
 }
 
 .panel-card:first-child {
@@ -1350,23 +1351,6 @@ body::before {
 }
 
 /* Progress Bar */
-.clot-progress-bar {
-  height: 5px;
-  background: #e2e8f0;
-  border-radius: 3px;
-  overflow: hidden;
-  margin-bottom: 8px;
-}
-
-.clot-progress-fill {
-  height: 100%;
-  background: linear-gradient(90deg, #752378, #e9630d);
-  border-radius: 4px;
-  transition: width 0.4s cubic-bezier(0.4, 0, 0.2, 1);
-  width: 0%;
-  box-shadow: 0 0 10px rgba(117, 35, 120, 0.4);
-}
-
 /* GrÃ¡ficos en tiempo real */
 .charts-container {
   margin-top: 8px;
@@ -2684,7 +2668,7 @@ body::before {
 @media (max-width: 1024px) {
   .main-container {
     max-width: 100%;
-    padding: 16px;
+    padding: 0;
   }
 
   .simulator-layout {
@@ -2732,7 +2716,7 @@ body::before {
 
 @media (max-width: 768px) {
   .main-container {
-    padding: 12px;
+    padding: 0;
   }
 
   .simulator-layout {
@@ -2860,7 +2844,7 @@ body::before {
 
 @media (max-width: 480px) {
   .main-container {
-    padding: 8px;
+    padding: 0;
   }
 
   .header {

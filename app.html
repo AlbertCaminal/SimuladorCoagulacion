@@ -459,10 +459,6 @@
                 </svg>
                 Métricas en Tiempo Real
               </div>
-              <div class="clot-progress-bar">
-                <div class="clot-progress-fill" id="clot-bar"></div>
-              </div>
-
 
               <!-- Métricas avanzadas -->
               <div class="advanced-metrics">
@@ -5115,9 +5111,6 @@
             setTimeout(() => clotPercentageEl.classList.remove("updated"), 400);
           }
         }
-
-        document.getElementById("clot-bar").style.width =
-          state.clotPercentage + "%";
 
         // Anuncios para lectores de pantalla
         if (state.hemostasisAchieved) {
