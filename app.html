@@ -18,210 +18,113 @@
     <a href="#main-content" class="skip-link">Saltar al contenido principal</a>
     
     <header class="header" role="banner">
+      <button
+        class="tutorial-start-btn"
+        id="tutorial-start-btn"
+        aria-label="Iniciar tutorial interactivo"
+        aria-describedby="tutorial-description"
+      >
+        🎓 Tutorial
+      </button>
+      <span id="tutorial-description" class="sr-only">
+        Abre un tutorial paso a paso sobre cómo usar el simulador
+      </span>
       <div class="header-title">
-        <div class="header-icon" aria-hidden="true">
-          <svg viewBox="0 0 24 24" aria-hidden="true">
-            <path
-              d="M12 2C13.1 2 14 2.9 14 4C14 4.74 13.6 5.39 13 5.73V7H14C17.31 7 20 9.69 20 13V20C20 21.1 19.1 22 18 22H6C4.9 22 4 21.1 4 20V13C4 9.69 6.69 7 10 7H11V5.73C10.4 5.39 10 4.74 10 4C10 2.9 10.9 2 12 2M7.5 13C6.67 13 6 13.67 6 14.5C6 15.33 6.67 16 7.5 16C8.33 16 9 15.33 9 14.5C9 13.67 8.33 13 7.5 13M16.5 13C15.67 13 15 13.67 15 14.5C15 15.33 15.67 16 16.5 16C17.33 16 18 15.33 18 14.5C18 13.67 17.33 13 16.5 13M12 9C10.34 9 9 10.34 9 12H15C15 10.34 13.66 9 12 9Z"
-            />
-          </svg>
-        </div>
         <h1>Laboratorio Virtual de Hemostasia</h1>
       </div>
-      <nav class="header-status" aria-label="Controles principales">
-        <button
-          class="tutorial-start-btn"
-          id="tutorial-start-btn"
-          aria-label="Iniciar tutorial interactivo"
-          aria-describedby="tutorial-description"
-        >
-          🎓 Tutorial
-        </button>
-        <span id="tutorial-description" class="sr-only">
-          Abre un tutorial paso a paso sobre cómo usar el simulador
-        </span>
-        <button
-          class="accessibility-btn"
-          id="accessibility-btn"
-          aria-label="Abrir configuración de accesibilidad"
-          aria-expanded="false"
-          aria-controls="accessibility-panel"
-          title="Accesibilidad (Alt+A)"
-        >
-          ♿ Accesibilidad
-        </button>
-        <div class="status-indicator" role="status" aria-live="polite" aria-atomic="true">
-          <div class="status-dot" id="status-dot" aria-hidden="true"></div>
-          <span id="status-text">Simulación activa</span>
-        </div>
-      </nav>
+      <button
+        class="accessibility-btn"
+        id="accessibility-btn"
+        aria-label="Abrir configuración de accesibilidad"
+        aria-expanded="false"
+        aria-controls="accessibility-panel"
+        title="Accesibilidad (Alt+A)"
+      >
+        ♿ Accesibilidad
+      </button>
     </header>
 
     <main class="main-container" id="main-content" role="main">
-      <section class="viewer-section" aria-labelledby="simulation-title">
-        <h2 id="simulation-title" class="sr-only">Área de simulación de coagulación sanguínea</h2>
-        <div class="viewer-container" role="img" aria-label="Simulación de coagulación sanguínea">
-          <div class="viewer-labels">
-            <div class="label label-wound" id="wound-label" role="status" aria-live="polite">
-              ⚠️ Lesión Activa
-            </div>
-          </div>
-          <div class="treatment-indicator" id="treatment-indicator" role="status" aria-live="assertive" aria-atomic="true">
-            💉 Tratamiento Administrado
-          </div>
-          <div class="hemostasis-achieved" id="hemostasis-indicator" role="status" aria-live="assertive" aria-atomic="true">
-            ✓ Hemostasia Lograda
-          </div>
-
-          <!-- Sistema de Feedback Contextual -->
-          <div class="contextual-feedback" id="contextual-feedback" role="alert" aria-live="polite" aria-atomic="true">
-            <div class="feedback-header">
-              <span class="feedback-icon" id="feedback-icon" aria-hidden="true">💡</span>
-              <span class="feedback-title" id="feedback-title"
-                >Información</span
-              >
-              <button class="feedback-close" id="feedback-close" aria-label="Cerrar mensaje">×</button>
-            </div>
-            <div class="feedback-content" id="feedback-content">
-              Mensaje de feedback contextual
-            </div>
-          </div>
-
-          <!-- Descripción textual para lectores de pantalla -->
-          <div class="sr-only" id="canvas-description" aria-live="polite">
-            Simulación de coagulación sanguínea iniciando
-          </div>
-
-          <canvas 
-            id="simulation-canvas"
-            aria-label="Visualización de células sanguíneas en el vaso sanguíneo"
-            role="img"
-            tabindex="0"
-            aria-describedby="canvas-description"
-          ></canvas>
+      <!-- Sistema de Tutorial Interactivo -->
+      <div class="tutorial-overlay" id="tutorial-overlay" aria-hidden="true"></div>
+      <div class="tutorial-highlight" id="tutorial-highlight" aria-hidden="true"></div>
+      <div class="tutorial-panel" id="tutorial-panel" role="dialog" aria-labelledby="tutorial-title-text" aria-modal="true" aria-hidden="true">
+        <div class="tutorial-robot-container" aria-hidden="true">
+          <img
+            src="images/DIINA-08.png"
+            alt="DIINA Robot"
+            class="tutorial-robot-image"
+          />
         </div>
-
-        <!-- Sistema de Tutorial Interactivo -->
-        <div class="tutorial-overlay" id="tutorial-overlay" aria-hidden="true"></div>
-        <div class="tutorial-highlight" id="tutorial-highlight" aria-hidden="true"></div>
-        <div class="tutorial-panel" id="tutorial-panel" role="dialog" aria-labelledby="tutorial-title-text" aria-modal="true" aria-hidden="true">
-          <div class="tutorial-robot-container" aria-hidden="true">
+        <div class="tutorial-header">
+          <div class="tutorial-title">
             <img
-              src="images/DIINA-08.png"
-              alt="DIINA Robot"
-              class="tutorial-robot-image"
+              src="images/puzzle.svg"
+              alt=""
+              class="tutorial-icon-puzzle"
+              aria-hidden="true"
             />
+            <span id="tutorial-title-text">RECUERDA</span>
           </div>
-          <div class="tutorial-header">
-            <div class="tutorial-title">
-              <img
-                src="images/puzzle.svg"
-                alt=""
-                class="tutorial-icon-puzzle"
-                aria-hidden="true"
-              />
-              <span id="tutorial-title-text">RECUERDA</span>
+          <button class="tutorial-close" id="tutorial-close" aria-label="Cerrar tutorial">×</button>
+        </div>
+        <div class="tutorial-content">
+          <div class="tutorial-step-indicator">
+            <div class="tutorial-step-info">
+              <span>Paso</span>
+              <span id="tutorial-current-step">1</span>
+              <span>de</span>
+              <span id="tutorial-total-steps">8</span>
             </div>
-            <button class="tutorial-close" id="tutorial-close" aria-label="Cerrar tutorial">×</button>
+            <div class="tutorial-progress-bar">
+              <div
+                class="tutorial-progress-fill"
+                id="tutorial-progress-fill"
+              ></div>
+            </div>
+            <div class="tutorial-step-dots" id="tutorial-step-dots"></div>
           </div>
-          <div class="tutorial-content">
-            <div class="tutorial-step-indicator">
-              <div class="tutorial-step-info">
-                <span>Paso</span>
-                <span id="tutorial-current-step">1</span>
-                <span>de</span>
-                <span id="tutorial-total-steps">8</span>
-              </div>
-              <div class="tutorial-progress-bar">
-                <div
-                  class="tutorial-progress-fill"
-                  id="tutorial-progress-fill"
-                ></div>
-              </div>
-              <div class="tutorial-step-dots" id="tutorial-step-dots"></div>
-            </div>
-            <div class="tutorial-text" id="tutorial-text">
-              Contenido del tutorial
-            </div>
-            <div class="tutorial-actions">
-              <button
-                class="tutorial-btn tutorial-btn-secondary"
-                id="tutorial-prev"
-                aria-label="Paso anterior del tutorial"
-              >
-                Anterior
-              </button>
-              <button
-                class="tutorial-btn tutorial-btn-primary"
-                id="tutorial-next"
-                aria-label="Siguiente paso del tutorial"
-              >
-                Siguiente
-              </button>
-            </div>
+          <div class="tutorial-text" id="tutorial-text">
+            Contenido del tutorial
+          </div>
+          <div class="tutorial-actions">
+            <button
+              class="tutorial-btn tutorial-btn-secondary"
+              id="tutorial-prev"
+              aria-label="Paso anterior del tutorial"
+            >
+              Anterior
+            </button>
+            <button
+              class="tutorial-btn tutorial-btn-primary"
+              id="tutorial-next"
+              aria-label="Siguiente paso del tutorial"
+            >
+              Siguiente
+            </button>
           </div>
         </div>
+      </div>
 
-        <div class="legend">
-          <div class="legend-item tooltip-container">
-            <div class="legend-dot platelet"></div>
-            <span class="tooltip-trigger">Plaquetas</span>
-            <div class="tooltip">
-              Células sanguíneas pequeñas que se adhieren a la herida y forman
-              el tapón inicial. Se activan al contacto con el colágeno expuesto.
+      <!-- Layout principal de tres columnas -->
+      <div class="simulator-layout">
+        <!-- Columna izquierda: Condiciones Clínicas -->
+        <aside class="conditions-sidebar" role="complementary" aria-label="Condiciones clínicas">
+          <div class="panel-card" role="region" aria-labelledby="condition-title">
+            <div class="panel-title" id="condition-title">
+              <svg viewBox="0 0 24 24" aria-hidden="true">
+                <path
+                  d="M12,8A4,4 0 0,0 8,12A4,4 0 0,0 12,16A4,4 0 0,0 16,12A4,4 0 0,0 12,8M12,18A6,6 0 0,1 6,12A6,6 0 0,1 12,6A6,6 0 0,1 18,12A6,6 0 0,1 12,18M20,8.69V4H15.31L12,0.69L8.69,4H4V8.69L0.69,12L4,15.31V20H8.69L12,23.31L15.31,20H20V15.31L23.31,12L20,8.69Z"
+                />
+              </svg>
+              Condición Clínica
             </div>
-          </div>
-          <div class="legend-item tooltip-container">
-            <div class="legend-dot rbc"></div>
-            <span class="tooltip-trigger">Glóbulos Rojos</span>
-            <div class="tooltip">
-              Eritrocitos que transportan oxígeno. No participan directamente en
-              la coagulación pero pueden quedar atrapados en el coágulo.
-            </div>
-          </div>
-          <div class="legend-item tooltip-container">
-            <div class="legend-dot wbc"></div>
-            <span class="tooltip-trigger">Glóbulos Blancos</span>
-            <div class="tooltip">
-              Leucocitos que participan en la respuesta inmune. Pueden ayudar en
-              la limpieza de la herida.
-            </div>
-          </div>
-          <div class="legend-item tooltip-container">
-            <div class="legend-dot fibrin"></div>
-            <span class="tooltip-trigger">Red de Fibrina</span>
-            <div class="tooltip">
-              Proteína formada a partir del fibrinógeno por acción de la
-              trombina. Crea una malla que refuerza el tapón plaquetario.
-            </div>
-          </div>
-          <div class="legend-item tooltip-container">
-            <div class="legend-dot vwf"></div>
-            <span class="tooltip-trigger">Factor von Willebrand</span>
-            <div class="tooltip">
-              Proteína que media la adhesión de las plaquetas al colágeno
-              expuesto. Esencial para el inicio de la hemostasia.
-            </div>
-          </div>
-        </div>
-      </section>
-
-      <section class="control-panel" aria-label="Panel de control de simulación">
-        <div class="panel-card" role="region" aria-labelledby="condition-title">
-          <div class="panel-title" id="condition-title">
-            <svg viewBox="0 0 24 24" aria-hidden="true">
-              <path
-                d="M12,8A4,4 0 0,0 8,12A4,4 0 0,0 12,16A4,4 0 0,0 16,12A4,4 0 0,0 12,8M12,18A6,6 0 0,1 6,12A6,6 0 0,1 12,6A6,6 0 0,1 18,12A6,6 0 0,1 12,18M20,8.69V4H15.31L12,0.69L8.69,4H4V8.69L0.69,12L4,15.31V20H8.69L12,23.31L15.31,20H20V15.31L23.31,12L20,8.69Z"
-              />
-            </svg>
-            Condición Clínica
-          </div>
-          <div class="condition-grid" role="radiogroup" aria-labelledby="condition-title">
+            <div class="condition-grid" role="radiogroup" aria-labelledby="condition-title">
             <button 
-              class="condition-btn active" 
+              class="condition-btn" 
               data-condition="normal"
               role="radio"
-              aria-checked="true"
+              aria-checked="false"
               aria-describedby="normal-desc"
             >
               <div class="condition-name">Normal</div>
@@ -322,68 +225,231 @@
             </button>
           </div>
         </div>
+        </aside>
 
-        <div class="panel-card">
-          <!-- Botones y Métricas en layout horizontal -->
-          <div class="controls-metrics-container">
-            <div class="controls-section">
-              <!-- Simulation Wizard -->
-              <div class="simulation-wizard">
-                <div class="wizard-step active" data-step="1">
-                  <div class="step-number">1</div>
-                  <div class="step-content">
-                    <div class="step-title">Selecciona condición</div>
-                    <div class="step-desc">
-                      Elige una condición clínica arriba
-                    </div>
-                  </div>
+        <!-- Columna central: Simulador -->
+        <section class="viewer-section" aria-labelledby="simulation-title">
+          <h2 id="simulation-title" class="sr-only">Área de simulación de coagulación sanguínea</h2>
+          
+          <!-- Leyenda encima del simulador -->
+          <div class="legend">
+            <div class="legend-item tooltip-container">
+              <div class="legend-dot platelet"></div>
+              <span class="tooltip-trigger">Plaquetas</span>
+              <div class="tooltip">
+                Células sanguíneas pequeñas que se adhieren a la herida y forman
+                el tapón inicial. Se activan al contacto con el colágeno expuesto.
+              </div>
+            </div>
+            <div class="legend-item tooltip-container">
+              <div class="legend-dot rbc"></div>
+              <span class="tooltip-trigger">Glóbulos Rojos</span>
+              <div class="tooltip">
+                Eritrocitos que transportan oxígeno. No participan directamente en
+                la coagulación pero pueden quedar atrapados en el coágulo.
+              </div>
+            </div>
+            <div class="legend-item tooltip-container">
+              <div class="legend-dot wbc"></div>
+              <span class="tooltip-trigger">Glóbulos Blancos</span>
+              <div class="tooltip">
+                Leucocitos que participan en la respuesta inmune. Pueden ayudar en
+                la limpieza de la herida.
+              </div>
+            </div>
+            <div class="legend-item tooltip-container">
+              <div class="legend-dot fibrin"></div>
+              <span class="tooltip-trigger">Red de Fibrina</span>
+              <div class="tooltip">
+                Proteína formada a partir del fibrinógeno por acción de la
+                trombina. Crea una malla que refuerza el tapón plaquetario.
+              </div>
+            </div>
+            <div class="legend-item tooltip-container">
+              <div class="legend-dot vwf"></div>
+              <span class="tooltip-trigger">Factor von Willebrand</span>
+              <div class="tooltip">
+                Proteína que media la adhesión de las plaquetas al colágeno
+                expuesto. Esencial para el inicio de la hemostasia.
+              </div>
+            </div>
+          </div>
+          
+          <div class="viewer-container" role="img" aria-label="Simulación de coagulación sanguínea">
+            <div class="viewer-labels">
+              <div class="label label-wound" id="wound-label" role="status" aria-live="polite">
+                ⚠️ Lesión Activa
+              </div>
+            </div>
+            <div class="treatment-indicator" id="treatment-indicator" role="status" aria-live="assertive" aria-atomic="true">
+              💉 Tratamiento Administrado
+            </div>
+
+            <!-- Sistema de Feedback Contextual -->
+            <div class="contextual-feedback" id="contextual-feedback" role="alert" aria-live="polite" aria-atomic="true">
+              <div class="feedback-header">
+                <span class="feedback-icon" id="feedback-icon" aria-hidden="true">💡</span>
+                <span class="feedback-title" id="feedback-title"
+                  >Información</span
+                >
+                <button class="feedback-close" id="feedback-close" aria-label="Cerrar mensaje">×</button>
+              </div>
+              <div class="feedback-content" id="feedback-content">
+                Mensaje de feedback contextual
+              </div>
+            </div>
+
+            <!-- Descripción textual para lectores de pantalla -->
+            <div class="sr-only" id="canvas-description" aria-live="polite">
+              Simulación de coagulación sanguínea iniciando
+            </div>
+
+            <canvas 
+              id="simulation-canvas"
+              aria-label="Visualización de células sanguíneas en el vaso sanguíneo"
+              role="img"
+              tabindex="0"
+              aria-describedby="canvas-description"
+            ></canvas>
+
+            <!-- Métricas dentro del simulador (lado derecho) -->
+            <div class="viewer-metrics">
+              <div class="metric-box">
+                <div class="metric-value blood-loss" id="blood-loss">0</div>
+                <div class="metric-label">Pérdida Sanguínea</div>
+              </div>
+              <div class="metric-box">
+                <div class="metric-value clot-progress" id="clot-percentage">
+                  0%
                 </div>
-                <div class="wizard-step" data-step="2">
-                  <div class="step-number">2</div>
-                  <div class="step-content">
-                    <div class="step-title">Configura parámetros</div>
-                    <div class="step-desc">Opcional: ajusta tratamiento</div>
-                  </div>
+                <div class="metric-label">Cierre de la Herida</div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Contenedor de botones de control -->
+          <div class="simulation-controls-row">
+            <button 
+              class="start-btn control-btn-large" 
+              id="start-btn"
+              aria-label="Iniciar la simulación"
+              title="Iniciar simulación (Alt+S)"
+            >
+              ▶ Iniciar Simulación
+            </button>
+            <button 
+              class="pause-btn control-btn-small" 
+              id="pause-btn"
+              aria-label="Pausar la simulación"
+              title="Pausar simulación"
+              disabled
+            >
+              ⏸ Pausar
+            </button>
+            <button 
+              class="reset-btn control-btn-small" 
+              id="reset-btn"
+              aria-label="Reiniciar la simulación"
+              title="Reiniciar simulación (Alt+R)"
+            >
+              ↻ Reiniciar
+            </button>
+            <div class="speed-control control-speed">
+              <label>Velocidad:</label>
+              <input
+                type="range"
+                class="speed-slider"
+                id="speed-slider"
+                min="0.25"
+                max="2"
+                step="0.25"
+                value="1"
+              />
+              <span id="speed-value">1x</span>
+            </div>
+            <button 
+              class="treatment-btn control-btn-large" 
+              id="treatment-btn"
+              aria-label="Administrar tratamiento médico"
+              title="Aplicar tratamiento (Alt+T)"
+            >
+              <svg viewBox="0 0 24 24" aria-hidden="true">
+                <path
+                  d="M11.15,15.18L9.73,13.77L11.15,12.35L12.56,13.77L13.97,12.35L12.56,10.94L13.97,9.53L15.39,10.94L16.8,9.53L13.97,6.7L6.9,13.77L9.73,16.6L11.15,15.18M3.08,9.27L9.73,2.62L11.15,4.03L4.5,10.69L3.08,9.27M20.92,14.73L14.27,21.38L12.85,19.97L19.5,13.31L20.92,14.73Z"
+                />
+              </svg>
+              Administrar Tratamiento
+            </button>
+          </div>
+
+          <!-- Simulation Wizard -->
+          <div class="simulation-wizard">
+            <div class="wizard-step active" data-step="1">
+              <div class="step-number">1</div>
+              <div class="step-content">
+                <div class="step-title">Selecciona condición</div>
+                <div class="step-desc">
+                  Elige una condición clínica arriba
                 </div>
-                <div class="wizard-step" data-step="3">
-                  <div class="step-number">3</div>
-                  <div class="step-content">
-                    <div class="step-title">Inicia simulación</div>
-                    <div class="step-desc">Presiona el botón Iniciar</div>
+              </div>
+            </div>
+            <div class="wizard-arrow" aria-hidden="true">→</div>
+            <div class="wizard-step" data-step="2">
+              <div class="step-number">2</div>
+              <div class="step-content">
+                <div class="step-title">Inicia simulación</div>
+                <div class="step-desc">Presiona el botón Iniciar</div>
+              </div>
+            </div>
+            <div class="wizard-arrow" aria-hidden="true">→</div>
+            <div class="wizard-step" data-step="3">
+              <div class="step-number">3</div>
+              <div class="step-content">
+                <div class="step-title">Aplica tratamiento</div>
+                <div class="step-desc">Opcional: administra tratamiento</div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Sección de información educativa y feedback acumulado -->
+          <div class="info-feedback-section">
+            <!-- Columna izquierda: Información Educativa -->
+            <div class="educational-info-column">
+              <div class="panel-card">
+                <div class="panel-title">
+                  <svg viewBox="0 0 24 24" aria-hidden="true">
+                    <path d="M12,3L1,9L12,15L21,10.09V17H23V9M5,13.18V17.18L12,21L19,17.18V13.18L12,17L5,13.18Z" />
+                  </svg>
+                  Información Educativa
+                </div>
+                <div class="educational-info-content" id="educational-info-content">
+                  <!-- El contenido se actualizará dinámicamente -->
+                </div>
+              </div>
+            </div>
+
+            <!-- Columna derecha: Tablero de Feedback Acumulado -->
+            <div class="feedback-board-column">
+              <div class="panel-card">
+                <div class="panel-title">
+                  <svg viewBox="0 0 24 24" aria-hidden="true">
+                    <path d="M20,2H4A2,2 0 0,0 2,4V22L6,18H20A2,2 0 0,0 22,16V4C22,2.89 21.1,2 20,2Z" />
+                  </svg>
+                  Feedback Contextual
+                </div>
+                <div class="feedback-board" id="feedback-board">
+                  <div class="feedback-board-empty">
+                    Los mensajes de feedback aparecerán aquí con su tiempo de aparición
                   </div>
                 </div>
               </div>
-              <button 
-                class="start-btn" 
-                id="start-btn"
-                aria-label="Iniciar o pausar la simulación"
-                title="Iniciar simulación (Alt+S)"
-              >
-                ▶ Iniciar Simulación
-              </button>
-              <button 
-                class="treatment-btn" 
-                id="treatment-btn"
-                aria-label="Administrar tratamiento médico"
-                title="Aplicar tratamiento (Alt+T)"
-              >
-                <svg viewBox="0 0 24 24" aria-hidden="true">
-                  <path
-                    d="M11.15,15.18L9.73,13.77L11.15,12.35L12.56,13.77L13.97,12.35L12.56,10.94L13.97,9.53L15.39,10.94L16.8,9.53L13.97,6.7L6.9,13.77L9.73,16.6L11.15,15.18M3.08,9.27L9.73,2.62L11.15,4.03L4.5,10.69L3.08,9.27M20.92,14.73L14.27,21.38L12.85,19.97L19.5,13.31L20.92,14.73Z"
-                  />
-                </svg>
-                Administrar Tratamiento
-              </button>
-              <button 
-                class="reset-btn" 
-                id="reset-btn"
-                aria-label="Reiniciar la simulación"
-                title="Reiniciar simulación (Alt+R)"
-              >
-                ↻ Reiniciar Simulación
-              </button>
             </div>
+          </div>
+        </section>
 
+        <!-- Columna derecha: Métricas en Tiempo Real -->
+        <aside class="metrics-sidebar" role="complementary" aria-label="Métricas en tiempo real">
+          <div class="panel-card">
             <div class="metrics-section">
               <div class="panel-title">
                 <svg viewBox="0 0 24 24">
@@ -393,38 +459,10 @@
                 </svg>
                 Métricas en Tiempo Real
               </div>
-              <div class="metrics-grid">
-                <div class="metric-box">
-                  <div class="metric-value blood-loss" id="blood-loss">0</div>
-                  <div class="metric-label">Pérdida Sanguínea</div>
-                </div>
-                <div class="metric-box">
-                  <div class="metric-value clot-progress" id="clot-percentage">
-                    0%
-                  </div>
-                  <div class="metric-label">Cierre de la Herida</div>
-                </div>
-              </div>
               <div class="clot-progress-bar">
                 <div class="clot-progress-fill" id="clot-bar"></div>
               </div>
 
-              <!-- Controles de velocidad y nivel de aprendizaje -->
-              <div class="simulation-controls">
-                <div class="speed-control">
-                  <label>Velocidad:</label>
-                  <input
-                    type="range"
-                    class="speed-slider"
-                    id="speed-slider"
-                    min="0.25"
-                    max="2"
-                    step="0.25"
-                    value="1"
-                  />
-                  <span id="speed-value">1x</span>
-                </div>
-              </div>
 
               <!-- Métricas avanzadas -->
               <div class="advanced-metrics">
@@ -477,83 +515,10 @@
                   <canvas class="chart-canvas" id="fibrin-chart"></canvas>
                 </div>
               </div>
-
-              <!-- Panel educativo expandible -->
-              <div class="educational-panel" id="educational-panel">
-                <div class="educational-panel-header" id="educational-toggle">
-                  <div class="educational-panel-title">
-                    <span>📚</span> Información Educativa
-                  </div>
-                  <span id="educational-arrow">▼</span>
-                </div>
-                <div class="educational-panel-content">
-                  <div class="educational-section">
-                    <h4>
-                      Condición Actual:
-                      <span id="current-condition-name">Normal</span>
-                    </h4>
-                    <p id="current-condition-desc">
-                      Coagulación fisiológica normal - Todos los factores
-                      funcionan correctamente
-                    </p>
-                  </div>
-                  <div class="educational-section">
-                    <h4>Cascada de Coagulación</h4>
-                    <p>
-                      La coagulación sanguínea es un proceso complejo que
-                      involucra múltiples factores:
-                    </p>
-                    <div class="coagulation-cascade">
-                      <div class="cascade-step">
-                        <div class="cascade-step-title">Vía Intrínseca</div>
-                        <div>Factores XII, XI, IX, VIII</div>
-                      </div>
-                      <div class="cascade-step">
-                        <div class="cascade-step-title">Vía Extrínseca</div>
-                        <div>Factor VII + Factor Tisular</div>
-                      </div>
-                      <div class="cascade-step">
-                        <div class="cascade-step-title">Vía Común</div>
-                        <div>Factores X, V, II (Trombina)</div>
-                      </div>
-                      <div class="cascade-step">
-                        <div class="cascade-step-title">
-                          Formación de Fibrina
-                        </div>
-                        <div>Fibrinógeno → Fibrina</div>
-                      </div>
-                    </div>
-                  </div>
-                  <div class="educational-section">
-                    <h4>Proceso de Hemostasia</h4>
-                    <p>
-                      <strong>1. Vasoconstricción:</strong> Los vasos se
-                      contraen para reducir el flujo sanguíneo.
-                    </p>
-                    <p>
-                      <strong>2. Adhesión Plaquetaria:</strong> Las plaquetas se
-                      adhieren al colágeno expuesto usando el factor von
-                      Willebrand.
-                    </p>
-                    <p>
-                      <strong>3. Agregación Plaquetaria:</strong> Las plaquetas
-                      se unen entre sí formando un tapón primario.
-                    </p>
-                    <p>
-                      <strong>4. Coagulación:</strong> La cascada de coagulación
-                      forma fibrina que refuerza el tapón.
-                    </p>
-                    <p>
-                      <strong>5. Retracción:</strong> El coágulo se contrae y
-                      estabiliza.
-                    </p>
-                  </div>
-                </div>
-              </div>
             </div>
           </div>
-        </div>
-      </section>
+        </aside>
+      </div>
     </main>
 
     <!-- Panel de Configuración de Accesibilidad -->
@@ -1167,8 +1132,6 @@
 
         // Verificar y mostrar feedbacks relevantes
         check(state) {
-          if (this.isShowing) return; // No interrumpir feedback actual
-
           // Buscar feedbacks que cumplan condiciones
           for (const key in this.feedbacks) {
             const feedback = this.feedbacks[key];
@@ -1181,6 +1144,10 @@
             // Verificar trigger
             try {
               if (feedback.trigger(state)) {
+                // Si hay un feedback mostrándose, ocultarlo inmediatamente
+                if (this.isShowing) {
+                  this.hide();
+                }
                 this.show(feedback);
                 break; // Solo mostrar uno a la vez
               }
@@ -1192,8 +1159,6 @@
 
         // Mostrar feedback
         show(feedback) {
-          if (this.isShowing) return;
-
           const container = document.getElementById("contextual-feedback");
           const icon = document.getElementById("feedback-icon");
           const title = document.getElementById("feedback-title");
@@ -1201,17 +1166,27 @@
 
           if (!container || !icon || !title || !content) return;
 
+          // Limpiar timeout anterior si existe
+          if (this.autoHideTimeout) {
+            clearTimeout(this.autoHideTimeout);
+            this.autoHideTimeout = null;
+          }
+
           // Actualizar contenido
           icon.textContent = feedback.icon;
           title.textContent = feedback.title;
           content.textContent = feedback.message;
 
-          // Mostrar
+          // Mostrar inmediatamente
+          container.classList.remove("entering");
           container.classList.add("visible", "entering");
           this.isShowing = true;
 
           // Marcar como mostrado
           this.shownFeedbacks.add(feedback.id);
+
+          // Agregar al tablero de feedback acumulado
+          this.addToFeedbackBoard(feedback);
 
           // Auto-ocultar
           if (feedback.autoHide) {
@@ -1220,10 +1195,46 @@
             }, feedback.autoHide);
           }
 
-          // Remover animación de entrada
+          // Remover animación de entrada después de que termine
           setTimeout(() => {
             container.classList.remove("entering");
           }, 400);
+        },
+
+        // Agregar feedback al tablero acumulado
+        addToFeedbackBoard(feedback) {
+          const feedbackBoard = document.getElementById("feedback-board");
+          if (!feedbackBoard) return;
+
+          // Remover mensaje de vacío si existe
+          const emptyMsg = feedbackBoard.querySelector(".feedback-board-empty");
+          if (emptyMsg) {
+            emptyMsg.remove();
+          }
+
+          // Calcular tiempo transcurrido desde el inicio de la simulación
+          let timeText = "0:00";
+          if (state.startTime) {
+            const elapsed = Math.floor((Date.now() - state.startTime) / 1000);
+            const minutes = Math.floor(elapsed / 60);
+            const seconds = elapsed % 60;
+            timeText = `${minutes}:${seconds.toString().padStart(2, '0')}`;
+          }
+
+          // Crear elemento de feedback
+          const feedbackItem = document.createElement("div");
+          feedbackItem.className = "feedback-board-item";
+          feedbackItem.innerHTML = `
+            <div class="feedback-board-item-header">
+              <span class="feedback-board-icon">${feedback.icon}</span>
+              <span class="feedback-board-title">${feedback.title}</span>
+              <span class="feedback-board-time">${timeText}</span>
+            </div>
+            <div class="feedback-board-item-content">${feedback.message}</div>
+          `;
+
+          // Agregar al inicio del tablero (más reciente arriba)
+          feedbackBoard.insertBefore(feedbackItem, feedbackBoard.firstChild);
         },
 
         // Ocultar feedback
@@ -1245,6 +1256,12 @@
         reset() {
           this.shownFeedbacks.clear();
           this.hide();
+          
+          // Limpiar tablero de feedback
+          const feedbackBoard = document.getElementById("feedback-board");
+          if (feedbackBoard) {
+            feedbackBoard.innerHTML = '<div class="feedback-board-empty">Los mensajes de feedback aparecerán aquí con su tiempo de aparición</div>';
+          }
         },
       };
 
@@ -1849,6 +1866,17 @@
               fibrinGlow: false,
               fibrinOpacity: 1.0,
             },
+            educational: {
+              overview: "La coagulación normal es un proceso fisiológico complejo que permite detener el sangrado tras una lesión vascular. Todos los componentes del sistema hemostático funcionan de manera coordinada.",
+              pathophysiology: "En condiciones normales, la hemostasia primaria (adhesión y agregación plaquetaria) y secundaria (cascada de coagulación) trabajan en sinergia. Las plaquetas se adhieren al colágeno expuesto mediante el factor von Willebrand (vWF), se agregan entre sí, y la cascada de coagulación genera trombina que convierte el fibrinógeno en fibrina, formando una red estable que refuerza el tapón plaquetario.",
+              symptoms: "No hay síntomas anormales. El tiempo de sangrado es normal (2-4 minutos) y la formación del coágulo es eficiente y estable.",
+              causes: "Estado fisiológico normal. No hay déficit ni alteración de factores de coagulación.",
+              treatment: "No requiere tratamiento. El sistema hemostático funciona correctamente.",
+              prognosis: "Excelente. La coagulación ocurre de manera eficiente, minimizando la pérdida sanguínea y permitiendo la cicatrización adecuada.",
+              clinicalNotes: "Este es el estado de referencia para comparar otras condiciones. Los tiempos normales de coagulación son: tiempo de sangrado 2-4 min, tiempo de protrombina (PT) 11-13 seg, tiempo de tromboplastina parcial (PTT) 25-35 seg.",
+              affectedFactors: "Ninguno - todos los factores funcionan normalmente",
+              cascadePathway: "Ambas vías (intrínseca y extrínseca) funcionan correctamente, convergiendo en la vía común que genera trombina eficientemente.",
+            },
           },
           hemophilia: {
             name: "Hemofilia A/B",
@@ -1871,6 +1899,17 @@
               fibrinColor: "#FF6B6B", // Rojo para indicar débil
               fibrinGlow: false,
               fibrinOpacity: 0.3, // Muy transparente
+            },
+            educational: {
+              overview: "La hemofilia es un trastorno hemorrágico hereditario causado por déficit de Factor VIII (Hemofilia A) o Factor IX (Hemofilia B). Es la coagulopatía hereditaria más común, afectando principalmente a varones.",
+              pathophysiology: "El déficit de Factor VIII o IX interrumpe la vía intrínseca de la cascada de coagulación. Las plaquetas se adhieren normalmente formando el tapón primario, pero la generación de trombina está severamente reducida. Sin suficiente trombina, el fibrinógeno no se convierte eficientemente en fibrina, resultando en coágulos débiles e inestables que se desintegran fácilmente.",
+              symptoms: "Sangrado prolongado tras lesiones menores, hemartrosis (sangrado en articulaciones), hematomas espontáneos, sangrado post-quirúrgico severo. El tiempo de sangrado puede ser normal, pero el tiempo de tromboplastina parcial (PTT) está prolongado.",
+              causes: "Mutaciones genéticas en el cromosoma X que codifican para Factor VIII (Hemofilia A) o Factor IX (Hemofilia B). Patrón de herencia ligado al cromosoma X (afecta principalmente varones).",
+              treatment: "Tratamiento de reemplazo con concentrados de Factor VIII o IX según el tipo. En casos leves puede usarse desmopresina (DDAVP) para Hemofilia A. Tratamiento profiláctico en casos severos. Tratamiento de episodios hemorrágicos agudos.",
+              prognosis: "Con tratamiento adecuado, los pacientes pueden llevar una vida relativamente normal. Sin tratamiento, el sangrado recurrente puede causar artropatía hemofílica, anemia crónica y complicaciones graves.",
+              clinicalNotes: "Hemofilia A (déficit Factor VIII) es más común que Hemofilia B (déficit Factor IX). La severidad depende del nivel de factor: severa (<1%), moderada (1-5%), leve (5-40%). El PTT está prolongado mientras que el PT es normal.",
+              affectedFactors: "Factor VIII (Hemofilia A) o Factor IX (Hemofilia B) - componentes críticos de la vía intrínseca",
+              cascadePathway: "Vía intrínseca defectuosa. El Factor VIII actúa como cofactor del Factor IX activado. Sin estos factores, la generación de trombina es insuficiente.",
             },
           },
           vwd: {
@@ -1901,6 +1940,17 @@
               fibrinGlow: false,
               fibrinOpacity: 1.0,
             },
+            educational: {
+              overview: "La enfermedad de Von Willebrand (EvW) es el trastorno hemorrágico hereditario más común, afectando aproximadamente al 1% de la población. Se caracteriza por déficit o disfunción del factor von Willebrand (vWF).",
+              pathophysiology: "El factor von Willebrand actúa como 'pegamento' que permite que las plaquetas se adhieran al colágeno expuesto en la pared vascular lesionada. También transporta y estabiliza el Factor VIII en plasma. Sin vWF funcional, las plaquetas no pueden adherirse al sitio de la lesión, impidiendo la formación del tapón primario y, por tanto, la iniciación de la cascada de coagulación.",
+              symptoms: "Sangrado mucocutáneo (epistaxis, sangrado gingival, menorragia), sangrado prolongado tras cirugía menor, hematomas fáciles, tiempo de sangrado prolongado. Los síntomas suelen ser más leves que en hemofilia.",
+              causes: "Mutaciones genéticas en el gen VWF localizado en el cromosoma 12. Puede ser heredada de forma autosómica dominante (tipo 1 y 2) o recesiva (tipo 3). Tipo 1: déficit cuantitativo parcial; Tipo 2: defectos cualitativos; Tipo 3: déficit completo severo.",
+              treatment: "Desmopresina (DDAVP) para tipos 1 y 2A leves - aumenta la liberación de vWF endógeno. Concentrados de vWF/Factor VIII para casos severos o cuando DDAVP no es efectivo. Ácido tranexámico como coadyuvante para sangrado mucocutáneo.",
+              prognosis: "Generalmente buena. La mayoría de los pacientes tienen síntomas leves y pueden manejar episodios hemorrágicos con tratamiento adecuado. Los casos severos requieren manejo similar a hemofilia.",
+              clinicalNotes: "Existen tres tipos principales: Tipo 1 (déficit parcial, 75% de casos), Tipo 2 (defectos cualitativos, 20-25%), Tipo 3 (déficit severo, raro). El tiempo de sangrado está prolongado y el Factor VIII puede estar reducido.",
+              affectedFactors: "Factor von Willebrand (vWF) - esencial para la adhesión plaquetaria y estabilización del Factor VIII",
+              cascadePathway: "Fallo en la hemostasia primaria. Sin adhesión plaquetaria, no se inicia adecuadamente la cascada de coagulación, aunque los factores de coagulación pueden estar normales.",
+            },
           },
           thrombocytopenia: {
             name: "Trombocitopenia",
@@ -1929,6 +1979,17 @@
               fibrinGlow: false,
               fibrinOpacity: 1.0,
             },
+            educational: {
+              overview: "La trombocitopenia es una condición caracterizada por un recuento bajo de plaquetas (<150,000/μL). Las plaquetas existentes funcionan normalmente, pero su número insuficiente dificulta la formación adecuada del tapón hemostático.",
+              pathophysiology: "Con pocas plaquetas circulantes, aunque cada plaqueta funcione correctamente, no hay suficientes células para cubrir el área de la lesión y formar un tapón primario efectivo. La cascada de coagulación puede funcionar normalmente, pero sin un tapón plaquetario adecuado, la formación de fibrina es limitada o ineficaz.",
+              symptoms: "Petequias (pequeñas manchas rojas en la piel), púrpura (manchas moradas), equimosis (hematomas), sangrado mucocutáneo, sangrado prolongado tras lesiones menores. El riesgo de sangrado aumenta significativamente con recuentos <50,000/μL y es severo con <20,000/μL.",
+              causes: "Múltiples causas: disminución de producción (anemia aplásica, leucemia, déficit de vitamina B12/folato), aumento de destrucción (púrpura trombocitopénica inmune, trombocitopenia inducida por fármacos), secuestro esplénico, consumo excesivo (coagulación intravascular diseminada).",
+              treatment: "Depende de la causa: corticosteroides o inmunoglobulina IV para trombocitopenia inmune, transfusión de plaquetas para sangrado activo o recuentos muy bajos, esplenectomía en casos refractarios, tratamiento de la causa subyacente.",
+              prognosis: "Varía según la causa. La trombocitopenia inmune aguda en niños suele resolverse espontáneamente. Las formas crónicas requieren manejo a largo plazo. Con tratamiento adecuado, la mayoría de los pacientes pueden mantener recuentos seguros.",
+              clinicalNotes: "Recuento normal: 150,000-450,000/μL. Leve: 100,000-150,000/μL (sangrado menor). Moderada: 50,000-100,000/μL (sangrado con trauma). Severa: <50,000/μL (sangrado espontáneo). El tiempo de sangrado está prolongado proporcionalmente al déficit.",
+              affectedFactors: "Ningún factor de coagulación está afectado - el problema es cuantitativo (número de plaquetas) no cualitativo (función)",
+              cascadePathway: "La cascada de coagulación funciona normalmente, pero la hemostasia primaria es inadecuada debido al número insuficiente de plaquetas para formar el tapón inicial.",
+            },
           },
           hemophiliaSevere: {
             name: "Hemofilia Severa",
@@ -1955,6 +2016,17 @@
               fibrinColor: "#FF0000",
               fibrinGlow: false,
               fibrinOpacity: 0.0, // Invisible porque no se forma
+            },
+            educational: {
+              overview: "La hemofilia severa se define por niveles de Factor VIII o IX <1% de lo normal. Representa la forma más grave de hemofilia, con sangrado espontáneo frecuente y riesgo significativo de complicaciones hemorrágicas graves.",
+              pathophysiology: "Con niveles prácticamente indetectables de Factor VIII o IX, la vía intrínseca de coagulación está completamente bloqueada. El tapón plaquetario primario se forma normalmente, pero sin generación de trombina, no hay conversión de fibrinógeno a fibrina. Los coágulos que se forman son extremadamente débiles y se desintegran rápidamente, resultando en sangrado prolongado o recurrente.",
+              symptoms: "Sangrado espontáneo frecuente (sin trauma aparente), hemartrosis recurrente que puede llevar a artropatía hemofílica, hematomas extensos, sangrado intracraneal (complicación grave), sangrado post-quirúrgico severo, sangrado gastrointestinal o genitourinario.",
+              causes: "Mutaciones genéticas severas en los genes de Factor VIII (Hemofilia A severa) o Factor IX (Hemofilia B severa) que resultan en producción mínima o nula del factor. Patrón de herencia ligado al cromosoma X.",
+              treatment: "Tratamiento profiláctico regular con concentrados de Factor VIII/IX (2-3 veces por semana) para prevenir sangrados. Tratamiento de episodios hemorrágicos agudos con dosis altas. En algunos casos, terapia génica experimental. Manejo multidisciplinario incluyendo fisioterapia para prevenir artropatía.",
+              prognosis: "Sin tratamiento, la esperanza de vida está significativamente reducida debido a complicaciones hemorrágicas. Con tratamiento profiláctico adecuado, los pacientes pueden llevar vidas relativamente normales, aunque requieren atención médica continua. La artropatía hemofílica es una complicación común a largo plazo.",
+              clinicalNotes: "Niveles de factor <1% definen hemofilia severa. El PTT está muy prolongado (>60 segundos). Los pacientes requieren tratamiento profiláctico para prevenir sangrados espontáneos. El desarrollo de inhibidores (anticuerpos contra el factor) es una complicación grave que afecta al 20-30% de pacientes con Hemofilia A severa.",
+              affectedFactors: "Factor VIII o Factor IX prácticamente ausentes (<1% de actividad normal) - bloqueo completo de la vía intrínseca",
+              cascadePathway: "Vía intrínseca completamente bloqueada. Sin Factor VIII/IX, no hay activación del Factor X, resultando en ausencia total de generación de trombina y formación de fibrina.",
             },
           },
           thrombasthenia: {
@@ -1984,6 +2056,17 @@
               fibrinGlow: false,
               fibrinOpacity: 0.0, // No se forma fibrina
             },
+            educational: {
+              overview: "La trombastenia de Glanzmann es un trastorno hemorrágico hereditario raro caracterizado por déficit o disfunción del complejo glicoproteína IIb/IIIa (GPIIb/IIIa), el receptor principal de fibrinógeno en las plaquetas.",
+              pathophysiology: "Las plaquetas pueden adherirse normalmente a la pared vascular mediante vWF y otros receptores, pero no pueden agregarse entre sí porque el receptor GPIIb/IIIa está ausente o disfuncional. Este receptor es esencial para que las plaquetas se unan mediante puentes de fibrinógeno. Sin agregación, no se forma un tapón plaquetario efectivo, y aunque la cascada de coagulación funcione, sin un tapón adecuado la formación de fibrina es limitada.",
+              symptoms: "Sangrado mucocutáneo severo (epistaxis, gingivorragia, menorragia), púrpura, equimosis, sangrado prolongado tras cirugía o trauma. El tiempo de sangrado está muy prolongado. Las plaquetas no se agregan en respuesta a agonistas como ADP, trombina o colágeno.",
+              causes: "Mutaciones en los genes ITGA2B (codifica GPIIb) o ITGB3 (codifica GPIIIa) localizados en el cromosoma 17. Herencia autosómica recesiva. Tipo I: ausencia completa del complejo; Tipo II: presencia pero disfunción del complejo.",
+              treatment: "Transfusión de plaquetas para episodios hemorrágicos agudos o antes de procedimientos quirúrgicos. Ácido tranexámico como coadyuvante. Desmopresina puede tener efecto limitado. En casos refractarios, factor VIIa recombinante. Evitar antiagregantes plaquetarios.",
+              prognosis: "Es un trastorno crónico que requiere manejo de por vida. Con tratamiento adecuado de episodios hemorrágicos, los pacientes pueden llevar vidas relativamente normales, aunque el sangrado puede ser severo. La menorragia puede ser particularmente problemática en mujeres.",
+              clinicalNotes: "El recuento plaquetario es normal, pero la agregación plaquetaria está ausente o severamente reducida. El tiempo de sangrado está muy prolongado (>20 minutos). La prueba de agregación plaquetaria muestra ausencia de respuesta a todos los agonistas. Es más común en poblaciones con consanguinidad.",
+              affectedFactors: "Glicoproteína IIb/IIIa (GPIIb/IIIa) - receptor de fibrinógeno esencial para la agregación plaquetaria",
+              cascadePathway: "La cascada de coagulación puede funcionar normalmente, pero sin agregación plaquetaria no se forma un tapón primario efectivo, limitando la iniciación y eficacia de la formación de fibrina.",
+            },
           },
           factorDeficiency: {
             name: "Déficit Factor VII",
@@ -2011,6 +2094,17 @@
               fibrinGlow: false,
               fibrinOpacity: 0.9,
             },
+            educational: {
+              overview: "El déficit de Factor VII es un trastorno hemorrágico hereditario raro que afecta la vía extrínseca de la coagulación. El Factor VII es el primer factor activado en la vía extrínseca cuando se expone el factor tisular tras una lesión.",
+              pathophysiology: "El Factor VII, junto con el factor tisular (FT), inicia la vía extrínseca activando el Factor X. Con déficit de Factor VII, esta activación inicial está retrasada o reducida. La vía intrínseca puede compensar parcialmente, pero hay un retraso significativo en la generación de trombina y formación de fibrina. Las plaquetas funcionan normalmente, pero el refuerzo de fibrina tarda más en formarse.",
+              symptoms: "Sangrado variable según la severidad del déficit. Puede incluir sangrado mucocutáneo, hemartrosis (menos común que en hemofilia), sangrado post-quirúrgico, menorragia. Los síntomas suelen ser más leves que en hemofilia. El tiempo de protrombina (PT) está prolongado mientras que el PTT puede ser normal.",
+              causes: "Mutaciones en el gen F7 localizado en el cromosoma 13 que codifica el Factor VII. Herencia autosómica recesiva. Puede ser congénito (raro) o adquirido (asociado a enfermedad hepática, déficit de vitamina K, o uso de warfarina).",
+              treatment: "Concentrados de Factor VII recombinante o plasma fresco congelado para episodios hemorrágicos. En casos leves puede no requerir tratamiento profiláctico. El tratamiento de reemplazo es efectivo pero de corta duración (vida media corta del Factor VII).",
+              prognosis: "Generalmente buena. Los pacientes con déficit leve pueden tener síntomas mínimos. Los casos severos requieren tratamiento de episodios hemorrágicos pero pueden llevar vidas relativamente normales con manejo adecuado.",
+              clinicalNotes: "El PT está prolongado mientras que el PTT es normal (patrón inverso a hemofilia). El déficit de Factor VII es el más común de los déficits de factores de la vía extrínseca, aunque sigue siendo raro. La vida media del Factor VII es corta (4-6 horas), requiriendo dosis frecuentes en tratamiento.",
+              affectedFactors: "Factor VII - componente crítico de la vía extrínseca que inicia la activación del Factor X",
+              cascadePathway: "Vía extrínseca defectuosa o retrasada. La vía intrínseca puede compensar parcialmente, pero hay un retraso en la generación inicial de trombina, resultando en formación tardía de fibrina.",
+            },
           },
           anticoagulated: {
             name: "Anticoagulado (Warfarina)",
@@ -2033,6 +2127,17 @@
               fibrinColor: "#FF6347",
               fibrinGlow: false,
               fibrinOpacity: 0.5, // Más transparente
+            },
+            educational: {
+              overview: "La anticoagulación con warfarina es un tratamiento común para prevenir trombosis en pacientes con fibrilación auricular, prótesis valvulares cardíacas, o historia de tromboembolismo. La warfarina inhibe la síntesis de factores de coagulación dependientes de vitamina K.",
+              pathophysiology: "La warfarina bloquea la enzima vitamina K epóxido reductasa, impidiendo la carboxilación de los factores II, VII, IX y X (factores dependientes de vitamina K). Sin esta modificación post-traduccional, estos factores no pueden unirse al calcio y fosfolípidos, reduciendo su actividad. Esto resulta en generación reducida de trombina y formación de fibrina débil e inestable. Las plaquetas funcionan normalmente, pero el refuerzo de fibrina es insuficiente.",
+              symptoms: "Aumento del riesgo de sangrado, especialmente con sobredosificación. Puede presentar sangrado mucocutáneo, hematomas fáciles, sangrado prolongado tras procedimientos, hemorragia gastrointestinal o intracraneal (complicación grave). El tiempo de protrombina (PT/INR) está prolongado.",
+              causes: "Uso terapéutico de warfarina para prevención de trombosis. La dosis se ajusta según el INR objetivo (generalmente 2-3 para mayoría de indicaciones, 2.5-3.5 para prótesis valvulares mecánicas). Interacciones con múltiples fármacos y alimentos pueden afectar los niveles.",
+              treatment: "Para sangrado menor: suspender warfarina temporalmente. Para sangrado mayor o INR muy elevado: vitamina K oral o IV para revertir la anticoagulación, concentrado de complejo protrombínico (PCC) para reversión rápida en emergencias, plasma fresco congelado como alternativa. Monitoreo regular de INR para ajuste de dosis.",
+              prognosis: "Con monitoreo adecuado y mantenimiento del INR en rango terapéutico, el riesgo de sangrado es bajo. Sin embargo, requiere monitoreo regular y ajuste de dosis. El riesgo de sangrado aumenta con INR >4.5. Los pacientes deben evitar traumatismos y ser cuidadosos con interacciones farmacológicas.",
+              clinicalNotes: "El INR (International Normalized Ratio) es el parámetro de monitoreo estándar. Rango terapéutico típico: 2-3. La warfarina tiene inicio de acción lento (2-3 días) y vida media larga (36-42 horas). Requiere 5-7 días para alcanzar efecto completo y similar tiempo para revertirse. Interacciones comunes con antibióticos, AINEs, y alimentos ricos en vitamina K.",
+              affectedFactors: "Factores II (protrombina), VII, IX y X - todos dependientes de vitamina K para su activación funcional",
+              cascadePathway: "Ambas vías (intrínseca y extrínseca) están afectadas porque comparten factores dependientes de vitamina K. La generación de trombina está reducida, resultando en formación de fibrina débil e inestable.",
             },
           },
         },
@@ -2200,12 +2305,15 @@
         lastSimulationTimeUpdate = 0;
 
         // Reset UI elements
-        document
-          .getElementById("hemostasis-indicator")
-          .classList.remove("visible");
         const woundLabel = document.getElementById("wound-label");
         woundLabel.classList.remove("healed", "hidden");
         woundLabel.innerHTML = "⚠️ Lesión Activa";
+        
+        // Remover efecto de pulsación del botón de reiniciar
+        const resetBtn = document.getElementById("reset-btn");
+        if (resetBtn) {
+          resetBtn.classList.remove("hemostasis-pulse");
+        }
 
         const treatmentBtn = document.getElementById("treatment-btn");
         treatmentBtn.classList.remove("applied");
@@ -2935,23 +3043,59 @@
           startParticleSpawning();
 
           const startBtn = document.getElementById("start-btn");
+          const pauseBtn = document.getElementById("pause-btn");
           if (startBtn) {
-            startBtn.textContent = "⏸ Pausar Simulación";
-            startBtn.classList.add("paused");
+            startBtn.disabled = true; // Deshabilitar botón de inicio cuando está corriendo
           }
-          updateWizardStep(3);
+          if (pauseBtn) {
+            pauseBtn.disabled = false; // Habilitar botón de pausa cuando está corriendo
+          }
+          
+          // Habilitar botón de tratamiento cuando la simulación está corriendo
+          const treatmentBtn = document.getElementById("treatment-btn");
+          if (treatmentBtn && !state.treatmentApplied) {
+            treatmentBtn.disabled = false;
+          }
+          
+          // Si el tratamiento ya se aplicó, marcar todos los pasos como completados
+          // Si no, avanzar al paso 3
+          if (state.treatmentApplied) {
+            document.querySelectorAll(".wizard-step").forEach((el, index) => {
+              const stepNum = index + 1;
+              el.classList.remove("active", "completed");
+              if (stepNum <= 3) {
+                el.classList.add("completed");
+              }
+            });
+            state.currentStep = 3;
+          } else {
+            updateWizardStep(3);
+          }
+          
           if (typeof ScreenReaderAnnouncements !== 'undefined') {
             ScreenReaderAnnouncements.announce("Simulación iniciada");
           }
         } else {
           // Pausar simulación
           state.simulationRunning = false;
+          state.isPaused = true;
           // No usar Runner.stop() - usamos nuestro propio loop
           const startBtn = document.getElementById("start-btn");
+          const pauseBtn = document.getElementById("pause-btn");
           if (startBtn) {
-            startBtn.textContent = "▶ Reanudar Simulación";
-            startBtn.classList.remove("paused");
+            startBtn.disabled = false; // Habilitar botón de inicio cuando está pausada
           }
+          if (pauseBtn) {
+            pauseBtn.disabled = true; // Deshabilitar botón de pausa cuando está pausada
+          }
+          
+          // El botón de tratamiento permanece habilitado cuando la simulación está pausada
+          // (siempre que se haya iniciado al menos una vez y no se haya aplicado ya)
+          const treatmentBtn = document.getElementById("treatment-btn");
+          if (treatmentBtn && !state.treatmentApplied && state.startTime) {
+            treatmentBtn.disabled = false;
+          }
+          
           if (typeof ScreenReaderAnnouncements !== 'undefined') {
             ScreenReaderAnnouncements.announce("Simulación pausada");
           }
@@ -2969,6 +3113,36 @@
             el.classList.add("active");
           }
         });
+        
+        // Agregar/remover efecto de aura en condiciones cuando el paso 1 está activo
+        const conditionsSidebar = document.querySelector(".conditions-sidebar");
+        if (conditionsSidebar) {
+          if (step === 1) {
+            conditionsSidebar.classList.add("wizard-step-1-active");
+          } else {
+            conditionsSidebar.classList.remove("wizard-step-1-active");
+          }
+        }
+        
+        // Agregar/remover efecto de aura en botón de iniciar cuando el paso 2 está activo
+        const startBtn = document.getElementById("start-btn");
+        if (startBtn) {
+          if (step === 2) {
+            startBtn.classList.add("wizard-step-2-active");
+          } else {
+            startBtn.classList.remove("wizard-step-2-active");
+          }
+        }
+        
+        // Agregar/remover efecto de aura en botón de tratamiento cuando el paso 3 está activo
+        const treatmentBtn = document.getElementById("treatment-btn");
+        if (treatmentBtn) {
+          if (step === 3) {
+            treatmentBtn.classList.add("wizard-step-3-active");
+          } else {
+            treatmentBtn.classList.remove("wizard-step-3-active");
+          }
+        }
       }
 
       function applyForces(timestep = 16.67) {
@@ -4173,12 +4347,16 @@
             if (!state.woundClosureTime && state.startTime) {
               state.woundClosureTime = accumulatedSimulationTime / 1000; // Guardar tiempo de simulación en segundos
             }
-            document
-              .getElementById("hemostasis-indicator")
-              .classList.add("visible");
             const woundLabel = document.getElementById("wound-label");
-            woundLabel.classList.add("healed", "hidden"); // Ocultar cuando está sellada
+            woundLabel.classList.add("healed");
             woundLabel.innerHTML = "✓ Lesión Sellada";
+            
+            // Agregar efecto de pulsación al botón de reiniciar
+            const resetBtn = document.getElementById("reset-btn");
+            if (resetBtn) {
+              resetBtn.classList.add("hemostasis-pulse");
+            }
+            
             updateUI();
             return;
           }
@@ -4941,13 +5119,8 @@
         document.getElementById("clot-bar").style.width =
           state.clotPercentage + "%";
 
-        // Status indicator
-        const statusDot = document.getElementById("status-dot");
-        const statusText = document.getElementById("status-text");
-
+        // Anuncios para lectores de pantalla
         if (state.hemostasisAchieved) {
-          statusDot.className = "status-dot";
-          statusText.textContent = "Hemostasia lograda";
           // Anunciar hemostasia lograda solo una vez
           if (!state.lastAnnouncedHemostasis) {
             ScreenReaderAnnouncements.announceUrgent(
@@ -4956,8 +5129,6 @@
             state.lastAnnouncedHemostasis = true;
           }
         } else if (state.treatmentApplied) {
-          statusDot.className = "status-dot treated";
-          statusText.textContent = "Tratamiento activo";
           // Anunciar tratamiento aplicado solo una vez
           if (!state.lastAnnouncedTreatment) {
             ScreenReaderAnnouncements.announce(
@@ -4965,12 +5136,6 @@
             );
             state.lastAnnouncedTreatment = true;
           }
-        } else if (state.bloodLoss > 20) {
-          statusDot.className = "status-dot bleeding";
-          statusText.textContent = "Sangrado activo";
-        } else {
-          statusDot.className = "status-dot";
-          statusText.textContent = "Simulación activa";
         }
 
         // Actualizar métricas avanzadas solo si la herida no está cerrada
@@ -5251,6 +5416,188 @@
                 : "▼";
           });
         }
+        
+        // Actualizar contenido educativo inicial
+        updateEducationalContent();
+      }
+
+      // Función para actualizar el contenido educativo completo
+      function updateEducationalContent() {
+        const conditionConfig = CONFIG.conditions[state.condition];
+        const educationalContent = conditionConfig.educational || {};
+        
+        // Obtener contenedor del panel educativo (mantener para compatibilidad)
+        const panelContent = document.querySelector('.educational-panel-content');
+        
+        // Obtener contenedor de la nueva sección educativa
+        const infoContent = document.getElementById('educational-info-content');
+        
+        // Si no hay ningún contenedor, salir
+        if (!panelContent && !infoContent) return;
+
+        // Crear HTML con toda la información educativa
+        let html = `
+          <div class="educational-section">
+            <h4>
+              Condición Actual:
+              <span id="current-condition-name">${conditionConfig.name}</span>
+            </h4>
+            <p id="current-condition-desc">
+              ${conditionConfig.description}
+            </p>
+          </div>
+        `;
+
+        // Agregar información educativa expandida si está disponible
+        if (educationalContent.overview) {
+          html += `
+            <div class="educational-section">
+              <h4>📖 Resumen</h4>
+              <p>${educationalContent.overview}</p>
+            </div>
+          `;
+        }
+
+        if (educationalContent.pathophysiology) {
+          html += `
+            <div class="educational-section">
+              <h4>🔬 Fisiopatología</h4>
+              <p>${educationalContent.pathophysiology}</p>
+            </div>
+          `;
+        }
+
+        if (educationalContent.symptoms) {
+          html += `
+            <div class="educational-section">
+              <h4>⚠️ Síntomas</h4>
+              <p>${educationalContent.symptoms}</p>
+            </div>
+          `;
+        }
+
+        if (educationalContent.causes) {
+          html += `
+            <div class="educational-section">
+              <h4>🔍 Causas</h4>
+              <p>${educationalContent.causes}</p>
+            </div>
+          `;
+        }
+
+        if (educationalContent.treatment) {
+          html += `
+            <div class="educational-section">
+              <h4>💊 Tratamiento</h4>
+              <p>${educationalContent.treatment}</p>
+            </div>
+          `;
+        }
+
+        if (educationalContent.prognosis) {
+          html += `
+            <div class="educational-section">
+              <h4>📊 Pronóstico</h4>
+              <p>${educationalContent.prognosis}</p>
+            </div>
+          `;
+        }
+
+        if (educationalContent.clinicalNotes) {
+          html += `
+            <div class="educational-section">
+              <h4>📝 Notas Clínicas</h4>
+              <p>${educationalContent.clinicalNotes}</p>
+            </div>
+          `;
+        }
+
+        if (educationalContent.affectedFactors) {
+          html += `
+            <div class="educational-section">
+              <h4>⚙️ Factores Afectados</h4>
+              <p>${educationalContent.affectedFactors}</p>
+            </div>
+          `;
+        }
+
+        if (educationalContent.cascadePathway) {
+          html += `
+            <div class="educational-section">
+              <h4>🔄 Vía de la Cascada</h4>
+              <p>${educationalContent.cascadePathway}</p>
+            </div>
+          `;
+        }
+
+        // Agregar cascada de coagulación general (siempre presente)
+        html += `
+          <div class="educational-section">
+            <h4>🩸 Cascada de Coagulación</h4>
+            <p>
+              La coagulación sanguínea es un proceso complejo que
+              involucra múltiples factores:
+            </p>
+            <div class="coagulation-cascade">
+              <div class="cascade-step">
+                <div class="cascade-step-title">Vía Intrínseca</div>
+                <div>Factores XII, XI, IX, VIII</div>
+              </div>
+              <div class="cascade-step">
+                <div class="cascade-step-title">Vía Extrínseca</div>
+                <div>Factor VII + Factor Tisular</div>
+              </div>
+              <div class="cascade-step">
+                <div class="cascade-step-title">Vía Común</div>
+                <div>Factores X, V, II (Trombina)</div>
+              </div>
+              <div class="cascade-step">
+                <div class="cascade-step-title">
+                  Formación de Fibrina
+                </div>
+                <div>Fibrinógeno → Fibrina</div>
+              </div>
+            </div>
+          </div>
+        `;
+
+        // Agregar proceso de hemostasia general
+        html += `
+          <div class="educational-section">
+            <h4>🩹 Proceso de Hemostasia</h4>
+            <p>
+              <strong>1. Vasoconstricción:</strong> Los vasos se
+              contraen para reducir el flujo sanguíneo.
+            </p>
+            <p>
+              <strong>2. Adhesión Plaquetaria:</strong> Las plaquetas se
+              adhieren al colágeno expuesto usando el factor von
+              Willebrand.
+            </p>
+            <p>
+              <strong>3. Agregación Plaquetaria:</strong> Las plaquetas
+              se unen entre sí formando un tapón primario.
+            </p>
+            <p>
+              <strong>4. Coagulación:</strong> La cascada de coagulación
+              forma fibrina que refuerza el tapón.
+            </p>
+            <p>
+              <strong>5. Retracción:</strong> El coágulo se contrae y
+              estabiliza.
+            </p>
+          </div>
+        `;
+
+        // Actualizar el contenido del panel educativo (si existe)
+        if (panelContent) {
+          panelContent.innerHTML = html;
+        }
+        
+        // Actualizar el contenido de la nueva sección educativa (si existe)
+        if (infoContent) {
+          infoContent.innerHTML = html;
+        }
       }
 
       // Tooltips
@@ -5271,13 +5618,31 @@
       }
 
       function applyTreatment() {
+        // Verificar que la simulación se haya iniciado al menos una vez
+        // (puede estar corriendo o pausada)
+        if (!state.startTime) {
+          if (typeof ScreenReaderAnnouncements !== 'undefined') {
+            ScreenReaderAnnouncements.announce("Debes iniciar la simulación antes de aplicar tratamiento");
+          }
+          return;
+        }
+        
+        // Verificar que no se haya aplicado ya
         if (state.treatmentApplied) return;
 
         state.treatmentApplied = true;
         state.showOintment = true;
 
-        // Actualizar wizard - paso 2 completado
-        updateWizardStep(2);
+        // Marcar el paso 3 como completado
+        // Actualizar wizard para marcar todos los pasos (1, 2 y 3) como completados
+        document.querySelectorAll(".wizard-step").forEach((el, index) => {
+          const stepNum = index + 1;
+          el.classList.remove("active", "completed");
+          if (stepNum <= 3) {
+            el.classList.add("completed");
+          }
+        });
+        state.currentStep = 3;
 
         // Show treatment indicator
         const indicator = document.getElementById("treatment-indicator");
@@ -5289,6 +5654,7 @@
         // Update button
         const btn = document.getElementById("treatment-btn");
         btn.classList.add("applied");
+        btn.classList.remove("wizard-step-3-active"); // Remover efecto de aura pulsante
         btn.innerHTML = "✓ Tratamiento Aplicado";
         btn.disabled = true;
 
@@ -5469,39 +5835,41 @@
 
         // Update UI
         document.querySelectorAll(".condition-btn").forEach((btn) => {
-          btn.classList.toggle("active", btn.dataset.condition === condition);
+          const isActive = btn.dataset.condition === condition;
+          btn.classList.toggle("active", isActive);
+          btn.setAttribute("aria-checked", isActive ? "true" : "false");
         });
 
         // Actualizar ARIA
         updateConditionARIA();
 
-        // Actualizar panel educativo
-        const conditionConfig = CONFIG.conditions[condition];
-        const conditionNameEl = document.getElementById(
-          "current-condition-name"
-        );
-        const conditionDescEl = document.getElementById(
-          "current-condition-desc"
-        );
-        if (conditionNameEl) conditionNameEl.textContent = conditionConfig.name;
-        if (conditionDescEl)
-          conditionDescEl.textContent = conditionConfig.description;
+        // Actualizar panel educativo con información completa
+        updateEducationalContent();
 
         // Reset simulation
         initSimulation();
 
-        // Actualizar wizard - paso 1 completado
-        updateWizardStep(1);
+        // Actualizar wizard - paso 2 (iniciar simulación)
+        updateWizardStep(2);
 
         // Habilitar botón de inicio
         const startBtn = document.getElementById("start-btn");
+        const pauseBtn = document.getElementById("pause-btn");
         if (startBtn) {
           startBtn.disabled = false;
-          startBtn.textContent = "▶ Iniciar Simulación";
-          startBtn.classList.remove("paused");
+        }
+        if (pauseBtn) {
+          pauseBtn.disabled = true; // Deshabilitar pausa cuando no hay simulación corriendo
+        }
+        
+        // Deshabilitar botón de tratamiento hasta que se inicie la simulación
+        const treatmentBtn = document.getElementById("treatment-btn");
+        if (treatmentBtn) {
+          treatmentBtn.disabled = true;
         }
 
         // Anunciar cambio de condición
+        const conditionConfig = CONFIG.conditions[condition];
         ScreenReaderAnnouncements.announce(
           `Condición cambiada a: ${conditionConfig.name}`
         );
@@ -5536,19 +5904,53 @@
           startParticleSpawning();
 
           const startBtn = document.getElementById("start-btn");
+          const pauseBtn = document.getElementById("pause-btn");
           if (startBtn) {
-            startBtn.textContent = "⏸ Pausar Simulación";
-            startBtn.classList.add("paused");
+            startBtn.disabled = true; // Deshabilitar botón de inicio cuando está corriendo
           }
-          updateWizardStep(3);
+          if (pauseBtn) {
+            pauseBtn.disabled = false; // Habilitar botón de pausa cuando está corriendo
+          }
+          
+          // Habilitar botón de tratamiento cuando la simulación está corriendo
+          const treatmentBtn = document.getElementById("treatment-btn");
+          if (treatmentBtn && !state.treatmentApplied) {
+            treatmentBtn.disabled = false;
+          }
+          
+          // Si el tratamiento ya se aplicó, marcar todos los pasos como completados
+          // Si no, avanzar al paso 3
+          if (state.treatmentApplied) {
+            document.querySelectorAll(".wizard-step").forEach((el, index) => {
+              const stepNum = index + 1;
+              el.classList.remove("active", "completed");
+              if (stepNum <= 3) {
+                el.classList.add("completed");
+              }
+            });
+            state.currentStep = 3;
+          } else {
+            updateWizardStep(3);
+          }
         } else {
           // Pausar simulación
           state.simulationRunning = false;
+          state.isPaused = true;
           // No usar Runner.stop() - usamos nuestro propio loop
           const startBtn = document.getElementById("start-btn");
+          const pauseBtn = document.getElementById("pause-btn");
           if (startBtn) {
-            startBtn.textContent = "▶ Reanudar Simulación";
-            startBtn.classList.remove("paused");
+            startBtn.disabled = false; // Habilitar botón de inicio cuando está pausada
+          }
+          if (pauseBtn) {
+            pauseBtn.disabled = true; // Deshabilitar botón de pausa cuando está pausada
+          }
+          
+          // El botón de tratamiento permanece habilitado cuando la simulación está pausada
+          // (siempre que se haya iniciado al menos una vez y no se haya aplicado ya)
+          const treatmentBtn = document.getElementById("treatment-btn");
+          if (treatmentBtn && !state.treatmentApplied && state.startTime) {
+            treatmentBtn.disabled = false;
           }
         }
       }
@@ -5564,6 +5966,36 @@
             el.classList.add("active");
           }
         });
+        
+        // Agregar/remover efecto de aura en condiciones cuando el paso 1 está activo
+        const conditionsSidebar = document.querySelector(".conditions-sidebar");
+        if (conditionsSidebar) {
+          if (step === 1) {
+            conditionsSidebar.classList.add("wizard-step-1-active");
+          } else {
+            conditionsSidebar.classList.remove("wizard-step-1-active");
+          }
+        }
+        
+        // Agregar/remover efecto de aura en botón de iniciar cuando el paso 2 está activo
+        const startBtn = document.getElementById("start-btn");
+        if (startBtn) {
+          if (step === 2) {
+            startBtn.classList.add("wizard-step-2-active");
+          } else {
+            startBtn.classList.remove("wizard-step-2-active");
+          }
+        }
+        
+        // Agregar/remover efecto de aura en botón de tratamiento cuando el paso 3 está activo
+        const treatmentBtn = document.getElementById("treatment-btn");
+        if (treatmentBtn) {
+          if (step === 3) {
+            treatmentBtn.classList.add("wizard-step-3-active");
+          } else {
+            treatmentBtn.classList.remove("wizard-step-3-active");
+          }
+        }
       }
 
       // Event Listeners
@@ -5583,9 +6015,11 @@
         });
 
         // Treatment button
-        document
-          .getElementById("treatment-btn")
-          .addEventListener("click", applyTreatment);
+        const treatmentBtn = document.getElementById("treatment-btn");
+        if (treatmentBtn) {
+          treatmentBtn.addEventListener("click", applyTreatment);
+          treatmentBtn.disabled = true; // Deshabilitado hasta iniciar simulación
+        }
 
         // Start button
         const startBtn = document.getElementById("start-btn");
@@ -5594,20 +6028,61 @@
           startBtn.disabled = true; // Deshabilitado hasta seleccionar condición
         }
 
+        // Pause button
+        const pauseBtn = document.getElementById("pause-btn");
+        if (pauseBtn) {
+          pauseBtn.addEventListener("click", toggleSimulation);
+        }
+
         // Reset button
         document.getElementById("reset-btn").addEventListener("click", () => {
           state.simulationRunning = false;
           state.isPaused = false;
           state.lastAnnouncedHemostasis = false;
           state.lastAnnouncedTreatment = false;
+          state.condition = null;
           // No necesitamos detener el runner porque usamos nuestro propio loop
           initSimulation();
+          
+          // Desactivar todas las condiciones
+          document.querySelectorAll(".condition-btn").forEach((btn) => {
+            btn.classList.remove("active");
+            btn.setAttribute("aria-checked", "false");
+          });
+          
+          // Resetear wizard al paso 1
           updateWizardStep(1);
+          
           if (startBtn) {
-            startBtn.textContent = "▶ Iniciar Simulación";
-            startBtn.classList.remove("paused");
-            startBtn.disabled = false;
+            startBtn.disabled = true; // Deshabilitado hasta seleccionar condición
           }
+          
+          const pauseBtn = document.getElementById("pause-btn");
+          if (pauseBtn) {
+            pauseBtn.disabled = true; // Deshabilitar pausa al resetear
+          }
+          
+          // Resetear botón de tratamiento
+          const treatmentBtn = document.getElementById("treatment-btn");
+          if (treatmentBtn) {
+            treatmentBtn.classList.remove("applied");
+            treatmentBtn.disabled = true; // Deshabilitado hasta iniciar simulación
+            treatmentBtn.innerHTML = `<svg viewBox="0 0 24 24" aria-hidden="true">
+              <path
+                d="M11.15,15.18L9.73,13.77L11.15,12.35L12.56,13.77L13.97,12.35L12.56,10.94L13.97,9.53L15.39,10.94L16.8,9.53L13.97,6.7L6.9,13.77L9.73,16.6L11.15,15.18M3.08,9.27L9.73,2.62L11.15,4.03L4.5,10.69L3.08,9.27M20.92,14.73L14.27,21.38L12.85,19.97L19.5,13.31L20.92,14.73Z"
+              />
+            </svg>
+            Administrar Tratamiento`;
+          }
+          
+          // Remover efecto de pulsación del botón de reiniciar
+          const resetBtn = document.getElementById("reset-btn");
+          if (resetBtn) {
+            resetBtn.classList.remove("hemostasis-pulse");
+          }
+          
+          state.treatmentApplied = false;
+          
           // Actualizar UI inmediatamente para mostrar valores reseteados
           updateUI();
           ScreenReaderAnnouncements.announce("Simulación reiniciada");
@@ -5625,19 +6100,11 @@
         // Inicializar tutorial interactivo
         InteractiveTutorial.init();
 
-        // Inicializar wizard
+        // Inicializar wizard - empezar en paso 1 sin condición activa
         updateWizardStep(1);
 
-        // Asegurar que la condición normal esté activa por defecto
-        const normalBtn = document.querySelector('[data-condition="normal"]');
-        if (normalBtn) {
-          normalBtn.classList.add("active");
-        }
-
-        // Habilitar botón de inicio ya que la condición normal está activa por defecto
-        if (startBtn) {
-          startBtn.disabled = false;
-        }
+        // No activar ninguna condición por defecto
+        // El botón de inicio permanece deshabilitado hasta que se seleccione una condición
 
         // Actualizar ARIA inicial
         updateConditionARIA();
