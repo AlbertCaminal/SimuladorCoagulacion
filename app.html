@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+﻿<!DOCTYPE html>
 <html lang="es">
   <head>
     <meta charset="UTF-8" />
@@ -24,7 +24,7 @@
         aria-label="Iniciar tutorial interactivo"
         aria-describedby="tutorial-description"
       >
-        🎓 Tutorial
+        Tutorial
       </button>
       <span id="tutorial-description" class="sr-only">
         Abre un tutorial paso a paso sobre cómo usar el simulador
@@ -40,7 +40,7 @@
         aria-controls="accessibility-panel"
         title="Accesibilidad (Alt+A)"
       >
-        ♿ Accesibilidad
+        Accesibilidad
       </button>
     </header>
 
@@ -278,24 +278,24 @@
           <div class="viewer-container" role="img" aria-label="Simulación de coagulación sanguínea">
             <div class="viewer-labels">
               <div class="label label-wound" id="wound-label" role="status" aria-live="polite">
-                ⚠️ Lesión Activa
+                Lesión Activa
               </div>
             </div>
             <div class="treatment-indicator" id="treatment-indicator" role="status" aria-live="assertive" aria-atomic="true">
-              💉 Tratamiento Administrado
+              Tratamiento Administrado
             </div>
 
-            <!-- Sistema de Feedback Contextual -->
+            <!-- Sistema de Feedback -->
             <div class="contextual-feedback" id="contextual-feedback" role="alert" aria-live="polite" aria-atomic="true">
               <div class="feedback-header">
-                <span class="feedback-icon" id="feedback-icon" aria-hidden="true">💡</span>
+                <span class="feedback-icon" id="feedback-icon" aria-hidden="true"></span>
                 <span class="feedback-title" id="feedback-title"
                   >Información</span
                 >
                 <button class="feedback-close" id="feedback-close" aria-label="Cerrar mensaje">×</button>
               </div>
               <div class="feedback-content" id="feedback-content">
-                Mensaje de feedback contextual
+                Mensaje de feedback
               </div>
             </div>
 
@@ -344,7 +344,7 @@
               title="Pausar simulación"
               disabled
             >
-              ⏸ Pausar
+              <span class="pause-icon">⏸</span> Pausar
             </button>
             <button 
               class="reset-btn control-btn-small" 
@@ -373,11 +373,6 @@
               aria-label="Administrar tratamiento médico"
               title="Aplicar tratamiento (Alt+T)"
             >
-              <svg viewBox="0 0 24 24" aria-hidden="true">
-                <path
-                  d="M11.15,15.18L9.73,13.77L11.15,12.35L12.56,13.77L13.97,12.35L12.56,10.94L13.97,9.53L15.39,10.94L16.8,9.53L13.97,6.7L6.9,13.77L9.73,16.6L11.15,15.18M3.08,9.27L9.73,2.62L11.15,4.03L4.5,10.69L3.08,9.27M20.92,14.73L14.27,21.38L12.85,19.97L19.5,13.31L20.92,14.73Z"
-                />
-              </svg>
               Administrar Tratamiento
             </button>
           </div>
@@ -435,7 +430,7 @@
                   <svg viewBox="0 0 24 24" aria-hidden="true">
                     <path d="M20,2H4A2,2 0 0,0 2,4V22L6,18H20A2,2 0 0,0 22,16V4C22,2.89 21.1,2 20,2Z" />
                   </svg>
-                  Feedback Contextual
+                  Feedback
                 </div>
                 <div class="feedback-board" id="feedback-board">
                   <div class="feedback-board-empty">
@@ -494,19 +489,19 @@
               <div class="charts-container">
                 <div class="chart-panel">
                   <div class="chart-title">
-                    <span>📈</span> Evolución del Cierre de la Herida
+                    Evolución del Cierre de la Herida
                   </div>
                   <canvas class="chart-canvas" id="clot-chart"></canvas>
                 </div>
                 <div class="chart-panel">
                   <div class="chart-title">
-                    <span>🩸</span> Pérdida Sanguínea Acumulada
+                    Pérdida Sanguínea Acumulada
                   </div>
                   <canvas class="chart-canvas" id="blood-loss-chart"></canvas>
                 </div>
                 <div class="chart-panel">
                   <div class="chart-title">
-                    <span>🕸️</span> Formación de Red de Fibrina
+                    Formación de Red de Fibrina
                   </div>
                   <canvas class="chart-canvas" id="fibrin-chart"></canvas>
                 </div>
@@ -600,7 +595,7 @@
       // ========================================
 
       // Sistema de anuncios para lectores de pantalla
-      const ScreenReaderAnnouncements = {
+      const Announcements = {
         liveRegion: null,
 
         init() {
@@ -632,7 +627,7 @@
       };
 
       // Navegación por teclado
-      const KeyboardNavigation = {
+      const Keyboard = {
         init() {
           // Atajos globales
           document.addEventListener('keydown', (e) => {
@@ -647,20 +642,20 @@
                 case 's': // Alt+S = Iniciar/Pausar simulación
                   e.preventDefault();
                   document.getElementById('start-btn')?.click();
-                  ScreenReaderAnnouncements.announce('Simulación iniciada o pausada');
+                  Announcements.announce('Simulación iniciada o pausada');
                   break;
                 case 't': // Alt+T = Tratamiento
                   e.preventDefault();
                   const treatmentBtn = document.getElementById('treatment-btn');
                   if (!treatmentBtn.disabled) {
                     treatmentBtn.click();
-                    ScreenReaderAnnouncements.announce('Tratamiento aplicado');
+                    Announcements.announce('Tratamiento aplicado');
                   }
                   break;
                 case 'r': // Alt+R = Reiniciar
                   e.preventDefault();
                   document.getElementById('reset-btn')?.click();
-                  ScreenReaderAnnouncements.announce('Simulación reiniciada');
+                  Announcements.announce('Simulación reiniciada');
                   break;
                 case 'h': // Alt+H = Tutorial
                   e.preventDefault();
@@ -668,7 +663,7 @@
                   break;
                 case 'a': // Alt+A = Accesibilidad
                   e.preventDefault();
-                  AccessibilityPanel.toggle();
+                  AccessPanel.toggle();
                   break;
                 case '1': // Alt+1-8 = Seleccionar condición
                 case '2':
@@ -683,7 +678,7 @@
                   const index = parseInt(e.key) - 1;
                   if (conditions[index]) {
                     conditions[index].click();
-                    ScreenReaderAnnouncements.announce(`Condición ${conditions[index].querySelector('.condition-name').textContent} seleccionada`);
+                    Announcements.announce(`Condición ${conditions[index].querySelector('.condition-name').textContent} seleccionada`);
                   }
                   break;
               }
@@ -717,7 +712,7 @@
           if (nextIndex >= buttons.length) nextIndex = 0;
           
           buttons[nextIndex].focus();
-          ScreenReaderAnnouncements.announce(`Condición ${buttons[nextIndex].querySelector('.condition-name').textContent}`);
+          Announcements.announce(`Condición ${buttons[nextIndex].querySelector('.condition-name').textContent}`);
         },
 
         setupFocusManagement() {
@@ -731,7 +726,7 @@
           }
           const a11yPanel = document.getElementById('accessibility-panel');
           if (a11yPanel && a11yPanel.getAttribute('aria-hidden') === 'false') {
-            AccessibilityPanel.close();
+            AccessPanel.close();
           }
           const feedback = document.getElementById('contextual-feedback');
           if (feedback && feedback.classList.contains('visible')) {
@@ -741,7 +736,7 @@
       };
 
       // Panel de accesibilidad
-      const AccessibilityPanel = {
+      const AccessPanel = {
         init() {
           const panel = document.getElementById('accessibility-panel');
           const overlay = document.getElementById('a11y-overlay');
@@ -793,7 +788,7 @@
             const firstFocusable = panel.querySelector('button, input');
             if (firstFocusable) setTimeout(() => firstFocusable.focus(), 100);
             
-            ScreenReaderAnnouncements.announce('Panel de accesibilidad abierto');
+            Announcements.announce('Panel de accesibilidad abierto');
           } else {
             this.close();
           }
@@ -832,12 +827,12 @@
               // Guardar preferencia
               localStorage.setItem('fontSize', size);
               
-              ScreenReaderAnnouncements.announce(`Tamaño de fuente: ${size}`);
+              Announcements.announce(`Tamaño de fuente: ${size}`);
               
               // Recalcular highlight del tutorial si está activo
               setTimeout(() => {
-                if (typeof InteractiveTutorial !== 'undefined') {
-                  InteractiveTutorial.recalculateHighlight();
+                if (typeof Tutorial !== 'undefined') {
+                  Tutorial.recalculateHighlight();
                 }
               }, 100);
             });
@@ -850,10 +845,10 @@
             checkbox.addEventListener('change', (e) => {
               if (e.target.checked) {
                 document.body.classList.add('high-contrast-mode');
-                ScreenReaderAnnouncements.announce('Modo de alto contraste activado');
+                Announcements.announce('Modo de alto contraste activado');
               } else {
                 document.body.classList.remove('high-contrast-mode');
-                ScreenReaderAnnouncements.announce('Modo de alto contraste desactivado');
+                Announcements.announce('Modo de alto contraste desactivado');
               }
               localStorage.setItem('highContrast', e.target.checked);
             });
@@ -866,10 +861,10 @@
             checkbox.addEventListener('change', (e) => {
               if (e.target.checked) {
                 document.body.classList.add('reduced-motion');
-                ScreenReaderAnnouncements.announce('Animaciones reducidas');
+                Announcements.announce('Animaciones reducidas');
               } else {
                 document.body.classList.remove('reduced-motion');
-                ScreenReaderAnnouncements.announce('Animaciones normales');
+                Announcements.announce('Animaciones normales');
               }
               localStorage.setItem('reduceMotion', e.target.checked);
             });
@@ -944,19 +939,19 @@
       }
 
       // ========================================
-      // SISTEMA DE FEEDBACK CONTEXTUAL INTELIGENTE
+      // SISTEMA DE FEEDBACK
       // ========================================
 
-      const ContextualFeedback = {
-        shownFeedbacks: new Set(),
-        isShowing: false,
-        autoHideTimeout: null,
+      const Feedback = {
+        shown: new Set(),
+        visible: false,
+        hideTimeout: null,
 
-        // Definición de todos los feedbacks contextuales
+        // Definición de feedbacks
         feedbacks: {
           simulationStart: {
             id: "simulationStart",
-            icon: "🎬",
+            icon: "",
             title: "Simulación Iniciada",
             message:
               "Observa cómo las células sanguíneas fluyen por el vaso. Las plaquetas (grises) son las responsables de formar el coágulo.",
@@ -964,71 +959,71 @@
               state.simulationRunning &&
               state.startTime &&
               Date.now() - state.startTime < 2000,
-            showOnce: true,
+            once: true,
             priority: 10,
             autoHide: 5000,
           },
 
-          firstPlateletAdhesion: {
-            id: "firstPlateletAdhesion",
-            icon: "🔴",
+          firstAdhesion: {
+            id: "firstAdhesion",
+            icon: "",
             title: "Primera Adhesión",
             message:
               "Las plaquetas se adhieren al colágeno mediante el factor von Willebrand (vWF).",
             trigger: (state) => {
               // Contar solo plaquetas que NO son ancla (excluir las invisibles de los lados)
-              const realPlatelets = state.stuckPlatelets.filter(
+              const platelets = state.stuckPlatelets.filter(
                 (p) => !p.isAnchor
               );
-              return realPlatelets.length >= 1 && realPlatelets.length <= 3;
+              return platelets.length >= 1 && platelets.length <= 3;
             },
-            showOnce: true,
+            once: true,
             priority: 9,
             autoHide: 5000,
           },
 
-          plateletAggregation: {
-            id: "plateletAggregation",
-            icon: "🔗",
+          aggregation: {
+            id: "aggregation",
+            icon: "",
             title: "Agregación Plaquetaria",
             message: "Las plaquetas se unen formando un tapón primario.",
             trigger: (state) =>
               state.stuckPlatelets.length >= 8 &&
               state.stuckPlatelets.length <= 12,
-            showOnce: true,
+            once: true,
             priority: 8,
             autoHide: 5000,
           },
 
-          fibrinFormationStart: {
-            id: "fibrinFormationStart",
-            icon: "🕸️",
+          fibrinStart: {
+            id: "fibrinStart",
+            icon: "",
             title: "Formación de Fibrina",
             message:
               "La cascada de coagulación genera trombina, que convierte fibrinógeno en fibrina.",
             trigger: (state) =>
               state.fibrinConstraints.length >= 5 &&
               state.fibrinConstraints.length <= 10,
-            showOnce: true,
+            once: true,
             priority: 7,
             autoHide: 5000,
           },
 
           hemostasisAchieved: {
             id: "hemostasisAchieved",
-            icon: "✅",
+            icon: "",
             title: "Hemostasia Lograda",
             message: "El coágulo ha sellado completamente la herida.",
             trigger: (state) =>
               state.hemostasisAchieved && !state.treatmentApplied,
-            showOnce: true,
+            once: true,
             priority: 10,
             autoHide: 5000,
           },
 
-          hemophiliaSlowFibrin: {
-            id: "hemophiliaSlowFibrin",
-            icon: "⚠️",
+          hemophiliaSlow: {
+            id: "hemophiliaSlow",
+            icon: "",
             title: "Fibrina Lenta",
             message:
               "En hemofilia, el déficit de Factor VIII/IX causa formación lenta de fibrina.",
@@ -1040,29 +1035,29 @@
               state.simulationRunning &&
               state.startTime &&
               Date.now() - state.startTime > 8000,
-            showOnce: true,
+            once: true,
             priority: 8,
             autoHide: 5000,
           },
 
-          vwdAdhesionProblem: {
-            id: "vwdAdhesionProblem",
-            icon: "⚠️",
+          vwdProblem: {
+            id: "vwdProblem",
+            icon: "",
             title: "Adhesión Dificultosa",
             message:
               "En von Willebrand, el déficit de vWF dificulta la adhesión plaquetaria.",
             trigger: (state) =>
               state.condition === "vwd" &&
-              state.totalPlateletsSpawned > 30 &&
+              state.plateletsSpawned > 30 &&
               state.stuckPlatelets.length < 5,
-            showOnce: true,
+            once: true,
             priority: 8,
             autoHide: 5000,
           },
 
-          thrombocytopeniaLowPlatelets: {
-            id: "thrombocytopeniaLowPlatelets",
-            icon: "⚠️",
+          lowPlatelets: {
+            id: "lowPlatelets",
+            icon: "",
             title: "Pocas Plaquetas",
             message:
               "En trombocitopenia hay pocas plaquetas disponibles para formar el coágulo.",
@@ -1073,38 +1068,38 @@
               Date.now() - state.startTime > 5000 &&
               state.startTime &&
               Date.now() - state.startTime < 7000,
-            showOnce: true,
+            once: true,
             priority: 8,
             autoHide: 5000,
           },
 
           treatmentApplied: {
             id: "treatmentApplied",
-            icon: "💉",
+            icon: "",
             title: "Tratamiento",
             message: "El tratamiento está mejorando la función de coagulación.",
             trigger: (state) =>
               state.treatmentApplied && state.simulationRunning,
-            showOnce: true,
+            once: true,
             priority: 9,
             autoHide: 5000,
           },
 
-          treatmentSuccess: {
-            id: "treatmentSuccess",
-            icon: "🎯",
+          treatmentWorked: {
+            id: "treatmentWorked",
+            icon: "",
             title: "Tratamiento Efectivo",
             message: "El tratamiento ha permitido lograr la hemostasia.",
             trigger: (state) =>
               state.hemostasisAchieved && state.treatmentApplied,
-            showOnce: true,
+            once: true,
             priority: 10,
             autoHide: 5000,
           },
 
-          bloodLossWarning: {
-            id: "bloodLossWarning",
-            icon: "🩸",
+          bloodLoss: {
+            id: "bloodLoss",
+            icon: "",
             title: "Pérdida Sanguínea",
             message:
               "La pérdida sanguínea está aumentando. Considera administrar tratamiento.",
@@ -1112,7 +1107,7 @@
               state.bloodLoss > 50 &&
               !state.treatmentApplied &&
               !state.hemostasisAchieved,
-            showOnce: true,
+            once: true,
             priority: 7,
             autoHide: 5000,
           },
@@ -1128,12 +1123,12 @@
 
         // Verificar y mostrar feedbacks relevantes
         check(state) {
-          // Buscar feedbacks que cumplan condiciones
+          // Buscar feedbacks activos
           for (const key in this.feedbacks) {
             const feedback = this.feedbacks[key];
 
-            // Skip si ya se mostró y es showOnce
-            if (feedback.showOnce && this.shownFeedbacks.has(feedback.id)) {
+            // Skip si ya se mostró y es once
+            if (feedback.once && this.shown.has(feedback.id)) {
               continue;
             }
 
@@ -1141,7 +1136,7 @@
             try {
               if (feedback.trigger(state)) {
                 // Si hay un feedback mostrándose, ocultarlo inmediatamente
-                if (this.isShowing) {
+                if (this.visible) {
                   this.hide();
                 }
                 this.show(feedback);
@@ -1157,27 +1152,27 @@
         show(feedback) {
           // NO mostrar en el simulador, solo agregar al tablero acumulado
           // Marcar como mostrado
-          this.shownFeedbacks.add(feedback.id);
+          this.shown.add(feedback.id);
 
           // Agregar al tablero de feedback acumulado
           this.addToFeedbackBoard(feedback);
 
           // Marcar que estamos mostrando (para evitar mostrar múltiples a la vez)
-          this.isShowing = true;
+          this.visible = true;
           
           // Resetear el estado después de un breve delay para permitir nuevos feedbacks
           setTimeout(() => {
-            this.isShowing = false;
+            this.visible = false;
           }, 100);
         },
 
         // Agregar feedback al tablero acumulado
         addToFeedbackBoard(feedback) {
-          const feedbackBoard = document.getElementById("feedback-board");
-          if (!feedbackBoard) return;
+          const board = document.getElementById("feedback-board");
+          if (!board) return;
 
           // Remover mensaje de vacío si existe
-          const emptyMsg = feedbackBoard.querySelector(".feedback-board-empty");
+          const emptyMsg = board.querySelector(".feedback-board-empty");
           if (emptyMsg) {
             emptyMsg.remove();
           }
@@ -1192,9 +1187,9 @@
           }
 
           // Crear elemento de feedback
-          const feedbackItem = document.createElement("div");
-          feedbackItem.className = "feedback-board-item";
-          feedbackItem.innerHTML = `
+          const item = document.createElement("div");
+          item.className = "feedback-board-item";
+          item.innerHTML = `
             <div class="feedback-board-item-header">
               <span class="feedback-board-icon">${feedback.icon}</span>
               <span class="feedback-board-title">${feedback.title}</span>
@@ -1204,7 +1199,7 @@
           `;
 
           // Agregar al inicio del tablero (más reciente arriba)
-          feedbackBoard.insertBefore(feedbackItem, feedbackBoard.firstChild);
+          board.insertBefore(item, board.firstChild);
         },
 
         // Ocultar feedback
@@ -1214,23 +1209,23 @@
             container.classList.remove("visible", "entering");
           }
 
-          this.isShowing = false;
+          this.visible = false;
 
-          if (this.autoHideTimeout) {
-            clearTimeout(this.autoHideTimeout);
-            this.autoHideTimeout = null;
+          if (this.hideTimeout) {
+            clearTimeout(this.hideTimeout);
+            this.hideTimeout = null;
           }
         },
 
         // Resetear feedbacks mostrados
         reset() {
-          this.shownFeedbacks.clear();
+          this.shown.clear();
           this.hide();
           
           // Limpiar tablero de feedback
-          const feedbackBoard = document.getElementById("feedback-board");
-          if (feedbackBoard) {
-            feedbackBoard.innerHTML = '<div class="feedback-board-empty">Los mensajes de feedback aparecerán aquí con su tiempo de aparición</div>';
+          const board = document.getElementById("feedback-board");
+          if (board) {
+            board.innerHTML = '<div class="feedback-board-empty">Los mensajes de feedback aparecerán aquí con su tiempo de aparición</div>';
           }
         },
       };
@@ -1239,10 +1234,10 @@
       // SISTEMA DE TUTORIAL INTERACTIVO
       // ========================================
 
-      const InteractiveTutorial = {
+      const Tutorial = {
         currentStep: 0,
         isActive: false,
-        currentHighlightSelector: null, // Guardar el selector del highlight actual
+        highlightSelector: null,
         steps: [
           {
             title: "Bienvenido al Simulador",
@@ -1304,7 +1299,7 @@
                         <p>Usa estos botones para controlar la simulación:</p>
                         <ul>
                             <li><strong>▶ Iniciar:</strong> Comienza la simulación</li>
-                            <li><strong>💉 Tratamiento:</strong> Administra tratamiento (si es necesario)</li>
+                            <li><strong>Tratamiento:</strong> Administra tratamiento (si es necesario)</li>
                             <li><strong>↻ Reiniciar:</strong> Vuelve a empezar</li>
                         </ul>
                         <p>El wizard te guía a través de los pasos necesarios.</p>
@@ -1379,7 +1374,7 @@
         init() {
           // Asegurar que el tutorial esté cerrado al inicio
           this.close();
-          this.currentHighlightSelector = null;
+          this.highlightSelector = null;
 
           const startBtn = document.getElementById("tutorial-start-btn");
           const closeBtn = document.getElementById("tutorial-close");
@@ -1413,7 +1408,7 @@
           window.addEventListener('resize', () => {
             clearTimeout(resizeTimeout);
             resizeTimeout = setTimeout(() => {
-              if (this.isActive && this.currentHighlightSelector) {
+              if (this.isActive && this.highlightSelector) {
                 this.recalculateHighlight();
               }
             }, 150);
@@ -1421,7 +1416,7 @@
 
           // Observar cambios en las clases del body para detectar cambios de tamaño de fuente
           const bodyObserver = new MutationObserver(() => {
-            if (this.isActive && this.currentHighlightSelector) {
+            if (this.isActive && this.highlightSelector) {
               // Esperar un momento para que el DOM se actualice
               setTimeout(() => {
                 this.recalculateHighlight();
@@ -1571,7 +1566,7 @@
           }
 
           // Guardar el selector del highlight actual
-          this.currentHighlightSelector = step.highlight || null;
+          this.highlightSelector = step.highlight || null;
           
           // Mostrar highlight si existe (con delay para suavizar transición)
           if (step.highlight && highlight) {
@@ -1622,7 +1617,7 @@
           }
 
           // Guardar el selector actual
-          this.currentHighlightSelector = selector;
+          this.highlightSelector = selector;
 
           // Scroll al elemento si está fuera de la vista (solo si no se omite)
           if (!skipScroll) {
@@ -1676,8 +1671,8 @@
 
         // Recalcular el highlight actual (útil cuando cambia el tamaño de fuente o ventana)
         recalculateHighlight() {
-          if (this.currentHighlightSelector && this.isActive) {
-            this.showHighlight(this.currentHighlightSelector, true);
+          if (this.highlightSelector && this.isActive) {
+            this.showHighlight(this.highlightSelector, true);
           }
         },
 
@@ -1735,7 +1730,7 @@
         close() {
           this.isActive = false;
           this.currentStep = 0;
-          this.currentHighlightSelector = null;
+          this.highlightSelector = null;
           const panel = document.getElementById("tutorial-panel");
           const overlay = document.getElementById("tutorial-overlay");
           const highlight = document.getElementById("tutorial-highlight");
@@ -2125,17 +2120,17 @@
         fibrinBodies: [], // Physical bodies for fibrin network
         allBodies: [],
         showOintment: false,
-        fibrinFormationStarted: false, // Secuencia: plaquetas primero, luego malla
+        fibrinStarted: false,
         simulationRunning: false, // Control manual de simulación
         currentStep: 1, // Paso actual del wizard
         // Métricas avanzadas
         startTime: null,
-        firstAdhesionTime: null,
-        woundClosureTime: null,
-        fibrinFormationRate: 0,
+        adhesionTime: null,
+        closureTime: null,
+        fibrinRate: 0,
         clotDensity: 0,
-        totalPlateletsSpawned: 0,
-        failedAdhesions: 0,
+        plateletsSpawned: 0,
+        failures: 0,
         aggregationRate: 0,
         // Datos históricos para gráficos
         history: {
@@ -2149,8 +2144,8 @@
         timeScale: 1.0,
         isPaused: false,
         // Accesibilidad
-        lastAnnouncedHemostasis: false,
-        lastAnnouncedTreatment: false,
+        announcedHemostasis: false,
+        announcedTreatment: false,
       };
 
       // Spawn timing for fixed interval
@@ -2205,17 +2200,17 @@
           fibrinBodies: [],
           allBodies: [],
           showOintment: false,
-          fibrinFormationStarted: false,
+          fibrinStarted: false,
           simulationRunning: false,
           currentStep: state.currentStep || 1,
           // Métricas avanzadas
           startTime: null,
-          firstAdhesionTime: null,
-          woundClosureTime: null,
-          fibrinFormationRate: 0,
+          adhesionTime: null,
+          closureTime: null,
+          fibrinRate: 0,
           clotDensity: 0,
-          totalPlateletsSpawned: 0,
-          failedAdhesions: 0,
+          plateletsSpawned: 0,
+          failures: 0,
           aggregationRate: 0,
           // Datos históricos para gráficos
           history: {
@@ -2229,8 +2224,8 @@
           timeScale: state.timeScale || 0.75,
           isPaused: false,
           // Accesibilidad
-          lastAnnouncedHemostasis: false,
-          lastAnnouncedTreatment: false,
+          announcedHemostasis: false,
+          announcedTreatment: false,
         };
 
         // FPS counter removed
@@ -2266,7 +2261,7 @@
         ctx.clearRect(0, 0, canvas.width, canvas.height);
 
         // Reset state
-        state.fibrinFormationStarted = false;
+        state.fibrinStarted = false;
         state.simulationRunning = false;
         state.currentStep = 1;
 
@@ -2277,7 +2272,7 @@
         // Reset UI elements
         const woundLabel = document.getElementById("wound-label");
         woundLabel.classList.remove("healed", "hidden");
-        woundLabel.innerHTML = "⚠️ Lesión Activa";
+        woundLabel.innerHTML = "Lesión Activa";
         
         // Remover efecto de pulsación del botón de reiniciar
         const resetBtn = document.getElementById("reset-btn");
@@ -2287,19 +2282,19 @@
 
         const treatmentBtn = document.getElementById("treatment-btn");
         treatmentBtn.classList.remove("applied");
-        treatmentBtn.innerHTML = `<svg viewBox="0 0 24 24"><path d="M11.15,15.18L9.73,13.77L11.15,12.35L12.56,13.77L13.97,12.35L12.56,10.94L13.97,9.53L15.39,10.94L16.8,9.53L13.97,6.7L6.9,13.77L9.73,16.6L11.15,15.18M3.08,9.27L9.73,2.62L11.15,4.03L4.5,10.69L3.08,9.27M20.92,14.73L14.27,21.38L12.85,19.97L19.5,13.31L20.92,14.73Z"/></svg> Administrar Tratamiento`;
+        treatmentBtn.innerHTML = `Administrar Tratamiento`;
         treatmentBtn.disabled = false;
 
         // Resetear tiempo hasta cierre de herida
-        const firstAdhesionTimeEl = document.getElementById(
+        const adhesionTimeEl = document.getElementById(
           "first-adhesion-time"
         );
-        if (firstAdhesionTimeEl) {
-          firstAdhesionTimeEl.textContent = "--";
+        if (adhesionTimeEl) {
+          adhesionTimeEl.textContent = "--";
         }
 
-        // Resetear sistema de feedback contextual
-        ContextualFeedback.reset();
+        // Resetear sistema de feedback
+        Feedback.reset();
 
         // Create engine with zero gravity
         engine = Engine.create();
@@ -2802,7 +2797,7 @@
               },
             });
             // Rastrear plaquetas spawnadas
-            state.totalPlateletsSpawned++;
+            state.plateletsSpawned++;
             break;
 
           case "rbc":
@@ -2988,11 +2983,11 @@
           state.simulationRunning = true;
           state.isPaused = false;
           state.startTime = Date.now();
-          state.firstAdhesionTime = null;
-          state.woundClosureTime = null;
-          state.totalPlateletsSpawned = 0;
-          state.lastAnnouncedHemostasis = false;
-          state.lastAnnouncedTreatment = false;
+          state.adhesionTime = null;
+          state.closureTime = null;
+          state.plateletsSpawned = 0;
+          state.announcedHemostasis = false;
+          state.announcedTreatment = false;
           state.history = {
             time: [],
             clotPercentage: [],
@@ -3042,8 +3037,8 @@
             updateWizardStep(3);
           }
           
-          if (typeof ScreenReaderAnnouncements !== 'undefined') {
-            ScreenReaderAnnouncements.announce("Simulación iniciada");
+          if (typeof Announcements !== 'undefined') {
+            Announcements.announce("Simulación iniciada");
           }
         } else {
           // Pausar simulación
@@ -3066,8 +3061,8 @@
             treatmentBtn.disabled = false;
           }
           
-          if (typeof ScreenReaderAnnouncements !== 'undefined') {
-            ScreenReaderAnnouncements.announce("Simulación pausada");
+          if (typeof Announcements !== 'undefined') {
+            Announcements.announce("Simulación pausada");
           }
         }
       }
@@ -3534,8 +3529,8 @@
         state.stuckPlatelets.push(plateletData);
 
         // Rastrear primera adhesión
-        if (!state.firstAdhesionTime && state.startTime) {
-          state.firstAdhesionTime = Date.now();
+        if (!state.adhesionTime && state.startTime) {
+          state.adhesionTime = Date.now();
         }
 
         // Limitar el número de plaquetas pegadas para mantener rendimiento
@@ -3552,7 +3547,7 @@
         // Con tratamiento, reducir el umbral mínimo de plaquetas
         const minPlateletsForFibrin = state.treatmentApplied ? 2 : 3;
         if (state.stuckPlatelets.length >= minPlateletsForFibrin) {
-          state.fibrinFormationStarted = true;
+          state.fibrinStarted = true;
 
           // Try to form fibrin after delay if specified
           // Con tratamiento, reducir significativamente el delay
@@ -3973,8 +3968,8 @@
         state.stuckPlatelets.push(plateletData);
 
         // Rastrear primera adhesión
-        if (!state.firstAdhesionTime && state.startTime) {
-          state.firstAdhesionTime = Date.now();
+        if (!state.adhesionTime && state.startTime) {
+          state.adhesionTime = Date.now();
         }
 
         // Limitar el número de plaquetas pegadas para mantener rendimiento
@@ -3991,7 +3986,7 @@
         // Con tratamiento, reducir el umbral mínimo de plaquetas
         const minPlateletsForFibrin = state.treatmentApplied ? 2 : 3;
         if (state.stuckPlatelets.length >= minPlateletsForFibrin) {
-          state.fibrinFormationStarted = true;
+          state.fibrinStarted = true;
 
           // Try to form fibrin with delay if specified
           // Con tratamiento, reducir significativamente el delay
@@ -4016,13 +4011,13 @@
         if (!canFormFibrin) return;
 
         // Secuencia: plaquetas primero, luego malla - solo formar si ya empezó la formación
-        if (!state.fibrinFormationStarted) return;
+        if (!state.fibrinStarted) return;
 
         // Check fibrin formation rate
-        const fibrinFormationRate = state.treatmentApplied
+        const fibrinRate = state.treatmentApplied
           ? 1.0
-          : conditionConfig.fibrinFormationRate;
-        if (Math.random() > fibrinFormationRate) {
+          : conditionConfig.fibrinFormationRate; // Note: keeping config name as is
+        if (Math.random() > fibrinRate) {
           return; // Failed to form fibrin this time
         }
 
@@ -4314,12 +4309,12 @@
             state.hemostasisAchieved = true;
             state.clotPercentage = 100;
             // Capturar el momento del cierre de la herida (tiempo de simulación acumulado)
-            if (!state.woundClosureTime && state.startTime) {
-              state.woundClosureTime = accumulatedSimulationTime / 1000; // Guardar tiempo de simulación en segundos
+            if (!state.closureTime && state.startTime) {
+              state.closureTime = accumulatedSimulationTime / 1000; // Guardar tiempo de simulación en segundos
             }
             const woundLabel = document.getElementById("wound-label");
             woundLabel.classList.add("healed");
-            woundLabel.innerHTML = "✓ Lesión Sellada";
+            woundLabel.innerHTML = "Lesión Sellada";
             
             // Agregar efecto de pulsación al botón de reiniciar
             const resetBtn = document.getElementById("reset-btn");
@@ -4764,7 +4759,7 @@
 
         // Renderizar malla morada horizontal en la zona de adhesión que se opaca progresivamente
         // Solo esta área horizontal es morada - las cuerdas son verdes
-        if (state.fibrinFormationStarted && stuckPlateletsInWound > 0) {
+        if (state.fibrinStarted && stuckPlateletsInWound > 0) {
           ctx.fillStyle = `rgba(117, 35, 120, ${meshOpacity})`; // Morado #752378
           ctx.fillRect(woundLeft, meshTopY, woundWidth, meshHeight);
         }
@@ -5089,19 +5084,19 @@
         // Anuncios para lectores de pantalla
         if (state.hemostasisAchieved) {
           // Anunciar hemostasia lograda solo una vez
-          if (!state.lastAnnouncedHemostasis) {
-            ScreenReaderAnnouncements.announceUrgent(
+          if (!state.announcedHemostasis) {
+            Announcements.announceUrgent(
               "¡Hemostasia lograda! La herida se ha cerrado completamente."
             );
-            state.lastAnnouncedHemostasis = true;
+            state.announcedHemostasis = true;
           }
         } else if (state.treatmentApplied) {
           // Anunciar tratamiento aplicado solo una vez
-          if (!state.lastAnnouncedTreatment) {
-            ScreenReaderAnnouncements.announce(
+          if (!state.announcedTreatment) {
+            Announcements.announce(
               `Tratamiento aplicado para condición ${CONFIG.conditions[state.condition]?.name || 'actual'}`
             );
-            state.lastAnnouncedTreatment = true;
+            state.announcedTreatment = true;
           }
         }
 
@@ -5114,8 +5109,8 @@
         // Actualizar descripción textual para lectores de pantalla
         updateSimulationDescription();
 
-        // SISTEMA DE FEEDBACK CONTEXTUAL - Verificar y mostrar feedbacks relevantes
-        ContextualFeedback.check(state);
+        // Verificar y mostrar feedbacks relevantes
+        Feedback.check(state);
       }
 
       function updateAdvancedMetrics() {
@@ -5126,11 +5121,11 @@
         const el = document.getElementById("first-adhesion-time");
         if (
           state.hemostasisAchieved &&
-          state.woundClosureTime !== null &&
+          state.closureTime !== null &&
           state.startTime
         ) {
           // Mostrar el tiempo de simulación cuando se cerró la herida (ya está en segundos de simulación)
-          if (el) el.textContent = state.woundClosureTime.toFixed(1) + "s";
+          if (el) el.textContent = state.closureTime.toFixed(1) + "s";
         } else if (state.startTime && !state.hemostasisAchieved) {
           // Mostrar tiempo de simulación transcurrido mientras la herida está abierta
           if (el) el.textContent = simulationTimeSeconds.toFixed(1) + "s";
@@ -5161,9 +5156,9 @@
 
         // Tasa de agregación (plaquetas pegadas / total spawnadas)
         const aggregationRate =
-          state.totalPlateletsSpawned > 0
+          state.plateletsSpawned > 0
             ? (
-                (state.stuckPlatelets.length / state.totalPlateletsSpawned) *
+                (state.stuckPlatelets.length / state.plateletsSpawned) *
                 100
               ).toFixed(1)
             : 0;
@@ -5429,7 +5424,7 @@
         if (educationalContent.overview) {
           html += `
             <div class="educational-section">
-              <h4>📖 Resumen</h4>
+              <h4>Resumen</h4>
               <p>${educationalContent.overview}</p>
             </div>
           `;
@@ -5438,7 +5433,7 @@
         if (educationalContent.pathophysiology) {
           html += `
             <div class="educational-section">
-              <h4>🔬 Fisiopatología</h4>
+              <h4>Fisiopatología</h4>
               <p>${educationalContent.pathophysiology}</p>
             </div>
           `;
@@ -5447,7 +5442,7 @@
         if (educationalContent.symptoms) {
           html += `
             <div class="educational-section">
-              <h4>⚠️ Síntomas</h4>
+              <h4>Síntomas</h4>
               <p>${educationalContent.symptoms}</p>
             </div>
           `;
@@ -5456,7 +5451,7 @@
         if (educationalContent.causes) {
           html += `
             <div class="educational-section">
-              <h4>🔍 Causas</h4>
+              <h4>Causas</h4>
               <p>${educationalContent.causes}</p>
             </div>
           `;
@@ -5465,7 +5460,7 @@
         if (educationalContent.treatment) {
           html += `
             <div class="educational-section">
-              <h4>💊 Tratamiento</h4>
+              <h4>Tratamiento</h4>
               <p>${educationalContent.treatment}</p>
             </div>
           `;
@@ -5474,7 +5469,7 @@
         if (educationalContent.prognosis) {
           html += `
             <div class="educational-section">
-              <h4>📊 Pronóstico</h4>
+              <h4>Pronóstico</h4>
               <p>${educationalContent.prognosis}</p>
             </div>
           `;
@@ -5483,7 +5478,7 @@
         if (educationalContent.clinicalNotes) {
           html += `
             <div class="educational-section">
-              <h4>📝 Notas Clínicas</h4>
+              <h4>Notas Clínicas</h4>
               <p>${educationalContent.clinicalNotes}</p>
             </div>
           `;
@@ -5492,7 +5487,7 @@
         if (educationalContent.affectedFactors) {
           html += `
             <div class="educational-section">
-              <h4>⚙️ Factores Afectados</h4>
+              <h4>Factores Afectados</h4>
               <p>${educationalContent.affectedFactors}</p>
             </div>
           `;
@@ -5501,7 +5496,7 @@
         if (educationalContent.cascadePathway) {
           html += `
             <div class="educational-section">
-              <h4>🔄 Vía de la Cascada</h4>
+              <h4>Vía de la Cascada</h4>
               <p>${educationalContent.cascadePathway}</p>
             </div>
           `;
@@ -5510,7 +5505,7 @@
         // Agregar cascada de coagulación general (siempre presente)
         html += `
           <div class="educational-section">
-            <h4>🩸 Cascada de Coagulación</h4>
+            <h4>Cascada de Coagulación</h4>
             <p>
               La coagulación sanguínea es un proceso complejo que
               involucra múltiples factores:
@@ -5541,7 +5536,7 @@
         // Agregar proceso de hemostasia general
         html += `
           <div class="educational-section">
-            <h4>🩹 Proceso de Hemostasia</h4>
+            <h4>Proceso de Hemostasia</h4>
             <p>
               <strong>1. Vasoconstricción:</strong> Los vasos se
               contraen para reducir el flujo sanguíneo.
@@ -5598,8 +5593,8 @@
         // Verificar que la simulación se haya iniciado al menos una vez
         // (puede estar corriendo o pausada)
         if (!state.startTime) {
-          if (typeof ScreenReaderAnnouncements !== 'undefined') {
-            ScreenReaderAnnouncements.announce("Debes iniciar la simulación antes de aplicar tratamiento");
+          if (typeof Announcements !== 'undefined') {
+            Announcements.announce("Debes iniciar la simulación antes de aplicar tratamiento");
           }
           return;
         }
@@ -5632,7 +5627,7 @@
         const btn = document.getElementById("treatment-btn");
         btn.classList.add("applied");
         btn.classList.remove("wizard-step-3-active"); // Remover efecto de aura pulsante
-        btn.innerHTML = "✓ Tratamiento Aplicado";
+        btn.innerHTML = "Tratamiento Aplicado";
         btn.disabled = true;
 
         // Apply treatment effects based on condition
@@ -5847,7 +5842,7 @@
 
         // Anunciar cambio de condición
         const conditionConfig = CONFIG.conditions[condition];
-        ScreenReaderAnnouncements.announce(
+        Announcements.announce(
           `Condición cambiada a: ${conditionConfig.name}`
         );
       }
@@ -5858,9 +5853,9 @@
           state.simulationRunning = true;
           state.isPaused = false;
           state.startTime = Date.now();
-          state.firstAdhesionTime = null;
-          state.woundClosureTime = null;
-          state.totalPlateletsSpawned = 0;
+          state.adhesionTime = null;
+          state.closureTime = null;
+          state.plateletsSpawned = 0;
           state.history = {
             time: [],
             clotPercentage: [],
@@ -5980,9 +5975,9 @@
         initSimulation();
 
         // Inicializar sistemas de accesibilidad PRIMERO
-        ScreenReaderAnnouncements.init();
-        KeyboardNavigation.init();
-        AccessibilityPanel.init();
+        Announcements.init();
+        Keyboard.init();
+        AccessPanel.init();
 
         // Condition buttons
         document.querySelectorAll(".condition-btn").forEach((btn) => {
@@ -6015,8 +6010,8 @@
         document.getElementById("reset-btn").addEventListener("click", () => {
           state.simulationRunning = false;
           state.isPaused = false;
-          state.lastAnnouncedHemostasis = false;
-          state.lastAnnouncedTreatment = false;
+          state.announcedHemostasis = false;
+          state.announcedTreatment = false;
           state.condition = null;
           
           // Limpiar contenido educativo
@@ -6069,7 +6064,7 @@
           
           // Actualizar UI inmediatamente para mostrar valores reseteados
           updateUI();
-          ScreenReaderAnnouncements.announce("Simulación reiniciada");
+          Announcements.announce("Simulación reiniciada");
         });
 
         // Inicializar controles avanzados
@@ -6078,11 +6073,11 @@
         setupEducationalPanel();
         setupTooltips();
 
-        // Inicializar sistema de feedback contextual
-        ContextualFeedback.init();
+        // Inicializar sistema de feedback
+        Feedback.init();
 
         // Inicializar tutorial interactivo
-        InteractiveTutorial.init();
+        Tutorial.init();
 
         // Inicializar wizard - empezar en paso 1 sin condición activa
         updateWizardStep(1);
