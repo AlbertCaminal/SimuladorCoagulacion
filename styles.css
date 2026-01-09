@@ -60,13 +60,28 @@
   cursor: pointer;
   transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
   justify-self: end;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+/* Iconos SVG en botones del header */
+.header-btn-icon {
+  width: 18px;
+  height: 18px;
+  flex-shrink: 0;
+  stroke: currentColor;
 }
 
 .accessibility-btn:hover {
-  border-color: #e9630d;
-  background: #fff5f0;
-  color: #e9630d;
+  border-color: #752378;
+  background: #752378;
+  color: white;
   transform: translateY(-1px);
+}
+
+.accessibility-btn:hover .header-btn-icon g {
+  fill: white;
 }
 
 .accessibility-btn:focus-visible {
@@ -130,10 +145,31 @@
   margin: 0;
 }
 
+/* Iconos SVG en botones de cerrar */
+.tutorial-close svg {
+  width: 24px;
+  height: 24px;
+  stroke: currentColor;
+  flex-shrink: 0;
+}
+
+.feedback-close svg {
+  width: 16px;
+  height: 16px;
+  stroke: currentColor;
+  flex-shrink: 0;
+}
+
+.a11y-close svg {
+  width: 20px;
+  height: 20px;
+  stroke: currentColor;
+  flex-shrink: 0;
+}
+
 .a11y-close {
   background: transparent;
   border: none;
-  font-size: calc(2rem * var(--font-size-scale));
   color: #64748b;
   cursor: pointer;
   padding: 0;
@@ -726,6 +762,9 @@ body::before {
   background: #ffffff;
   border: 2px solid #e9630d;
   color: #e9630d;
+  display: flex;
+  align-items: center;
+  gap: 6px;
   padding: 12px 24px;
   border-radius: 8px;
   font-size: calc(1rem * var(--font-size-scale));
@@ -1447,7 +1486,19 @@ body::before {
   border: 1px solid #e2e8f0;
 }
 
+/* Icono de velocidad */
+.speed-icon {
+  width: 16px;
+  height: 16px;
+  flex-shrink: 0;
+  stroke: currentColor;
+  vertical-align: middle;
+}
+
 .speed-control label {
+  display: flex;
+  align-items: center;
+  gap: 6px;
   font-size: 0.7rem;
   color: #64748b;
   font-weight: 500;
@@ -1740,7 +1791,6 @@ body::before {
   background: transparent;
   border: none;
   border-radius: 0;
-  font-size: 2rem;
   color: #505050;
   cursor: pointer;
   padding: 0;
@@ -1751,7 +1801,6 @@ body::before {
   display: flex;
   align-items: center;
   justify-content: center;
-  font-weight: 300;
 }
 
 .tutorial-close:hover {
@@ -2021,12 +2070,11 @@ body::before {
   color: #94a3b8;
   cursor: pointer;
   padding: 0;
-  font-size: 1rem;
   line-height: 1;
   transition: color 0.2s;
   flex-shrink: 0;
-  width: 16px;
-  height: 16px;
+  width: 20px;
+  height: 20px;
   display: flex;
   align-items: center;
   justify-content: center;
@@ -2226,13 +2274,18 @@ body::before {
 }
 
 .wizard-arrow {
-  font-size: 1.5rem;
   color: #94a3b8;
-  font-weight: bold;
   display: flex;
   align-items: center;
   justify-content: center;
   flex: 0 0 auto;
+}
+
+.wizard-arrow svg {
+  width: 20px;
+  height: 20px;
+  flex-shrink: 0;
+  stroke: currentColor;
 }
 
 .wizard-step.active {
@@ -2448,6 +2501,26 @@ body::before {
   display: flex;
   align-items: center;
   justify-content: center;
+  gap: 8px;
+}
+
+/* Iconos SVG profesionales en botones */
+.btn-icon {
+  width: 18px;
+  height: 18px;
+  flex-shrink: 0;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.start-btn .btn-icon,
+.reset-btn .btn-icon {
+  stroke: currentColor;
+}
+
+.pause-btn .btn-icon {
+  fill: currentColor;
 }
 
 /* Pause Button */
@@ -2470,9 +2543,9 @@ body::before {
 }
 
 .pause-btn .pause-icon {
-  display: inline-block;
-  vertical-align: middle;
-  transform: translateY(-1px);
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
   line-height: 1;
 }
 
@@ -2517,6 +2590,7 @@ body::before {
   display: flex;
   align-items: center;
   justify-content: center;
+  gap: 6px;
 }
 
 .reset-btn:hover {

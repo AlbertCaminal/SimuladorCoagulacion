@@ -1,4 +1,4 @@
-﻿<!DOCTYPE html>
+<!DOCTYPE html>
 <html lang="es">
   <head>
     <meta charset="UTF-8" />
@@ -24,6 +24,13 @@
         aria-label="Iniciar tutorial interactivo"
         aria-describedby="tutorial-description"
       >
+        <svg class="header-btn-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+          <path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"></path>
+          <path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"></path>
+          <line x1="8" y1="6" x2="18" y2="6"></line>
+          <line x1="8" y1="10" x2="18" y2="10"></line>
+          <line x1="8" y1="14" x2="14" y2="14"></line>
+        </svg>
         Tutorial
       </button>
       <span id="tutorial-description" class="sr-only">
@@ -40,6 +47,13 @@
         aria-controls="accessibility-panel"
         title="Accesibilidad (Alt+A)"
       >
+        <svg class="header-btn-icon" viewBox="0 0 24 24" aria-hidden="true">
+          <g transform="translate(12, 12) scale(0.0015, -0.0015) translate(-5100, -6400)" fill="currentColor">
+            <path d="M3328 12785 c-664 -108 -1088 -776 -902 -1422 101 -350 391 -650 732 -757 296 -93 575 -72 847 64 226 113 392 278 505 505 82 165 110 276 117 465 4 123 2 161 -17 250 -92 451 -428 790 -875 885 -108 23 -298 28 -407 10z"/>
+            <path d="M3435 10334 c-11 -2 -45 -9 -75 -15 -194 -38 -383 -142 -534 -292 -199 -197 -307 -440 -322 -722 -5 -89 4 -266 66 -1330 6 -93 37 -638 70 -1210 48 -828 64 -1059 80 -1133 71 -335 297 -616 617 -767 77 -37 210 -79 308 -97 42 -8 628 -12 1955 -15 l1895 -4 131 -227 c1009 -1750 1375 -2380 1403 -2415 92 -111 233 -198 378 -232 102 -25 262 -17 360 18 334 116 510 486 395 830 -23 68 -221 416 -992 1748 -530 915 -980 1689 -1000 1719 -83 122 -225 224 -375 267 -56 17 -164 18 -1511 21 l-1451 2 -6 173 c-4 94 -10 286 -14 425 l-6 252 1044 0 c901 0 1053 2 1104 15 266 68 437 315 396 573 -28 185 -147 329 -334 405 -52 22 -54 22 -1162 27 l-1110 5 -8 105 c-35 487 -70 907 -78 965 -23 145 -92 317 -182 450 -99 146 -299 310 -461 378 -149 63 -227 79 -401 83 -88 1 -169 1 -180 -2z"/>
+            <path d="M1880 7729 c-527 -357 -957 -808 -1283 -1346 -564 -930 -737 -2072 -477 -3148 253 -1044 888 -1944 1790 -2540 1026 -677 2306 -870 3489 -528 1011 292 1897 976 2444 1887 108 181 240 444 232 464 -11 31 -580 1012 -586 1012 -4 0 -12 -28 -19 -62 -18 -95 -84 -308 -136 -443 -359 -924 -1102 -1640 -2034 -1960 -650 -222 -1370 -234 -2044 -34 -715 213 -1381 707 -1804 1339 -289 433 -462 892 -538 1430 -26 178 -26 683 -1 855 36 247 83 444 153 646 174 499 439 918 825 1300 l167 167 -29 498 c-16 275 -29 507 -29 517 0 9 -3 17 -7 17 -5 0 -55 -32 -113 -71z"/>
+          </g>
+        </svg>
         Accesibilidad
       </button>
     </header>
@@ -66,7 +80,12 @@
             />
             <span id="tutorial-title-text">RECUERDA</span>
           </div>
-          <button class="tutorial-close" id="tutorial-close" aria-label="Cerrar tutorial">×</button>
+          <button class="tutorial-close" id="tutorial-close" aria-label="Cerrar tutorial">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+              <line x1="18" y1="6" x2="6" y2="18"></line>
+              <line x1="6" y1="6" x2="18" y2="18"></line>
+            </svg>
+          </button>
         </div>
         <div class="tutorial-content">
           <div class="tutorial-step-indicator">
@@ -112,10 +131,9 @@
         <aside class="conditions-sidebar" role="complementary" aria-label="Condiciones clínicas">
           <div class="panel-card" role="region" aria-labelledby="condition-title">
             <div class="panel-title" id="condition-title">
-              <svg viewBox="0 0 24 24" aria-hidden="true">
-                <path
-                  d="M12,8A4,4 0 0,0 8,12A4,4 0 0,0 12,16A4,4 0 0,0 16,12A4,4 0 0,0 12,8M12,18A6,6 0 0,1 6,12A6,6 0 0,1 12,6A6,6 0 0,1 18,12A6,6 0 0,1 12,18M20,8.69V4H15.31L12,0.69L8.69,4H4V8.69L0.69,12L4,15.31V20H8.69L12,23.31L15.31,20H20V15.31L23.31,12L20,8.69Z"
-                />
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                <path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"></path>
+                <polyline points="22 4 12 14.01 9 11.01"></polyline>
               </svg>
               Condición Clínica
             </div>
@@ -292,7 +310,12 @@
                 <span class="feedback-title" id="feedback-title"
                   >Información</span
                 >
-                <button class="feedback-close" id="feedback-close" aria-label="Cerrar mensaje">×</button>
+                <button class="feedback-close" id="feedback-close" aria-label="Cerrar mensaje">
+                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                    <line x1="18" y1="6" x2="6" y2="18"></line>
+                    <line x1="6" y1="6" x2="18" y2="18"></line>
+                  </svg>
+                </button>
               </div>
               <div class="feedback-content" id="feedback-content">
                 Mensaje de feedback
@@ -335,7 +358,10 @@
               aria-label="Iniciar la simulación"
               title="Iniciar simulación (Alt+S)"
             >
-              ▶ Iniciar Simulación
+              <svg class="btn-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                <polygon points="5 3 19 12 5 21 5 3"></polygon>
+              </svg>
+              Iniciar Simulación
             </button>
             <button 
               class="pause-btn control-btn-small" 
@@ -344,7 +370,11 @@
               title="Pausar simulación"
               disabled
             >
-              <span class="pause-icon">⏸</span> Pausar
+              <svg class="btn-icon pause-icon" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
+                <rect x="6" y="4" width="4" height="16"></rect>
+                <rect x="14" y="4" width="4" height="16"></rect>
+              </svg>
+              Pausar
             </button>
             <button 
               class="reset-btn control-btn-small" 
@@ -352,10 +382,20 @@
               aria-label="Reiniciar la simulación"
               title="Reiniciar simulación (Alt+R)"
             >
-              ↻ Reiniciar
+              <svg class="btn-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                <polyline points="23 4 23 10 17 10"></polyline>
+                <polyline points="1 20 1 14 7 14"></polyline>
+                <path d="M3.51 9a9 9 0 0 1 14.85-3.36L23 10M1 14l4.64 4.36A9 9 0 0 0 20.49 15"></path>
+              </svg>
+              Reiniciar
             </button>
             <div class="speed-control control-speed">
-              <label>Velocidad:</label>
+              <label>
+                <svg class="speed-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                  <polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"></polygon>
+                </svg>
+                Velocidad:
+              </label>
               <input
                 type="range"
                 class="speed-slider"
@@ -388,7 +428,11 @@
                 </div>
               </div>
             </div>
-            <div class="wizard-arrow" aria-hidden="true">→</div>
+            <div class="wizard-arrow" aria-hidden="true">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <polyline points="9 18 15 12 9 6"></polyline>
+              </svg>
+            </div>
             <div class="wizard-step" data-step="2">
               <div class="step-number">2</div>
               <div class="step-content">
@@ -396,7 +440,11 @@
                 <div class="step-desc">Presiona el botón Iniciar</div>
               </div>
             </div>
-            <div class="wizard-arrow" aria-hidden="true">→</div>
+            <div class="wizard-arrow" aria-hidden="true">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <polyline points="9 18 15 12 9 6"></polyline>
+              </svg>
+            </div>
             <div class="wizard-step" data-step="3">
               <div class="step-number">3</div>
               <div class="step-content">
@@ -447,10 +495,10 @@
           <div class="panel-card">
             <div class="metrics-section">
               <div class="panel-title">
-                <svg viewBox="0 0 24 24">
-                  <path
-                    d="M19,3H5C3.89,3 3,3.89 3,5V19A2,2 0 0,0 5,21H19A2,2 0 0,0 21,19V5C21,3.89 20.1,3 19,3M9,17H7V10H9V17M13,17H11V7H13V17M17,17H15V13H17V17Z"
-                  />
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                  <line x1="18" y1="20" x2="18" y2="10"></line>
+                  <line x1="12" y1="20" x2="12" y2="4"></line>
+                  <line x1="6" y1="20" x2="6" y2="14"></line>
                 </svg>
                 Métricas en Tiempo Real
               </div>
@@ -524,7 +572,12 @@
     >
       <div class="a11y-header">
         <h2 id="a11y-title">Configuración de Accesibilidad</h2>
-        <button class="a11y-close" id="a11y-close" aria-label="Cerrar panel de accesibilidad">×</button>
+        <button class="a11y-close" id="a11y-close" aria-label="Cerrar panel de accesibilidad">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+            <line x1="18" y1="6" x2="6" y2="18"></line>
+            <line x1="6" y1="6" x2="18" y2="18"></line>
+          </svg>
+        </button>
       </div>
       <div class="a11y-content">
         <section>
@@ -1298,9 +1351,9 @@
                         <h3>Controles Principales</h3>
                         <p>Usa estos botones para controlar la simulación:</p>
                         <ul>
-                            <li><strong>▶ Iniciar:</strong> Comienza la simulación</li>
+                            <li><strong>Iniciar:</strong> Comienza la simulación</li>
                             <li><strong>Tratamiento:</strong> Administra tratamiento (si es necesario)</li>
-                            <li><strong>↻ Reiniciar:</strong> Vuelve a empezar</li>
+                            <li><strong>Reiniciar:</strong> Vuelve a empezar</li>
                         </ul>
                         <p>El wizard te guía a través de los pasos necesarios.</p>
                     `,
