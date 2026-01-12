@@ -288,8 +288,8 @@
         },
         wound: {
           x: 550, // Center
-          width: 300,
-          height: 20,
+          width: 450,
+          height: 35,
         },
         wall: {
           thickness: 30, // Increased thickness to prevent particles from passing through
@@ -1177,7 +1177,7 @@
         woundWidth,
         wallThickness
       ) {
-        const adhesionLineY = 23; // Same Y position as the adhesion line
+        const adhesionLineY = 30; // Bottom visually = top in canvas coords (rotated 180°)
         const woundLeft = woundX - woundWidth / 2;
         const woundRight = woundX + woundWidth / 2;
 
@@ -1234,8 +1234,9 @@
       }
 
       function createParticle(type) {
-        const y = 50 + Math.random() * 200;
-        const x = -10;
+        // Spawn particles at the top (visually), which is bottom in canvas coordinates (rotated 180°)
+        const y = CONFIG.canvas.height - 10 - Math.random() * 30; // Top visually = bottom in canvas coords
+        const x = CONFIG.wound.x - CONFIG.wound.width / 2 + Math.random() * (CONFIG.wound.width + 100);
 
         let body;
 
@@ -1318,15 +1319,15 @@
           // Calcular velocidad inicial basada en la fuerza promedio del flujo
           // Simula que la partícula ya ha estado acelerándose por un tiempo
           const flowForceAvg = (CONFIG.physics.flowForceMin + CONFIG.physics.flowForceMax) / 2;
-          // Velocidad inicial: simula ~1 segundo de aceleración previa
+          // Velocidad inicial: simula ~1 segundo de aceleración previa hacia abajo
           // v = a * t, donde a = F/m y t = tiempo de aceleración
           const accelerationTime = 1.0; // 1 segundo de aceleración previa
           const acceleration = flowForceAvg / body.mass; // a = F/m
-          const initialVelocityX = acceleration * accelerationTime;
+          const initialVelocityY = acceleration * accelerationTime;
           
           Body.setVelocity(body, {
-            x: Math.max(0.02, initialVelocityX), // Mínimo para asegurar movimiento visible
-            y: 0, // Sin velocidad vertical inicial
+            x: 0, // Sin velocidad horizontal inicial
+            y: -Math.max(0.02, initialVelocityY), // Caer hacia abajo visualmente = hacia arriba en canvas coords (negativo)
           });
           
           Composite.add(engine.world, body);
@@ -1522,7 +1523,7 @@
         const woundRight = woundX + woundWidth / 2;
 
         // Invisible adhesion line parameters - positioned at wound opening
-        const adhesionLineY = 23; // Y position center of the adhesion zone
+        const adhesionLineY = 30; // Y position center of the adhesion zone (bottom visually = top in canvas coords)
         const adhesionLineThreshold = 25; // Width of adhesion zone (más ancho para efecto de profundidad)
         const adhesionDetectionThreshold = 8; // Umbral más estricto para detectar adhesión (solo cuando está muy cerca)
 
@@ -1562,17 +1563,18 @@
           const woundLeft = woundX - woundWidth / 2;
           const woundRight = woundX + woundWidth / 2;
 
+          // Check collision with bottom wall visually (top wall in canvas coords, where wound is)
           if (body.position.y < wallThickness + particleRadius) {
             // Check if particle is in wound area
             if (body.position.x < woundLeft || body.position.x > woundRight) {
-              // Outside wound - push back from top wall
+              // Outside wound - push back from top wall (bottom visually)
               Body.setPosition(body, {
                 x: body.position.x,
                 y: wallThickness + particleRadius + 0.1,
               });
               Body.setVelocity(body, {
                 x: body.velocity.x,
-                y: Math.max(0, body.velocity.y * -0.8), // Bounce down
+                y: Math.max(0, body.velocity.y * -0.8), // Bounce down (away from wall)
               });
             }
           }
@@ -1591,37 +1593,13 @@
           const flowForce = CONFIG.physics.flowForceMin + 
             (pulseRange / 2) * (1 + pulseFactor); // Mapea seno(-1 a 1) a (min a max)
           
-          // Aplicar fuerza laminar con pulso
+          // Aplicar fuerza gravitacional con pulso (hacia abajo visualmente = hacia arriba en canvas coords)
           Body.applyForce(body, body.position, {
-            x: flowForce * body.mass * timeScale,
-            y: 0,
+            x: 0,
+            y: -flowForce * body.mass * timeScale, // Hacia abajo visualmente = negativo en canvas coords
           });
 
-          // Suction force (vertical hacia arriba) - solo bajo la herida
-          // Desactivar succión cuando la herida está cerrada
-          if (!state.hemostasisAchieved) {
-            // Aplicar succión vertical hacia arriba en el área de la herida
-            // Área de succión desplazada un poco a la izquierda
-            const suctionOffset = 35; // Desplazamiento hacia la izquierda
-            const suctionLeft = woundLeft - suctionOffset;
-            const suctionRight = woundRight - suctionOffset;
-            
-            if (
-              body.position.x > suctionLeft &&
-              body.position.x < suctionRight &&
-              body.position.y < 250
-            ) {
-              const distanceToWound = Math.abs(body.position.y - 20);
-              // Succión más fuerte cerca de la herida, disminuye con la distancia
-              const suctionStrength =
-                Math.abs(CONFIG.physics.suctionForce) * (1 - distanceToWound / 230);
-
-              Body.applyForce(body, body.position, {
-                x: 0,
-                y: CONFIG.physics.suctionForce * body.mass * timeScale, // Vertical hacia arriba (negativo)
-              });
-            }
-          }
+          // Suction force removed - particles now fall naturally downward
 
           // FIBRIN NET BOUNCE - Make RBCs and WBCs bounce off fibrin network
           if (
@@ -2076,18 +2054,17 @@
             if (px > CONFIG.canvas.width + 20) {
               toRemove.push(body);
             }
-            // Remove particles that exit top (blood loss)
-            else if (py < -20) {
+            // Remove particles that exit through wound at bottom visually (top in canvas coords, blood loss)
+            if (py < 10 && px >= woundLeft - 5 && px <= woundRight + 5) {
               toRemove.push(body);
               state.bloodLoss++;
             }
-            // Remove particles that exit through the wound (upward)
-            else if (py < 10 && px >= woundLeft - 5 && px <= woundRight + 5) {
-              toRemove.push(body);
-              state.bloodLoss++;
-            }
-            // Remove particles way off screen (bottom or left)
+            // Remove particles way off screen (bottom visually = top in canvas coords, or left)
             else if (py > CONFIG.canvas.height + 20 || px < -30) {
+              toRemove.push(body);
+            }
+            // Remove particles that exit top visually (bottom in canvas coords, outside wound area)
+            else if (py < -20) {
               toRemove.push(body);
             }
           }
@@ -2150,7 +2127,7 @@
             if (px > CONFIG.canvas.width - 30) {
               additionalToRemove.push(body);
             }
-            // También eliminar partículas que están muy abajo (fuera de la vista útil)
+            // También eliminar partículas que están muy abajo visualmente (arriba en canvas coords, fuera de la vista útil)
             else if (py > CONFIG.canvas.height - 10) {
               additionalToRemove.push(body);
             }
@@ -3125,7 +3102,7 @@
         const woundWidth = CONFIG.wound.width;
         const woundLeft = woundX - woundWidth / 2;
         const woundRight = woundX + woundWidth / 2;
-        const adhesionLineY = 23; // Centro del área de adhesión (debe coincidir con el área de adhesión)
+        const adhesionLineY = CONFIG.canvas.height - 30; // Centro del área de adhesión (debe coincidir con el área de adhesión)
         const adhesionZoneHalfWidth = 12; // Mitad del ancho del área de adhesión
 
         // Render ointment layer when treatment is applied - ultra simple for performance
