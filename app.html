@@ -21,6 +21,15 @@
         <!-- Columna izquierda: Condiciones Clínicas -->
         <aside class="conditions-sidebar" role="complementary" aria-label="Condiciones clínicas">
           <div class="panel-card" role="region">
+            <h2 class="conditions-title">
+              <svg class="conditions-title-icon" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path>
+                <polyline points="14 2 14 8 20 8"></polyline>
+                <line x1="9" y1="15" x2="15" y2="15"></line>
+                <line x1="12" y1="12" x2="12" y2="18"></line>
+              </svg>
+              Condición Clínica
+            </h2>
             <div class="condition-grid" role="radiogroup">
             <button 
               class="condition-btn" 
@@ -107,52 +116,55 @@
         <section class="viewer-section">
           
           <div class="viewer-container">
+            <!-- Contador de FPS -->
+            <div class="fps-counter" id="fps-counter">FPS: --</div>
+            
             <!-- Leyenda dentro del visor -->
-            <div class="legend">
-              <div class="legend-item tooltip-container">
-                <div class="legend-dot platelet"></div>
-                <span class="tooltip-trigger">Plaquetas</span>
-                <div class="tooltip">
-                  Células sanguíneas pequeñas que se adhieren a la herida y forman
-                  el tapón inicial. Se activan al contacto con el colágeno expuesto.
-                </div>
-              </div>
-              <div class="legend-item tooltip-container">
-                <div class="legend-dot rbc"></div>
-                <span class="tooltip-trigger">Glóbulos Rojos</span>
-                <div class="tooltip">
-                  Eritrocitos que transportan oxígeno. No participan directamente en
-                  la coagulación pero pueden quedar atrapados en el coágulo.
-                </div>
-              </div>
-              <div class="legend-item tooltip-container">
-                <div class="legend-dot wbc"></div>
-                <span class="tooltip-trigger">Glóbulos Blancos</span>
-                <div class="tooltip">
-                  Leucocitos que participan en la respuesta inmune. Pueden ayudar en
-                  la limpieza de la herida.
-                </div>
-              </div>
-              <div class="legend-item tooltip-container">
-                <div class="legend-dot fibrin"></div>
-                <span class="tooltip-trigger">Red de Fibrina</span>
-                <div class="tooltip">
-                  Proteína formada a partir del fibrinógeno por acción de la
-                  trombina. Crea una malla que refuerza el tapón plaquetario.
-                </div>
-              </div>
-              <div class="legend-item tooltip-container">
-                <div class="legend-dot vwf"></div>
-                <span class="tooltip-trigger">Factor von Willebrand</span>
-                <div class="tooltip">
-                  Proteína que media la adhesión de las plaquetas al colágeno
-                  expuesto. Esencial para el inicio de la hemostasia.
-                </div>
+          <div class="legend">
+            <div class="legend-item tooltip-container">
+              <div class="legend-dot platelet"></div>
+              <span class="tooltip-trigger">Plaquetas</span>
+              <div class="tooltip">
+                Células sanguíneas pequeñas que se adhieren a la herida y forman
+                el tapón inicial. Se activan al contacto con el colágeno expuesto.
               </div>
             </div>
-            
+            <div class="legend-item tooltip-container">
+              <div class="legend-dot rbc"></div>
+              <span class="tooltip-trigger">Glóbulos Rojos</span>
+              <div class="tooltip">
+                Eritrocitos que transportan oxígeno. No participan directamente en
+                la coagulación pero pueden quedar atrapados en el coágulo.
+              </div>
+            </div>
+            <div class="legend-item tooltip-container">
+              <div class="legend-dot wbc"></div>
+              <span class="tooltip-trigger">Glóbulos Blancos</span>
+              <div class="tooltip">
+                Leucocitos que participan en la respuesta inmune. Pueden ayudar en
+                la limpieza de la herida.
+              </div>
+            </div>
+            <div class="legend-item tooltip-container">
+              <div class="legend-dot fibrin"></div>
+              <span class="tooltip-trigger">Red de Fibrina</span>
+              <div class="tooltip">
+                Proteína formada a partir del fibrinógeno por acción de la
+                trombina. Crea una malla que refuerza el tapón plaquetario.
+              </div>
+            </div>
+            <div class="legend-item tooltip-container">
+              <div class="legend-dot vwf"></div>
+              <span class="tooltip-trigger">Factor von Willebrand</span>
+              <div class="tooltip">
+                Proteína que media la adhesión de las plaquetas al colágeno
+                expuesto. Esencial para el inicio de la hemostasia.
+              </div>
+            </div>
+          </div>
+          
             <div class="viewer-labels">
-              <div class="label label-wound" id="wound-label" role="status" aria-live="polite">
+              <div class="label label-wound hidden" id="wound-label" role="status" aria-live="polite">
                 Lesión Activa
               </div>
             </div>
@@ -280,27 +292,357 @@
 
 
 
-      // Simulation Configuration
-      const CONFIG = {
+      // Simulation Configuration - Tamaños base (referencia)
+      const BASE_CONFIG = {
         canvas: {
           width: 1300,
           height: 300,
         },
         wound: {
-          x: 550, // Center
           width: 450,
           height: 35,
         },
         wall: {
-          thickness: 30, // Increased thickness to prevent particles from passing through
+          thickness: 30,
           color: "#FDA4AF",
         },
+        particles: {
+          plateletRadius: 4,
+          rbcRadius: 6,
+          wbcRadius: 10,
+        },
+      };
+      
+      // Factor de escala global (se actualiza dinámicamente)
+      let scaleFactor = 1.0;
+      
+      // Valores base para UI (referencia para escala)
+      const BASE_UI = {
+        fps: {
+          fontSize: 0.875, // rem
+          padding: { top: 6, right: 12, bottom: 6, left: 12 }, // px
+          top: 16, // px
+          left: 16, // px
+          borderRadius: 8, // px
+        },
+        legend: {
+          fontSize: 0.875, // rem - aumentado para mejor visibilidad
+          padding: { top: 14, right: 10, bottom: 14, left: 10 }, // px
+          gap: 10, // px
+          top: 16, // px
+          borderRadius: 12, // px
+          maxWidth: 1000, // px
+        },
+        legendItem: {
+          fontSize: 0.75, // rem
+          padding: { top: 4, right: 16, bottom: 4, left: 16 }, // px
+          gap: 10, // px
+          borderRadius: 6, // px
+        },
+        legendDot: {
+          platelet: { width: 12, height: 12 },
+          rbc: { width: 14, height: 10 },
+          wbc: { width: 20, height: 20 },
+          fibrin: { width: 24, height: 3 },
+          vwf: { width: 20, height: 2 },
+        },
+        woundLabel: {
+          fontSize: 0.875, // rem
+          padding: { top: 8, right: 16, bottom: 8, left: 16 }, // px
+          top: 12, // px
+          right: 17, // px
+          borderRadius: 6, // px
+        },
+        metrics: {
+          fontSize: { value: 1.75, label: 0.75 }, // rem
+          padding: { top: 10, right: 14, bottom: 10, left: 14 }, // px
+          gap: 16, // px
+          bottom: 16, // px
+          borderRadius: 8, // px
+          minWidth: 110, // px
+          marginBottom: 5, // px
+        },
+        sidebar: {
+          width: 380, // px
+          padding: 16, // px
+        },
+        conditionBtn: {
+          padding: 12, // px
+          minHeight: 80, // px
+          borderRadius: 8, // px
+          fontSize: { name: 0.9, desc: 0.75 }, // rem
+          marginBottom: 4, // px
+        },
+        controlBtn: {
+          large: {
+            height: 48, // px
+            padding: { top: 12, right: 24, bottom: 12, left: 24 }, // px
+            minWidth: { start: 200, treatment: 300 }, // px
+            fontSize: 1.0, // rem
+          },
+          small: {
+            height: 48, // px
+            padding: { top: 12, right: 16, bottom: 12, left: 16 }, // px
+            minWidth: 120, // px
+            fontSize: 1.0, // rem
+          },
+        },
+        panelTitle: {
+          fontSize: 0.7, // rem
+          marginBottom: 10, // px
+          gap: 6, // px
+          iconSize: 16, // px
+        },
+        btnIcon: {
+          size: 18, // px
+        },
+        speedControl: {
+          height: 48, // px
+          padding: { top: 0, right: 12, bottom: 0, left: 12 }, // px
+          gap: 8, // px
+          borderRadius: 8, // px
+          fontSize: { label: 0.75, value: 0.75 }, // rem
+          sliderWidth: 100, // px
+          valueMinWidth: 30, // px
+          iconSize: 18, // px (aproximado, basado en btn-icon)
+        },
+      };
+      
+      // Función simplificada para actualizar escalado de UI usando CSS
+      function updateUIScaling(scale) {
+        // Solo actualizar la variable CSS, el resto lo maneja CSS automáticamente
+        document.documentElement.style.setProperty('--ui-scale', scale);
+      }
+      
+      // Función antigua (mantenida por compatibilidad pero no se usa)
+      function updateUIScalingOld(scale) {
+        // FPS Counter
+        const fpsEl = document.getElementById('fps-counter');
+        if (fpsEl) {
+          fpsEl.style.fontSize = `${BASE_UI.fps.fontSize * scale}rem`;
+          fpsEl.style.padding = `${BASE_UI.fps.padding.top * scale}px ${BASE_UI.fps.padding.right * scale}px ${BASE_UI.fps.padding.bottom * scale}px ${BASE_UI.fps.padding.left * scale}px`;
+          fpsEl.style.top = `${BASE_UI.fps.top * scale}px`;
+          fpsEl.style.left = `${BASE_UI.fps.left * scale}px`;
+          fpsEl.style.borderRadius = `${BASE_UI.fps.borderRadius * scale}px`;
+        }
+        
+        // Leyenda
+        const legendEl = document.querySelector('.legend');
+        if (legendEl) {
+          legendEl.style.fontSize = `${BASE_UI.legend.fontSize * scale}rem`;
+          legendEl.style.padding = `${BASE_UI.legend.padding.top * scale}px ${BASE_UI.legend.padding.right * scale}px ${BASE_UI.legend.padding.bottom * scale}px ${BASE_UI.legend.padding.left * scale}px`;
+          legendEl.style.gap = `${BASE_UI.legend.gap * scale}px`;
+          legendEl.style.top = `${BASE_UI.legend.top * scale}px`;
+          legendEl.style.borderRadius = `${BASE_UI.legend.borderRadius * scale}px`;
+          legendEl.style.maxWidth = `${BASE_UI.legend.maxWidth * scale}px`;
+        }
+        
+        // Elementos de la leyenda (texto "Plaquetas", "Glóbulos Rojos", etc.)
+        const legendItems = document.querySelectorAll('.legend-item');
+        legendItems.forEach(item => {
+          item.style.fontSize = `${BASE_UI.legendItem.fontSize * scale}rem`;
+          item.style.padding = `${BASE_UI.legendItem.padding.top * scale}px ${BASE_UI.legendItem.padding.right * scale}px ${BASE_UI.legendItem.padding.bottom * scale}px ${BASE_UI.legendItem.padding.left * scale}px`;
+          item.style.gap = `${BASE_UI.legendItem.gap * scale}px`;
+          item.style.borderRadius = `${BASE_UI.legendItem.borderRadius * scale}px`;
+        });
+        
+        // Dots de la leyenda
+        const legendDots = {
+          '.legend-dot.platelet': BASE_UI.legendDot.platelet,
+          '.legend-dot.rbc': BASE_UI.legendDot.rbc,
+          '.legend-dot.wbc': BASE_UI.legendDot.wbc,
+          '.legend-dot.fibrin': BASE_UI.legendDot.fibrin,
+          '.legend-dot.vwf': BASE_UI.legendDot.vwf,
+        };
+        Object.keys(legendDots).forEach(selector => {
+          const dots = document.querySelectorAll(selector);
+          dots.forEach(dot => {
+            const size = legendDots[selector];
+            dot.style.width = `${size.width * scale}px`;
+            dot.style.height = `${size.height * scale}px`;
+          });
+        });
+        
+        // Lesión Activa
+        const woundLabelEl = document.getElementById('wound-label');
+        if (woundLabelEl) {
+          woundLabelEl.style.fontSize = `${BASE_UI.woundLabel.fontSize * scale}rem`;
+          woundLabelEl.style.padding = `${BASE_UI.woundLabel.padding.top * scale}px ${BASE_UI.woundLabel.padding.right * scale}px ${BASE_UI.woundLabel.padding.bottom * scale}px ${BASE_UI.woundLabel.padding.left * scale}px`;
+          woundLabelEl.style.top = `${BASE_UI.woundLabel.top * scale}px`;
+          woundLabelEl.style.right = `${BASE_UI.woundLabel.right * scale}px`;
+          woundLabelEl.style.borderRadius = `${BASE_UI.woundLabel.borderRadius * scale}px`;
+        }
+        
+        // Métricas
+        const metricsEl = document.querySelector('.viewer-metrics');
+        if (metricsEl) {
+          metricsEl.style.gap = `${BASE_UI.metrics.gap * scale}px`;
+          metricsEl.style.bottom = `${BASE_UI.metrics.bottom * scale}px`;
+        }
+        
+        const metricBoxes = document.querySelectorAll('.metric-box');
+        metricBoxes.forEach(box => {
+          box.style.padding = `${BASE_UI.metrics.padding.top * scale}px ${BASE_UI.metrics.padding.right * scale}px ${BASE_UI.metrics.padding.bottom * scale}px ${BASE_UI.metrics.padding.left * scale}px`;
+          box.style.borderRadius = `${BASE_UI.metrics.borderRadius * scale}px`;
+          box.style.minWidth = `${BASE_UI.metrics.minWidth * scale}px`;
+        });
+        
+        const metricValues = document.querySelectorAll('.metric-value');
+        metricValues.forEach(value => {
+          value.style.fontSize = `${BASE_UI.metrics.fontSize.value * scale}rem`;
+          value.style.marginBottom = `${BASE_UI.metrics.marginBottom * scale}px`;
+        });
+        
+        const metricLabels = document.querySelectorAll('.metric-label');
+        metricLabels.forEach(label => {
+          label.style.fontSize = `${BASE_UI.metrics.fontSize.label * scale}rem`;
+        });
+        
+        // Panel lateral izquierdo
+        const sidebarEl = document.querySelector('.conditions-sidebar');
+        const sidebarWidth = BASE_UI.sidebar.width * scale;
+        const sidebarGap = 16 * scale; // Gap entre sidebar y visor
+        
+        if (sidebarEl) {
+          sidebarEl.style.width = `${sidebarWidth}px`;
+        }
+        
+        const panelCardEl = document.querySelector('.conditions-sidebar .panel-card:first-child');
+        if (panelCardEl) {
+          panelCardEl.style.padding = `${BASE_UI.sidebar.padding * scale}px`;
+        }
+        
+        // Ajustar el layout del visor para mantener proporciones con el sidebar
+        const simulatorLayout = document.querySelector('.simulator-layout');
+        if (simulatorLayout) {
+          simulatorLayout.style.marginLeft = `${sidebarWidth}px`;
+          simulatorLayout.style.width = `calc(100% - ${sidebarWidth}px - ${sidebarGap}px)`;
+          simulatorLayout.style.maxWidth = `calc(100% - ${sidebarWidth}px - ${sidebarGap}px)`;
+          simulatorLayout.style.paddingRight = `${sidebarGap}px`;
+        }
+        
+        // Botones de condición
+        const conditionBtns = document.querySelectorAll('.condition-btn');
+        conditionBtns.forEach(btn => {
+          btn.style.padding = `${BASE_UI.conditionBtn.padding * scale}px`;
+          btn.style.minHeight = `${BASE_UI.conditionBtn.minHeight * scale}px`;
+        });
+        
+        const conditionNames = document.querySelectorAll('.condition-name');
+        conditionNames.forEach(name => {
+          name.style.fontSize = `${BASE_UI.conditionBtn.fontSize.name * scale}rem`;
+          name.style.marginBottom = `${BASE_UI.conditionBtn.marginBottom * scale}px`;
+        });
+        
+        const conditionDescs = document.querySelectorAll('.condition-desc');
+        conditionDescs.forEach(desc => {
+          desc.style.fontSize = `${BASE_UI.conditionBtn.fontSize.desc * scale}rem`;
+        });
+        
+        // Botones de control grandes
+        const controlBtnsLarge = document.querySelectorAll('.control-btn-large');
+        controlBtnsLarge.forEach(btn => {
+          btn.style.height = `${BASE_UI.controlBtn.large.height * scale}px`;
+          btn.style.padding = `${BASE_UI.controlBtn.large.padding.top * scale}px ${BASE_UI.controlBtn.large.padding.right * scale}px ${BASE_UI.controlBtn.large.padding.bottom * scale}px ${BASE_UI.controlBtn.large.padding.left * scale}px`;
+          btn.style.fontSize = `${BASE_UI.controlBtn.large.fontSize * scale}rem`;
+        });
+        
+        const startBtn = document.querySelector('.start-btn.control-btn-large');
+        if (startBtn) {
+          startBtn.style.minWidth = `${BASE_UI.controlBtn.large.minWidth.start * scale}px`;
+        }
+        
+        const treatmentBtn = document.querySelector('.treatment-btn.control-btn-large');
+        if (treatmentBtn) {
+          treatmentBtn.style.width = `${BASE_UI.controlBtn.large.minWidth.treatment * scale}px`;
+          treatmentBtn.style.minWidth = `${BASE_UI.controlBtn.large.minWidth.treatment * scale}px`;
+        }
+        
+        // Botones de control pequeños
+        const controlBtnsSmall = document.querySelectorAll('.control-btn-small');
+        controlBtnsSmall.forEach(btn => {
+          btn.style.height = `${BASE_UI.controlBtn.small.height * scale}px`;
+          btn.style.padding = `${BASE_UI.controlBtn.small.padding.top * scale}px ${BASE_UI.controlBtn.small.padding.right * scale}px ${BASE_UI.controlBtn.small.padding.bottom * scale}px ${BASE_UI.controlBtn.small.padding.left * scale}px`;
+          btn.style.minWidth = `${BASE_UI.controlBtn.small.minWidth * scale}px`;
+          btn.style.fontSize = `${BASE_UI.controlBtn.small.fontSize * scale}rem`;
+        });
+        
+        // Títulos de panel
+        const panelTitles = document.querySelectorAll('.panel-title');
+        panelTitles.forEach(title => {
+          title.style.fontSize = `${BASE_UI.panelTitle.fontSize * scale}rem`;
+          title.style.marginBottom = `${BASE_UI.panelTitle.marginBottom * scale}px`;
+          title.style.gap = `${BASE_UI.panelTitle.gap * scale}px`;
+        });
+        
+        const panelTitleIcons = document.querySelectorAll('.panel-title svg');
+        panelTitleIcons.forEach(icon => {
+          icon.style.width = `${BASE_UI.panelTitle.iconSize * scale}px`;
+          icon.style.height = `${BASE_UI.panelTitle.iconSize * scale}px`;
+        });
+        
+        // Iconos de los botones de control
+        const btnIcons = document.querySelectorAll('.btn-icon');
+        btnIcons.forEach(icon => {
+          icon.style.width = `${BASE_UI.btnIcon.size * scale}px`;
+          icon.style.height = `${BASE_UI.btnIcon.size * scale}px`;
+        });
+        
+        // Barra de velocidad
+        const speedControl = document.querySelector('.control-speed');
+        if (speedControl) {
+          speedControl.style.height = `${BASE_UI.speedControl.height * scale}px`;
+          speedControl.style.padding = `${BASE_UI.speedControl.padding.top * scale}px ${BASE_UI.speedControl.padding.right * scale}px ${BASE_UI.speedControl.padding.bottom * scale}px ${BASE_UI.speedControl.padding.left * scale}px`;
+          speedControl.style.gap = `${BASE_UI.speedControl.gap * scale}px`;
+          speedControl.style.borderRadius = `${BASE_UI.speedControl.borderRadius * scale}px`;
+        }
+        
+        const speedLabels = document.querySelectorAll('.control-speed label');
+        speedLabels.forEach(label => {
+          label.style.fontSize = `${BASE_UI.speedControl.fontSize.label * scale}rem`;
+        });
+        
+        const speedSliders = document.querySelectorAll('.speed-slider');
+        speedSliders.forEach(slider => {
+          slider.style.width = `${BASE_UI.speedControl.sliderWidth * scale}px`;
+        });
+        
+        const speedValues = document.querySelectorAll('.control-speed #speed-value');
+        speedValues.forEach(value => {
+          value.style.fontSize = `${BASE_UI.speedControl.fontSize.value * scale}rem`;
+          value.style.minWidth = `${BASE_UI.speedControl.valueMinWidth * scale}px`;
+        });
+        
+        // Icono de velocidad
+        const speedIcons = document.querySelectorAll('.speed-icon');
+        speedIcons.forEach(icon => {
+          icon.style.width = `${BASE_UI.speedControl.iconSize * scale}px`;
+          icon.style.height = `${BASE_UI.speedControl.iconSize * scale}px`;
+        });
+      }
+      
+      // Simulation Configuration - Valores escalados dinámicamente
+      const CONFIG = {
+        canvas: {
+          width: BASE_CONFIG.canvas.width,
+          height: BASE_CONFIG.canvas.height,
+        },
+        wound: {
+          x: BASE_CONFIG.canvas.width / 2, // Center
+          width: BASE_CONFIG.wound.width,
+          height: BASE_CONFIG.wound.height,
+        },
+        wall: {
+          thickness: BASE_CONFIG.wall.thickness,
+          color: BASE_CONFIG.wall.color,
+        },
+        adhesionLineY: BASE_CONFIG.canvas.height - 250, // Posición base de la herida
         physics: {
           flowForce: 0.000175, // Base: promedio entre 0.00015 y 0.00020
           flowForceMin: 0.00008, // Mínimo muy reducido para pulso extremadamente dramático
           flowForceMax: 0.00045, // Máximo muy aumentado para hacer el pulso extremadamente visible (5.6x diferencia)
-          suctionForce: -0.00050, // Vertical hacia arriba (negativo) - aumentado más
-          suctionRadius: 180,
+          suctionForce: 0.00030, // Fuerza de succión hacia la herida (positivo = atraer)
+          suctionRadius: 2000, // Radio de efecto muy grande para ocupar todo el ancho del visor (solo mitad superior)
         },
         particles: {
           maxCount: 150, // Reduced for better performance
@@ -664,6 +1006,11 @@
 
       // Matter.js Setup
       let engine, render, runner;
+      
+      // FPS Counter variables
+      let fpsFrameCount = 0;
+      let fpsLastTime = performance.now();
+      let currentFPS = 0;
 
       function initSimulation() {
         // Clear spawn timeout
@@ -744,7 +1091,9 @@
 
         // Reset UI elements
         const woundLabel = document.getElementById("wound-label");
-        woundLabel.classList.remove("healed", "hidden");
+        // El label se oculta por defecto y solo aparece al iniciar la simulación
+        woundLabel.classList.add("hidden");
+        woundLabel.classList.remove("healed", "active-pulse");
         woundLabel.innerHTML = "Lesión Activa";
         
         // Remover efecto de pulsación del botón de reiniciar
@@ -775,90 +1124,27 @@
         // Create renderer using existing canvas
         const canvasEl = document.getElementById("simulation-canvas");
 
-        // Guardar el ancho original del canvas
-        const originalCanvasWidth = CONFIG.canvas.width;
-        const fixedCanvasHeight = CONFIG.canvas.height; // 300px fijo
-
-        // Ajustar tamaño del canvas según el tamaño de la pantalla
-        // Mantener altura fija, solo ajustar ancho
-        const updateCanvasSize = () => {
-          const container = canvasEl.parentElement;
-          const containerWidth = container.clientWidth;
-          const maxWidth = Math.min(originalCanvasWidth, containerWidth - 32); // 32px de padding
-
-          // Obtener el tamaño visual real del canvas (considerando zoom del navegador)
-          const rect = canvasEl.getBoundingClientRect();
-          const visualWidth = rect.width;
-          const visualHeight = rect.height;
-
-          // Ajustar el tamaño interno del canvas para que coincida exactamente con el tamaño visual
-          // Esto asegura que el canvas se renderice correctamente incluso con zoom
-          // Usar el tamaño visual directamente sin escalar con DPR para evitar problemas de zoom
-          canvasEl.width = Math.round(visualWidth);
-          canvasEl.height = Math.round(visualHeight);
-
-          // Usar el tamaño visual como tamaño lógico para la física
-          const logicalWidth = visualWidth;
-          const logicalHeight = visualHeight;
-
-          // Actualizar CONFIG para que la física use el nuevo tamaño lógico
-          CONFIG.canvas.width = logicalWidth;
-          CONFIG.canvas.height = logicalHeight;
-
-          // Mantener la herida siempre centrada
-          CONFIG.wound.x = logicalWidth / 2;
-
-          // Actualizar el renderer si ya existe
-          if (render) {
-            render.options.width = logicalWidth;
-            render.options.height = logicalHeight;
-            render.canvas.width = canvasEl.width;
-            render.canvas.height = canvasEl.height;
-            // Obtener el contexto fresco después de cambiar el tamaño del canvas
-            render.context = canvasEl.getContext("2d");
-          }
-
-          // Invalidar el cache del fondo del vaso para que se regenere con el nuevo tamaño
-          vesselBackgroundCache = null;
-
-          // Si el engine ya existe, necesitamos recrear las paredes con el nuevo tamaño
-          if (engine && state.simulationRunning === false) {
-            // Solo recrear si la simulación no está corriendo
-            // Las paredes se recrearán en el siguiente initSimulation
-          }
+        // Función para detectar el zoom del navegador
+        const getBrowserZoom = () => {
+          // Crear un elemento de referencia para medir el zoom
+          const testEl = document.createElement('div');
+          testEl.style.width = '100px';
+          testEl.style.height = '100px';
+          testEl.style.position = 'absolute';
+          testEl.style.visibility = 'hidden';
+          testEl.style.top = '-9999px';
+          document.body.appendChild(testEl);
+          
+          const logicalWidth = testEl.offsetWidth;
+          const visualWidth = testEl.getBoundingClientRect().width;
+          const zoom = visualWidth / logicalWidth;
+          
+          document.body.removeChild(testEl);
+          return zoom;
         };
 
-        updateCanvasSize();
-
-        // Actualizar tamaño cuando cambia el tamaño de la ventana o el zoom
-        let resizeTimeout;
-        const handleResize = () => {
-          clearTimeout(resizeTimeout);
-          resizeTimeout = setTimeout(() => {
-            updateCanvasSize();
-            // Si la simulación está corriendo, reiniciar para aplicar los cambios
-            if (state.simulationRunning) {
-              const wasRunning = state.simulationRunning;
-              state.simulationRunning = false;
-              initSimulation();
-              if (wasRunning) {
-                setTimeout(() => {
-                  state.simulationRunning = true;
-                  lastPhysicsTime = 0;
-                  accumulatedTime = 0;
-                }, 100);
-              }
-            }
-          }, 250);
-        };
-
-        window.addEventListener("resize", handleResize);
-
-        // Detectar cambios de zoom usando ResizeObserver
-        const resizeObserver = new ResizeObserver(() => {
-          handleResize();
-        });
-        resizeObserver.observe(canvasEl);
+        // El tamaño del canvas se inicializa en initializeResizeHandlers()
+        // que se ejecuta una sola vez cuando el DOM está cargado
 
         render = Render.create({
           canvas: canvasEl,
@@ -875,6 +1161,13 @@
             pixelRatio: 1,
           },
         });
+        
+        // Mejorar calidad de renderizado del canvas
+        const canvasCtx = canvasEl.getContext("2d");
+        if (canvasCtx) {
+          canvasCtx.imageSmoothingEnabled = true;
+          canvasCtx.imageSmoothingQuality = "high";
+        }
 
         // Asegurar que el engine siempre use timestep fijo
         engine.timing.timeScale = 1.0;
@@ -900,6 +1193,24 @@
           if (render) {
             Render.world(render);
           }
+          
+          // Calcular FPS
+          fpsFrameCount++;
+          const currentTime = performance.now();
+          const elapsed = currentTime - fpsLastTime;
+          
+          if (elapsed >= 1000) { // Actualizar cada segundo
+            currentFPS = Math.round((fpsFrameCount * 1000) / elapsed);
+            fpsFrameCount = 0;
+            fpsLastTime = currentTime;
+            
+            // Actualizar el contador de FPS en el DOM
+            const fpsCounterEl = document.getElementById("fps-counter");
+            if (fpsCounterEl) {
+              fpsCounterEl.textContent = `FPS: ${currentFPS}`;
+            }
+          }
+          
           renderLoopId = requestAnimationFrame(renderLoop);
         }
 
@@ -1061,30 +1372,12 @@
         const woundX = CONFIG.wound.x;
         const woundWidth = CONFIG.wound.width;
 
-        // Bottom wall (solid) - with bounce and collision filter
-        const bottomWall = Bodies.rectangle(
-          width / 2,
-          height - thickness / 2,
-          width,
-          thickness,
-          {
-            isStatic: true,
-            render: { visible: false }, // Renderizado personalizado
-            label: "wall",
-            restitution: 0.8, // Higher restitution for stronger bounce
-            friction: 0.1,
-            collisionFilter: {
-              category: 0x0004, // Wall category
-              mask: 0xffffffff, // Collide with everything
-            },
-          }
-        );
-
-        // Top wall - Left segment - with bounce and collision filter
+        // Top wall - Left and Right segments - moved down visually to match wound position
+        const adhesionLineY = CONFIG.adhesionLineY;
         const leftWallWidth = woundX - woundWidth / 2;
         const topWallLeft = Bodies.rectangle(
           leftWallWidth / 2,
-          thickness / 2,
+          adhesionLineY,
           leftWallWidth,
           thickness,
           {
@@ -1100,12 +1393,12 @@
           }
         );
 
-        // Top wall - Right segment - with bounce and collision filter
+        // Top wall - Right segment - with bounce and collision filter (moved down visually)
         const rightWallStart = woundX + woundWidth / 2;
         const rightWallWidth = width - rightWallStart;
         const topWallRight = Bodies.rectangle(
           rightWallStart + rightWallWidth / 2,
-          thickness / 2,
+          adhesionLineY,
           rightWallWidth,
           thickness,
           {
@@ -1161,7 +1454,6 @@
         );
 
         Composite.add(engine.world, [
-          bottomWall,
           topWallLeft,
           topWallRight,
           woundEdgeLeft,
@@ -1177,13 +1469,13 @@
         woundWidth,
         wallThickness
       ) {
-        const adhesionLineY = 30; // Bottom visually = top in canvas coords (rotated 180°)
+        const adhesionLineY = CONFIG.adhesionLineY; // More down visually = higher Y in canvas coords (rotated 180°)
         const woundLeft = woundX - woundWidth / 2;
         const woundRight = woundX + woundWidth / 2;
 
         // Left anchor platelet - positioned just inside the left edge of the wound
-        const leftAnchorX = woundLeft + 2;
-        const leftAnchor = Bodies.circle(leftAnchorX, adhesionLineY + 6, 4, {
+        const leftAnchorX = woundLeft + 2 * scaleFactor;
+        const leftAnchor = Bodies.circle(leftAnchorX, adhesionLineY + 6 * scaleFactor, BASE_CONFIG.particles.plateletRadius * scaleFactor, {
           isStatic: true,
           render: { fillStyle: "transparent", visible: false },
           label: "platelet",
@@ -1192,8 +1484,8 @@
         });
 
         // Right anchor platelet - positioned just inside the right edge of the wound
-        const rightAnchorX = woundRight - 10;
-        const rightAnchor = Bodies.circle(rightAnchorX, adhesionLineY + 6, 4, {
+        const rightAnchorX = woundRight - 10 * scaleFactor;
+        const rightAnchor = Bodies.circle(rightAnchorX, adhesionLineY + 6 * scaleFactor, BASE_CONFIG.particles.plateletRadius * scaleFactor, {
           isStatic: true,
           render: { fillStyle: "transparent", visible: false },
           label: "platelet",
@@ -1234,9 +1526,11 @@
       }
 
       function createParticle(type) {
-        // Spawn particles at the top (visually), which is bottom in canvas coordinates (rotated 180°)
-        const y = CONFIG.canvas.height - 10 - Math.random() * 30; // Top visually = bottom in canvas coords
-        const x = CONFIG.wound.x - CONFIG.wound.width / 2 + Math.random() * (CONFIG.wound.width + 100);
+        // Spawn particles at the top (visually), which is low Y in canvas coordinates (rotated 180°)
+        // Particles spawn from the top of the screen (low Y in canvas coords due to 180° rotation)
+        const y = 10 * scaleFactor + Math.random() * 30 * scaleFactor; // Top visually = low Y in canvas coords (rotated 180°)
+        // Spawn particles across the entire width of the canvas
+        const x = 20 * scaleFactor + Math.random() * (CONFIG.canvas.width - 40 * scaleFactor); // Todo el ancho del visor con márgenes
 
         let body;
 
@@ -1249,7 +1543,7 @@
                 ? 0.9 // Alta restitución para vWD - rebotan en lugar de adherirse
                 : 0.5; // Rebote medio normal
             
-            body = Bodies.circle(x, y, 4, {
+            body = Bodies.circle(x, y, BASE_CONFIG.particles.plateletRadius * scaleFactor, {
               render: {
                 fillStyle: "transparent",
                 strokeStyle: "transparent",
@@ -1268,13 +1562,15 @@
                 mask: 0x0002 | 0x0004, // Collide with fibrin barriers and walls
               },
             });
+            // Agregar timestamp de creación para duración de vida
+            body.createdAt = performance.now();
             // Rastrear plaquetas spawnadas
             state.plateletsSpawned++;
             break;
 
           case "rbc":
             // Glóbulos rojos: usar círculo pero renderizar como elipse en custom render
-            body = Bodies.circle(x, y, 6, {
+            body = Bodies.circle(x, y, BASE_CONFIG.particles.rbcRadius * scaleFactor, {
               render: {
                 fillStyle: "transparent",
                 strokeStyle: "transparent",
@@ -1291,10 +1587,12 @@
                 mask: 0x0002 | 0x0004, // Collide with fibrin barriers and walls
               },
             });
+            // Agregar timestamp de creación para duración de vida
+            body.createdAt = performance.now();
             break;
 
           case "wbc":
-            body = Bodies.circle(x, y, 10, {
+            body = Bodies.circle(x, y, BASE_CONFIG.particles.wbcRadius * scaleFactor, {
               render: {
                 fillStyle: "transparent",
                 strokeStyle: "transparent",
@@ -1311,6 +1609,8 @@
                 mask: 0x0002 | 0x0004, // Collide with fibrin barriers and walls
               },
             });
+            // Agregar timestamp de creación para duración de vida
+            body.createdAt = performance.now();
             break;
         }
 
@@ -1327,7 +1627,7 @@
           
           Body.setVelocity(body, {
             x: 0, // Sin velocidad horizontal inicial
-            y: -Math.max(0.02, initialVelocityY), // Caer hacia abajo visualmente = hacia arriba en canvas coords (negativo)
+            y: Math.max(0.02, initialVelocityY), // Caer hacia abajo visualmente = aumentar Y en canvas coords (positivo)
           });
           
           Composite.add(engine.world, body);
@@ -1378,12 +1678,7 @@
 
           let spawnedThisCycle = 0;
 
-          // Contar solo partículas móviles (no pegadas) para el límite de spawn
-          const mobileBodies = state.allBodies.filter((b) => {
-            return !state.stuckPlatelets.some((p) => p.body === b);
-          });
-
-          if (mobileBodies.length < CONFIG.particles.maxCount) {
+          // Spawn constante: siempre generar partículas sin verificar límites
             const conditionConfig = CONFIG.conditions[state.condition];
             const plateletRatio = conditionConfig.plateletRatio;
 
@@ -1395,12 +1690,6 @@
             );
 
             for (let i = 0; i < spawnCount; i++) {
-              // Verificar límite con partículas móviles actualizadas
-              const currentMobileCount = state.allBodies.filter((b) => {
-                return !state.stuckPlatelets.some((p) => p.body === b);
-              }).length;
-              if (currentMobileCount >= CONFIG.particles.maxCount) break;
-
               const rand = Math.random();
 
               if (rand < plateletRatio) {
@@ -1412,7 +1701,6 @@
               } else {
                 createParticle("wbc");
                 spawnedThisCycle++;
-              }
             }
           }
 
@@ -1447,6 +1735,12 @@
         }
 
         // Contador de spawn removido
+        
+        // Resetear el flag de inicialización después de un pequeño delay
+        // para permitir que todos los cambios del DOM se completen
+        setTimeout(() => {
+          isInitializingSimulation = false;
+        }, 100);
       }
 
       function toggleSimulation() {
@@ -1476,6 +1770,15 @@
 
           // Reiniciar el spawn para asegurar que funcione
           startParticleSpawning();
+          
+          // Mostrar el label "Lesión Activa" con efecto de pulso
+          const woundLabel = document.getElementById("wound-label");
+          if (woundLabel) {
+            woundLabel.classList.remove("hidden");
+            woundLabel.classList.add("active-pulse");
+            woundLabel.classList.remove("healed");
+            woundLabel.innerHTML = "Lesión Activa";
+          }
 
           const startBtn = document.getElementById("start-btn");
           const pauseBtn = document.getElementById("pause-btn");
@@ -1523,7 +1826,7 @@
         const woundRight = woundX + woundWidth / 2;
 
         // Invisible adhesion line parameters - positioned at wound opening
-        const adhesionLineY = 30; // Y position center of the adhesion zone (bottom visually = top in canvas coords)
+        const adhesionLineY = CONFIG.adhesionLineY; // Y position center of the adhesion zone (more down visually = higher Y in canvas coords)
         const adhesionLineThreshold = 25; // Width of adhesion zone (más ancho para efecto de profundidad)
         const adhesionDetectionThreshold = 8; // Umbral más estricto para detectar adhesión (solo cuando está muy cerca)
 
@@ -1545,61 +1848,83 @@
             body.circleRadius ||
             (body.label === "rbc" ? 6 : body.label === "wbc" ? 10 : 4);
 
-          // Check bottom wall
-          if (body.position.y > height - wallThickness - particleRadius) {
-            Body.setPosition(body, {
-              x: body.position.x,
-              y: height - wallThickness - particleRadius - 0.1,
-            });
-            Body.setVelocity(body, {
-              x: body.velocity.x,
-              y: Math.min(0, body.velocity.y * -0.8), // Bounce up
-            });
-          }
-
           // Check top walls (left and right segments)
           const woundX = CONFIG.wound.x;
           const woundWidth = CONFIG.wound.width;
           const woundLeft = woundX - woundWidth / 2;
           const woundRight = woundX + woundWidth / 2;
 
-          // Check collision with bottom wall visually (top wall in canvas coords, where wound is)
-          if (body.position.y < wallThickness + particleRadius) {
+          // Check collision near wound area (wound is near bottom of canvas)
+          const adhesionLineY = CONFIG.adhesionLineY;
+          const woundCollisionThreshold = 15;
+          if (body.position.y < adhesionLineY + woundCollisionThreshold && body.position.y > adhesionLineY - woundCollisionThreshold) {
             // Check if particle is in wound area
             if (body.position.x < woundLeft || body.position.x > woundRight) {
-              // Outside wound - push back from top wall (bottom visually)
+              // Outside wound - push away from wound area
+              const pushDirection = body.position.y < adhesionLineY ? 1 : -1;
               Body.setPosition(body, {
                 x: body.position.x,
-                y: wallThickness + particleRadius + 0.1,
+                y: adhesionLineY + (woundCollisionThreshold + 1) * pushDirection,
               });
               Body.setVelocity(body, {
                 x: body.velocity.x,
-                y: Math.max(0, body.velocity.y * -0.8), // Bounce down (away from wall)
+                y: body.velocity.y * -0.8,
               });
             }
           }
 
-          // Laminar flow force (right) con pulso cardíaco (sístole/diástole)
-          // Simular pulso cardíaco con función seno: oscila entre flowForceMin y flowForceMax
-          // Usar tiempo de simulación acumulado (ajustado por timeScale) para que el pulso se acelere/ralentice con la velocidad
-          const heartRate = 0.6; // Latidos por segundo (36 bpm) - muy lento para ser extremadamente visible
-          const currentTime = accumulatedSimulationTime / 1000; // Tiempo de simulación en segundos (ajustado por timeScale)
-          const pulseFactor = Math.sin(currentTime * heartRate * Math.PI * 2);
-          // Mapear seno (-1 a 1) al rango de fuerzas (min a max)
-          // Calcular fuerza con pulso: oscila suavemente entre min y max
-          // Cuando pulseFactor = -1 → flowForce = min
-          // Cuando pulseFactor = 1 → flowForce = max
-          const pulseRange = CONFIG.physics.flowForceMax - CONFIG.physics.flowForceMin;
-          const flowForce = CONFIG.physics.flowForceMin + 
-            (pulseRange / 2) * (1 + pulseFactor); // Mapea seno(-1 a 1) a (min a max)
-          
-          // Aplicar fuerza gravitacional con pulso (hacia abajo visualmente = hacia arriba en canvas coords)
-          Body.applyForce(body, body.position, {
-            x: 0,
-            y: -flowForce * body.mass * timeScale, // Hacia abajo visualmente = negativo en canvas coords
-          });
+          // Also check collision with top wall (bottom visually) - removed to allow particles to spawn and fall freely
+          // Particles spawn at y=10-40, so they should fall freely without hitting this wall
 
-          // Suction force removed - particles now fall naturally downward
+          // Laminar flow force constante (sin pulso)
+          // Usar fuerza promedio constante
+          const flowForce = (CONFIG.physics.flowForceMin + CONFIG.physics.flowForceMax) / 2;
+          
+          // Aplicar fuerza gravitacional constante (hacia abajo visualmente = positivo en canvas coords)
+          Body.applyForce(body, body.position, {
+                x: 0,
+            y: flowForce * body.mass * timeScale, // Hacia abajo visualmente = positivo en canvas coords
+              });
+
+          // Fuerza de succión hacia la herida (solo en la mitad superior) - OPTIMIZADO
+          const particlePos = body.position;
+          
+          // Optimización: solo calcular si está arriba de la herida y dentro del área aproximada
+          if (particlePos.y < adhesionLineY) {
+            const dx = woundX - particlePos.x;
+            const dy = adhesionLineY - particlePos.y;
+            
+            // Optimización: usar distancia al cuadrado para evitar sqrt innecesario
+            const distanceSq = dx * dx + dy * dy;
+            const suctionRadiusSq = CONFIG.physics.suctionRadius * CONFIG.physics.suctionRadius;
+            
+            // Aplicar succión solo si está dentro del radio de efecto (comparar distancias al cuadrado)
+            if (distanceSq < suctionRadiusSq && distanceSq > 0) {
+              // Optimización: calcular sqrt solo una vez cuando realmente se necesita
+              const distance = Math.sqrt(distanceSq);
+              const invDistance = 1 / distance; // Evitar división repetida
+              
+              // La fuerza de succión es inversamente proporcional a la distancia
+              const baseSuctionStrength = Math.abs(CONFIG.physics.suctionForce) * (1 - distance / CONFIG.physics.suctionRadius);
+              
+              // Aumentar la fuerza horizontal cuando está más lejos del centro (en los lados)
+              // Calcular distancia horizontal desde el centro de la herida
+              const horizontalDistance = Math.abs(dx);
+              const woundWidth = CONFIG.wound.width;
+              // Factor multiplicador: más fuerza horizontal cuando está más lejos del centro
+              // Usar una función que aumenta exponencialmente con la distancia horizontal
+              const sideMultiplier = 1.0 + (horizontalDistance / (CONFIG.canvas.width / 2)) * 1.0; // Hasta 3x más fuerza en los bordes
+              
+              const suctionStrength = baseSuctionStrength;
+              const horizontalSuctionStrength = baseSuctionStrength * sideMultiplier; // Fuerza horizontal aumentada en los lados
+              const massTimeScale = body.mass * timeScale;
+
+              Body.applyForce(body, body.position, {
+                x: dx * invDistance * horizontalSuctionStrength * massTimeScale, // Fuerza horizontal aumentada en los lados
+                y: dy * invDistance * suctionStrength * massTimeScale, // Fuerza vertical normal
+              });
+            }
+          }
 
           // FIBRIN NET BOUNCE - Make RBCs and WBCs bounce off fibrin network
           if (
@@ -1919,11 +2244,8 @@
         // Limitar el número de plaquetas pegadas para mantener rendimiento
         cleanupOldStuckPlatelets();
 
-        // Ocultar cartel cuando hay plaquetas pegadas
-        const woundLabel = document.getElementById("wound-label");
-        if (state.stuckPlatelets.length > 0) {
-          woundLabel.classList.add("hidden");
-        }
+        // El cartel "Lesión Activa" permanece visible hasta que la herida esté sellada
+        // Solo se oculta cuando se logra la hemostasia completa
 
         // Secuencia: plaquetas primero, luego malla
         // Activar formación de fibrina solo después de umbral de plaquetas
@@ -2039,6 +2361,7 @@
         const woundWidth = CONFIG.wound.width;
         const woundLeft = woundX - woundWidth / 2;
         const woundRight = woundX + woundWidth / 2;
+        const adhesionLineY = CONFIG.adhesionLineY; // Posición de la herida
 
         // Optimized cleanup: iterate backwards for better performance when removing
         for (let i = state.allBodies.length - 1; i >= 0; i--) {
@@ -2050,22 +2373,33 @@
           const isStuck = state.stuckPlatelets.some((p) => p.body === body);
 
           if (!isStuck) {
+            // Verificar duración de vida de 10 segundos
+            if (body.createdAt) {
+              const age = (performance.now() - body.createdAt) / 1000; // Edad en segundos
+              if (age >= 10) {
+                toRemove.push(body);
+                continue; // Ya marcada para eliminar, no verificar otras condiciones
+              }
+            }
+            
             // Remove particles that exit right (eliminar cuando salen completamente del canvas)
             if (px > CONFIG.canvas.width + 20) {
               toRemove.push(body);
             }
-            // Remove particles that exit through wound at bottom visually (top in canvas coords, blood loss)
-            if (py < 10 && px >= woundLeft - 5 && px <= woundRight + 5) {
-              toRemove.push(body);
-              state.bloodLoss++;
-            }
-            // Remove particles way off screen (bottom visually = top in canvas coords, or left)
-            else if (py > CONFIG.canvas.height + 20 || px < -30) {
+            // Remove particles way off screen (left side)
+            else if (px < -30) {
               toRemove.push(body);
             }
-            // Remove particles that exit top visually (bottom in canvas coords, outside wound area)
+            // Remove particles that exit bottom visually (top in canvas coords, outside screen)
             else if (py < -20) {
               toRemove.push(body);
+            }
+            // Remove particles that have passed through the wound and reached the bottom
+            // Particles that are below the wound (adhesionLineY) and reach the bottom disappear
+            // Solo eliminar si están realmente fuera del canvas (más allá del borde inferior)
+            else if (py > adhesionLineY + 50 && py > CONFIG.canvas.height + 20) {
+              toRemove.push(body);
+              state.bloodLoss++;
             }
           }
         }
@@ -2127,8 +2461,9 @@
             if (px > CONFIG.canvas.width - 30) {
               additionalToRemove.push(body);
             }
-            // También eliminar partículas que están muy abajo visualmente (arriba en canvas coords, fuera de la vista útil)
-            else if (py > CONFIG.canvas.height - 10) {
+            // También eliminar partículas que han atravesado la herida y están muy abajo visualmente
+            const adhesionLineY = CONFIG.adhesionLineY;
+            if (py > adhesionLineY + 20 && py > CONFIG.canvas.height - 10) {
               additionalToRemove.push(body);
             }
           }
@@ -2248,10 +2583,15 @@
           const woundLeft = CONFIG.wound.x - CONFIG.wound.width / 2;
           const woundRight = CONFIG.wound.x + CONFIG.wound.width / 2;
 
+          // Solo permitir adhesión cuando está cerca de la línea de adhesión (herida)
+          const adhesionLineY = CONFIG.adhesionLineY;
+          const adhesionThreshold = 30; // Distancia máxima desde la línea de adhesión
+          const distanceFromAdhesionLine = Math.abs(platelet.position.y - adhesionLineY);
+
           if (
             platelet.position.x >= woundLeft - 20 &&
             platelet.position.x <= woundRight + 20 &&
-            platelet.position.y < 45
+            distanceFromAdhesionLine < adhesionThreshold
           ) {
             // Check aggregation rate for platelet-to-platelet adhesion
             // En vWD sin tratamiento, las plaquetas no se agregan (no hay cemento vWF)
@@ -2357,11 +2697,8 @@
         // Limitar el número de plaquetas pegadas para mantener rendimiento
         cleanupOldStuckPlatelets();
 
-        // Ocultar cartel cuando hay plaquetas pegadas
-        const woundLabel = document.getElementById("wound-label");
-        if (state.stuckPlatelets.length > 0) {
-          woundLabel.classList.add("hidden");
-        }
+        // El cartel "Lesión Activa" permanece visible hasta que la herida esté sellada
+        // Solo se oculta cuando se logra la hemostasia completa
 
         // Secuencia: plaquetas primero, luego malla
         // Activar formación de fibrina solo después de umbral de plaquetas
@@ -2655,7 +2992,8 @@
         const woundWidth = CONFIG.wound.width;
         const woundLeft = woundX - woundWidth / 2;
         const woundRight = woundX + woundWidth / 2;
-        const woundCenterY = 29; // Y position where platelets stick
+        const adhesionLineY = CONFIG.adhesionLineY; // Y position where platelets stick (herida)
+        const woundCenterY = adhesionLineY; // Usar la posición real de la herida
 
         // Find platelets on the left side of the wound (including anchor platelets)
         const leftSidePlatelets = state.stuckPlatelets.filter((p) => {
@@ -2695,6 +3033,7 @@
               state.closureTime = accumulatedSimulationTime / 1000; // Guardar tiempo de simulación en segundos
             }
             const woundLabel = document.getElementById("wound-label");
+            woundLabel.classList.remove("active-pulse");
             woundLabel.classList.add("healed");
             woundLabel.innerHTML = "Lesión Sellada";
             
@@ -2774,20 +3113,31 @@
 
       function renderVesselBackground(event) {
         const ctx = render.context;
-        const canvas = render.canvas;
-        const width = canvas.width;
-        const height = canvas.height;
+        // Usar las dimensiones lógicas del canvas (tamaño visual)
+        const dpr = window.devicePixelRatio || 1;
+        const width = CONFIG.canvas.width;
+        const height = CONFIG.canvas.height;
+        
+        ctx.save();
+        // El contexto ya está escalado con dpr en updateCanvasSizeGlobal, 
+        // así que solo necesitamos resetear la transformación si es necesario
+        ctx.setTransform(1, 0, 0, 1, 0, 0);
+        ctx.scale(dpr, dpr);
 
         // Si el canvas cambió de tamaño, regenerar el cache
         if (
           !vesselBackgroundCache ||
-          vesselBackgroundCache.width !== width ||
-          vesselBackgroundCache.height !== height
+          vesselBackgroundCache.width !== width * dpr ||
+          vesselBackgroundCache.height !== height * dpr
         ) {
           const cacheCanvas = document.createElement("canvas");
-          cacheCanvas.width = width;
-          cacheCanvas.height = height;
+          // Cache en alta resolución para mejor calidad
+          cacheCanvas.width = width * dpr;
+          cacheCanvas.height = height * dpr;
           const cacheCtx = cacheCanvas.getContext("2d");
+          cacheCtx.scale(dpr, dpr);
+          cacheCtx.imageSmoothingEnabled = true;
+          cacheCtx.imageSmoothingQuality = "high";
 
           // Fondo base - gradiente que simula el interior de un vaso sanguíneo
           const baseGradient = cacheCtx.createLinearGradient(0, 0, 0, height);
@@ -2846,15 +3196,20 @@
           vesselBackgroundCache = cacheCanvas;
         }
 
-        // Dibujar el fondo desde el cache (muy rápido)
+        // Dibujar el fondo desde el cache ocupando todo el espacio del canvas
+        // El cache está en alta resolución (width * dpr x height * dpr)
+        // El canvas interno también está en alta resolución, así que dibujamos directamente
+        ctx.setTransform(1, 0, 0, 1, 0, 0); // Resetear transformación
         ctx.drawImage(vesselBackgroundCache, 0, 0);
+        ctx.restore();
       }
 
       function renderVesselWalls(event) {
         const ctx = render.context;
-        const canvas = render.canvas;
-        const width = canvas.width;
-        const height = canvas.height;
+        // Usar las dimensiones lógicas (no las internas de alta resolución)
+        const dpr = window.devicePixelRatio || 1;
+        const width = CONFIG.canvas.width;
+        const height = CONFIG.canvas.height;
         const { thickness } = CONFIG.wall;
         const woundX = CONFIG.wound.x;
         const woundWidth = CONFIG.wound.width;
@@ -2863,98 +3218,57 @@
 
         ctx.save();
 
-        // ========== PARED INFERIOR (Endotelio vascular) ==========
-        const bottomY = height - thickness;
+        // Asegurar que el contexto esté escalado correctamente para alta resolución
+        ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+        
+        // Mejorar calidad de renderizado para pantallas pequeñas
+        ctx.imageSmoothingEnabled = true;
+        ctx.imageSmoothingQuality = "high";
+        
+        // Asegurar que las líneas se rendericen con mejor calidad
+        ctx.lineCap = "round";
+        ctx.lineJoin = "round";
 
-        // Capa 1: Adventitia (tejido conectivo externo) - más oscuro
+        // ========== PARED SUPERIOR IZQUIERDA ==========
+        const adhesionLineY = CONFIG.adhesionLineY;
+        const topY = adhesionLineY - thickness / 2;
+
+        // Gradiente Adventitia (tejido conectivo externo) - más oscuro
         const adventitiaGradient = ctx.createLinearGradient(
           0,
-          height - thickness,
+          topY,
           0,
-          height
+          topY + thickness
         );
         adventitiaGradient.addColorStop(0, "#2d1a1a");
         adventitiaGradient.addColorStop(0.3, "#3d2222");
         adventitiaGradient.addColorStop(0.7, "#4a2828");
         adventitiaGradient.addColorStop(1, "#3d2222");
 
-        ctx.fillStyle = adventitiaGradient;
-        ctx.fillRect(0, height - thickness, width, thickness);
-
-        // Capa 2: Media (músculo liso) - tono medio
-        const mediaGradient = ctx.createLinearGradient(
-          0,
-          height - thickness,
-          0,
-          height - thickness * 0.4
-        );
-        mediaGradient.addColorStop(0, "#5a3535");
-        mediaGradient.addColorStop(0.5, "#6b4040");
-        mediaGradient.addColorStop(1, "#7a4a4a");
-
-        ctx.fillStyle = mediaGradient;
-        ctx.fillRect(0, height - thickness, width, thickness * 0.6);
-
-        // Capa 3: Intima/Endotelio (superficie interior) - más rosado/brillante
-        const intimaGradient = ctx.createLinearGradient(
-          0,
-          height - thickness,
-          0,
-          height - thickness * 0.7
-        );
-        intimaGradient.addColorStop(0, "#8b5555");
-        intimaGradient.addColorStop(0.3, "#a06666");
-        intimaGradient.addColorStop(0.7, "#b87777");
-        intimaGradient.addColorStop(1, "#c98888");
-
-        ctx.fillStyle = intimaGradient;
-        ctx.fillRect(0, height - thickness, width, thickness * 0.3);
-
-        // Brillo sutil en el borde interior (superficie del endotelio)
-        ctx.strokeStyle = "rgba(255, 200, 180, 0.35)";
-        ctx.lineWidth = 2;
-        ctx.beginPath();
-        ctx.moveTo(0, height - thickness);
-        ctx.lineTo(width, height - thickness);
-        ctx.stroke();
-
-        // Textura del tejido - fibras horizontales
-        ctx.strokeStyle = "rgba(100, 50, 50, 0.15)";
-        ctx.lineWidth = 1;
-        for (let y = height - thickness + 3; y < height - 2; y += 4) {
-          ctx.beginPath();
-          ctx.moveTo(0, y);
-          ctx.lineTo(width, y);
-          ctx.stroke();
-        }
-
-        // ========== PARED SUPERIOR IZQUIERDA ==========
-        const topY = 0;
-
         // Adventitia
         ctx.fillStyle = adventitiaGradient;
-        ctx.fillRect(0, 0, woundLeft, thickness);
+        ctx.fillRect(0, topY, woundLeft, thickness);
 
         // Media
         const topMediaGradient = ctx.createLinearGradient(
           0,
-          thickness * 0.4,
+          topY + thickness * 0.4,
           0,
-          thickness
+          topY + thickness
         );
         topMediaGradient.addColorStop(0, "#7a4a4a");
         topMediaGradient.addColorStop(0.5, "#6b4040");
         topMediaGradient.addColorStop(1, "#5a3535");
 
         ctx.fillStyle = topMediaGradient;
-        ctx.fillRect(0, thickness * 0.4, woundLeft, thickness * 0.6);
+        ctx.fillRect(0, topY + thickness * 0.4, woundLeft, thickness * 0.6);
 
         // Intima
         const topIntimaGradient = ctx.createLinearGradient(
           0,
-          thickness * 0.7,
+          topY + thickness * 0.7,
           0,
-          thickness
+          topY + thickness
         );
         topIntimaGradient.addColorStop(0, "#c98888");
         topIntimaGradient.addColorStop(0.3, "#b87777");
@@ -2962,20 +3276,24 @@
         topIntimaGradient.addColorStop(1, "#8b5555");
 
         ctx.fillStyle = topIntimaGradient;
-        ctx.fillRect(0, thickness * 0.7, woundLeft, thickness * 0.3);
+        ctx.fillRect(0, topY + thickness * 0.7, woundLeft, thickness * 0.3);
 
-        // Brillo del endotelio
+        // Brillo del endotelio - mejorar calidad en pantallas pequeñas
         ctx.strokeStyle = "rgba(255, 200, 180, 0.35)";
-        ctx.lineWidth = 2;
+        // Ajustar grosor de línea según escala para mantener calidad
+        const minLineWidth = Math.max(1, 2 * scaleFactor);
+        ctx.lineWidth = minLineWidth;
         ctx.beginPath();
-        ctx.moveTo(0, thickness);
-        ctx.lineTo(woundLeft, thickness);
+        ctx.moveTo(0, topY + thickness);
+        ctx.lineTo(woundLeft, topY + thickness);
         ctx.stroke();
 
-        // Textura
+        // Textura - ajustar espaciado según escala para mantener detalle
         ctx.strokeStyle = "rgba(100, 50, 50, 0.15)";
-        ctx.lineWidth = 1;
-        for (let y = 3; y < thickness - 2; y += 4) {
+        const textureSpacing = Math.max(2, 4 * scaleFactor);
+        const minTextureLineWidth = Math.max(0.5, 1 * scaleFactor);
+        ctx.lineWidth = minTextureLineWidth;
+        for (let y = topY + 3; y < topY + thickness - 2; y += textureSpacing) {
           ctx.beginPath();
           ctx.moveTo(0, y);
           ctx.lineTo(woundLeft, y);
@@ -2985,13 +3303,13 @@
         // ========== PARED SUPERIOR DERECHA ==========
         // Adventitia
         ctx.fillStyle = adventitiaGradient;
-        ctx.fillRect(woundRight, 0, width - woundRight, thickness);
+        ctx.fillRect(woundRight, topY, width - woundRight, thickness);
 
         // Media
         ctx.fillStyle = topMediaGradient;
         ctx.fillRect(
           woundRight,
-          thickness * 0.4,
+          topY + thickness * 0.4,
           width - woundRight,
           thickness * 0.6
         );
@@ -3000,23 +3318,23 @@
         ctx.fillStyle = topIntimaGradient;
         ctx.fillRect(
           woundRight,
-          thickness * 0.7,
+          topY + thickness * 0.7,
           width - woundRight,
           thickness * 0.3
         );
 
-        // Brillo del endotelio
+        // Brillo del endotelio - mejorar calidad en pantallas pequeñas
         ctx.strokeStyle = "rgba(255, 200, 180, 0.35)";
-        ctx.lineWidth = 2;
+        ctx.lineWidth = minLineWidth;
         ctx.beginPath();
-        ctx.moveTo(woundRight, thickness);
-        ctx.lineTo(width, thickness);
+        ctx.moveTo(woundRight, topY + thickness);
+        ctx.lineTo(width, topY + thickness);
         ctx.stroke();
 
-        // Textura
+        // Textura - ajustar espaciado según escala para mantener detalle
         ctx.strokeStyle = "rgba(100, 50, 50, 0.15)";
-        ctx.lineWidth = 1;
-        for (let y = 3; y < thickness - 2; y += 4) {
+        ctx.lineWidth = minTextureLineWidth;
+        for (let y = topY + 3; y < topY + thickness - 2; y += textureSpacing) {
           ctx.beginPath();
           ctx.moveTo(woundRight, y);
           ctx.lineTo(width, y);
@@ -3025,14 +3343,15 @@
 
         // ========== BORDES DE LA HERIDA ==========
         // Renderizar los bordes de la herida como tejido dañado
-        const woundEdgeWidth = 6;
+        // Ajustar grosor según escala para mantener calidad visual
+        const woundEdgeWidth = Math.max(4, 6 * scaleFactor);
 
         // Borde izquierdo de la herida
         const woundEdgeGradient = ctx.createLinearGradient(
           woundLeft - woundEdgeWidth,
-          0,
+          topY,
           woundLeft,
-          0
+          topY
         );
         woundEdgeGradient.addColorStop(0, "#c98888");
         woundEdgeGradient.addColorStop(0.3, "#d46666");
@@ -3042,7 +3361,7 @@
         ctx.fillStyle = woundEdgeGradient;
         ctx.fillRect(
           woundLeft - woundEdgeWidth / 2,
-          0,
+          topY,
           woundEdgeWidth,
           thickness + 5
         );
@@ -3050,9 +3369,9 @@
         // Borde derecho de la herida
         const woundEdgeGradientRight = ctx.createLinearGradient(
           woundRight,
-          0,
+          topY,
           woundRight + woundEdgeWidth,
-          0
+          topY
         );
         woundEdgeGradientRight.addColorStop(0, "#ff6666");
         woundEdgeGradientRight.addColorStop(0.3, "#e55555");
@@ -3062,38 +3381,149 @@
         ctx.fillStyle = woundEdgeGradientRight;
         ctx.fillRect(
           woundRight - woundEdgeWidth / 2,
-          0,
+          topY,
           woundEdgeWidth,
           thickness + 5
         );
 
-        // Efecto de "sangrado" en los bordes de la herida
+        // Efecto de "sangrado" en los bordes de la herida - mejorar calidad
         ctx.strokeStyle = "rgba(255, 80, 80, 0.6)";
-        ctx.lineWidth = 2;
+        const bleedingLineWidth = Math.max(1, 2 * scaleFactor);
+        ctx.lineWidth = bleedingLineWidth;
         ctx.beginPath();
-        ctx.moveTo(woundLeft - 1, 0);
-        ctx.lineTo(woundLeft - 1, thickness + 8);
+        ctx.moveTo(woundLeft - 1, topY);
+        ctx.lineTo(woundLeft - 1, topY + thickness + 8);
         ctx.stroke();
 
         ctx.beginPath();
-        ctx.moveTo(woundRight + 1, 0);
-        ctx.lineTo(woundRight + 1, thickness + 8);
+        ctx.moveTo(woundRight + 1, topY);
+        ctx.lineTo(woundRight + 1, topY + thickness + 8);
         ctx.stroke();
 
-        // Brillo/reflejo en los bordes de la herida
+        // Brillo/reflejo en los bordes de la herida - mejorar calidad
         ctx.strokeStyle = "rgba(255, 150, 150, 0.4)";
-        ctx.lineWidth = 1;
+        const highlightLineWidth = Math.max(0.5, 1 * scaleFactor);
+        ctx.lineWidth = highlightLineWidth;
         ctx.beginPath();
-        ctx.moveTo(woundLeft - 2, 0);
-        ctx.lineTo(woundLeft - 2, thickness + 6);
+        ctx.moveTo(woundLeft - 2, topY);
+        ctx.lineTo(woundLeft - 2, topY + thickness + 6);
         ctx.stroke();
 
         ctx.beginPath();
-        ctx.moveTo(woundRight + 2, 0);
-        ctx.lineTo(woundRight + 2, thickness + 6);
+        ctx.moveTo(woundRight + 2, topY);
+        ctx.lineTo(woundRight + 2, topY + thickness + 6);
         ctx.stroke();
 
         ctx.restore();
+      }
+
+      // Cache para el campo de succión (solo se regenera si cambia el tamaño del canvas)
+      let suctionFieldCache = null;
+      let suctionFieldCacheWidth = 0;
+      let suctionFieldCacheHeight = 0;
+      
+      function renderSuctionField(event) {
+        const ctx = render.context;
+        const canvas = render.canvas;
+        const width = canvas.width;
+        const height = canvas.height;
+        const woundX = CONFIG.wound.x;
+        const adhesionLineY = CONFIG.adhesionLineY;
+        const suctionRadius = Math.min(CONFIG.physics.suctionRadius, height); // Limitar al tamaño del canvas
+        
+        // Optimización: usar cache si el tamaño no ha cambiado
+        if (!suctionFieldCache || width !== suctionFieldCacheWidth || height !== suctionFieldCacheHeight) {
+          // Crear canvas para cache
+          const cacheCanvas = document.createElement("canvas");
+          cacheCanvas.width = width;
+          cacheCanvas.height = height;
+          const cacheCtx = cacheCanvas.getContext("2d");
+          
+          // Solo dibujar en la mitad superior usando un clip path
+          cacheCtx.beginPath();
+          cacheCtx.rect(0, 0, width, adhesionLineY);
+          cacheCtx.clip();
+          
+          // Crear gradiente radial optimizado
+          const gradient = cacheCtx.createRadialGradient(
+            woundX, adhesionLineY, 0,
+            woundX, adhesionLineY - Math.min(suctionRadius, adhesionLineY), Math.min(suctionRadius, adhesionLineY)
+          );
+          
+          gradient.addColorStop(0, "rgba(100, 150, 255, 0.4)");
+          gradient.addColorStop(0.3, "rgba(100, 150, 255, 0.25)");
+          gradient.addColorStop(0.6, "rgba(100, 150, 255, 0.1)");
+          gradient.addColorStop(1, "rgba(100, 150, 255, 0.0)");
+          
+          cacheCtx.fillStyle = gradient;
+          cacheCtx.beginPath();
+          cacheCtx.arc(woundX, adhesionLineY, Math.min(suctionRadius, adhesionLineY), 0, Math.PI * 2);
+          cacheCtx.fill();
+          
+          // Optimización: dibujar menos líneas de fuerza (grid más espaciado)
+          cacheCtx.strokeStyle = "rgba(100, 150, 255, 0.6)";
+          cacheCtx.lineWidth = 1.5;
+          cacheCtx.lineCap = "round";
+          
+          const gridSpacing = 60; // Aumentado de 40 a 60 para menos líneas
+          const startX = 20;
+          const endX = width - 20;
+          const startY = Math.max(20, adhesionLineY - Math.min(suctionRadius, adhesionLineY));
+          const endY = adhesionLineY - 10;
+          
+          // Pre-calcular valores constantes
+          const suctionRadiusSq = suctionRadius * suctionRadius;
+          
+          for (let x = startX; x <= endX; x += gridSpacing) {
+            for (let y = startY; y <= endY; y += gridSpacing) {
+              const dx = woundX - x;
+              const dy = adhesionLineY - y;
+              const distanceSq = dx * dx + dy * dy;
+              
+              // Optimización: usar distancia al cuadrado para comparación
+              if (distanceSq < suctionRadiusSq && distanceSq > 100) { // 100 = 10^2
+                const distance = Math.sqrt(distanceSq);
+                const angle = Math.atan2(dy, dx);
+                const lineLength = Math.min(15, distance * 0.3);
+                
+                const endX_line = x + Math.cos(angle) * lineLength;
+                const endY_line = y + Math.sin(angle) * lineLength;
+                const opacity = 0.3 + (1 - distance / suctionRadius) * 0.3;
+                
+                cacheCtx.strokeStyle = `rgba(100, 150, 255, ${opacity})`;
+                cacheCtx.beginPath();
+                cacheCtx.moveTo(x, y);
+                cacheCtx.lineTo(endX_line, endY_line);
+                cacheCtx.stroke();
+                
+                // Flecha simplificada (solo si está cerca de la herida para mejor rendimiento)
+                if (distance < suctionRadius * 0.5) {
+                  const arrowLength = 4;
+                  const arrowAngle = Math.PI / 6;
+                  cacheCtx.beginPath();
+                  cacheCtx.moveTo(endX_line, endY_line);
+                  cacheCtx.lineTo(
+                    endX_line - arrowLength * Math.cos(angle - arrowAngle),
+                    endY_line - arrowLength * Math.sin(angle - arrowAngle)
+                  );
+                  cacheCtx.moveTo(endX_line, endY_line);
+                  cacheCtx.lineTo(
+                    endX_line - arrowLength * Math.cos(angle + arrowAngle),
+                    endY_line - arrowLength * Math.sin(angle + arrowAngle)
+                  );
+                  cacheCtx.stroke();
+                }
+              }
+            }
+          }
+          
+          suctionFieldCache = cacheCanvas;
+          suctionFieldCacheWidth = width;
+          suctionFieldCacheHeight = height;
+        }
+        
+        // Dibujar desde cache (muy rápido)
+        ctx.drawImage(suctionFieldCache, 0, 0);
       }
 
       function renderFibrin(event) {
@@ -3102,7 +3532,7 @@
         const woundWidth = CONFIG.wound.width;
         const woundLeft = woundX - woundWidth / 2;
         const woundRight = woundX + woundWidth / 2;
-        const adhesionLineY = CONFIG.canvas.height - 30; // Centro del área de adhesión (debe coincidir con el área de adhesión)
+        const adhesionLineY = CONFIG.adhesionLineY; // Centro del área de adhesión (more down visually = higher Y in canvas coords)
         const adhesionZoneHalfWidth = 12; // Mitad del ancho del área de adhesión
 
         // Render ointment layer when treatment is applied - ultra simple for performance
@@ -3298,12 +3728,12 @@
 
           if (body.label === "rbc") {
             // Glóbulo rojo: ovalado con highlight y sombra
-            const radiusX = 6;
-            const radiusY = 4.5; // Más ancho que alto para efecto ovalado
+            const radiusX = BASE_CONFIG.particles.rbcRadius * scaleFactor;
+            const radiusY = radiusX * 0.75; // Más ancho que alto para efecto ovalado
 
             // Sombra/contorno oscuro
             ctx.beginPath();
-            ctx.ellipse(0, 0, radiusX + 0.5, radiusY + 0.5, 0, 0, Math.PI * 2);
+            ctx.ellipse(0, 0, radiusX + 0.5 * scaleFactor, radiusY + 0.5 * scaleFactor, 0, 0, Math.PI * 2);
             ctx.fillStyle = "rgba(139, 0, 0, 0.3)"; // Rojo muy oscuro para sombra
             ctx.fill();
 
@@ -3314,19 +3744,22 @@
             ctx.fill();
 
             // Highlight pequeño cerca del centro (superior izquierda)
+            // Mantener tamaño mínimo para visibilidad
+            const highlightRadiusRBC = Math.max(1.0, 1.2 * scaleFactor);
             ctx.beginPath();
-            ctx.arc(-1.5, -1, 1.2, 0, Math.PI * 2);
+            ctx.arc(-1.5 * scaleFactor, -1 * scaleFactor, highlightRadiusRBC, 0, Math.PI * 2);
             ctx.fillStyle = "rgba(255, 200, 200, 0.8)"; // Rojo claro/rosa para highlight
             ctx.fill();
           } else if (body.label === "wbc") {
             // Glóbulo blanco: circular con highlight brillante y contorno azul oscuro
-            const radius = 10;
+            const radius = BASE_CONFIG.particles.wbcRadius * scaleFactor;
 
-            // Contorno azul oscuro para profundidad
+            // Contorno azul oscuro para profundidad (mantener grosor mínimo)
+            const outlineWidth = Math.max(1.0, 1.5 * scaleFactor);
             ctx.beginPath();
-            ctx.arc(0, 0, radius + 1, 0, Math.PI * 2);
+            ctx.arc(0, 0, radius + Math.max(0.5, 1 * scaleFactor), 0, Math.PI * 2);
             ctx.strokeStyle = "#4A90E2"; // Azul más oscuro para contorno
-            ctx.lineWidth = 1.5;
+            ctx.lineWidth = outlineWidth;
             ctx.stroke();
 
             // Cuerpo principal azul claro
@@ -3336,28 +3769,33 @@
             ctx.fill();
 
             // Highlight brillante blanco en cuadrante superior izquierdo
-            const gradient = ctx.createRadialGradient(-3, -3, 0, -3, -3, 4);
+            const highlightX = -3 * scaleFactor;
+            const highlightY = -3 * scaleFactor;
+            const highlightRadius = Math.max(3.0, 4 * scaleFactor); // Mantener tamaño mínimo
+            const gradient = ctx.createRadialGradient(highlightX, highlightY, 0, highlightX, highlightY, highlightRadius);
             gradient.addColorStop(0, "rgba(255, 255, 255, 0.95)"); // Blanco brillante en el centro
             gradient.addColorStop(0.5, "rgba(255, 255, 255, 0.6)");
             gradient.addColorStop(1, "rgba(255, 255, 255, 0)"); // Transparente hacia afuera
 
             ctx.beginPath();
-            ctx.arc(-3, -3, 4, 0, Math.PI * 2);
+            ctx.arc(highlightX, highlightY, highlightRadius, 0, Math.PI * 2);
             ctx.fillStyle = gradient;
             ctx.fill();
 
-            // Punto de highlight más pequeño y brillante
+            // Punto de highlight más pequeño y brillante (mantener tamaño mínimo)
+            const highlightDotRadius = Math.max(1.0, 1.5 * scaleFactor);
             ctx.beginPath();
-            ctx.arc(-3, -3, 1.5, 0, Math.PI * 2);
+            ctx.arc(highlightX, highlightY, highlightDotRadius, 0, Math.PI * 2);
             ctx.fillStyle = "rgba(255, 255, 255, 1)"; // Blanco sólido
             ctx.fill();
           } else if (body.label === "platelet") {
             // Plaqueta: circular gris con highlight sutil
-            const radius = 4;
+            const radius = BASE_CONFIG.particles.plateletRadius * scaleFactor;
 
-            // Sombra sutil
+            // Sombra sutil (mantener grosor mínimo para visibilidad)
+            const shadowOffsetPlatelet = Math.max(0.3, 0.3 * scaleFactor);
             ctx.beginPath();
-            ctx.arc(0, 0, radius + 0.3, 0, Math.PI * 2);
+            ctx.arc(0, 0, radius + shadowOffsetPlatelet, 0, Math.PI * 2);
             ctx.fillStyle = "rgba(100, 100, 100, 0.2)"; // Gris oscuro para sombra
             ctx.fill();
 
@@ -3367,9 +3805,10 @@
             ctx.fillStyle = "#808080"; // Gris medio
             ctx.fill();
 
-            // Highlight pequeño en cuadrante superior izquierdo
+            // Highlight pequeño en cuadrante superior izquierdo (mantener tamaño mínimo)
+            const highlightRadiusPlatelet = Math.max(0.6, 0.8 * scaleFactor);
             ctx.beginPath();
-            ctx.arc(-1.2, -1.2, 0.8, 0, Math.PI * 2);
+            ctx.arc(-1.2 * scaleFactor, -1.2 * scaleFactor, highlightRadiusPlatelet, 0, Math.PI * 2);
             ctx.fillStyle = "rgba(220, 220, 220, 0.7)"; // Gris claro para highlight
             ctx.fill();
           }
@@ -3387,7 +3826,8 @@
 
         const woundLeft = CONFIG.wound.x - CONFIG.wound.width / 2;
         const woundWidth = CONFIG.wound.width;
-        const woundCenterY = 29; // Y position where platelets stick
+        const adhesionLineY = CONFIG.adhesionLineY; // Y position where platelets stick (herida)
+        const woundCenterY = adhesionLineY; // Usar la posición real de la herida
 
         // Optimized coverage calculation
         const segments = 20; // Reduced from 30 for better performance
@@ -3773,6 +4213,15 @@
 
           // Reiniciar el spawn para asegurar que funcione
           startParticleSpawning();
+          
+          // Mostrar el label "Lesión Activa" con efecto de pulso
+          const woundLabel = document.getElementById("wound-label");
+          if (woundLabel) {
+            woundLabel.classList.remove("hidden");
+            woundLabel.classList.add("active-pulse");
+            woundLabel.classList.remove("healed");
+            woundLabel.innerHTML = "Lesión Activa";
+          }
 
           const startBtn = document.getElementById("start-btn");
           const pauseBtn = document.getElementById("pause-btn");
@@ -3812,7 +4261,187 @@
       }
 
       // Event Listeners
+      // Variables globales para el sistema de resize simplificado
+      let resizeInitialized = false;
+      let resizeTimeout;
+      let lastKnownScale = 1;
+
+      // Función para detectar el zoom del navegador (global)
+      function getBrowserZoom() {
+        const testEl = document.createElement('div');
+        testEl.style.width = '100px';
+        testEl.style.height = '100px';
+        testEl.style.position = 'absolute';
+        testEl.style.visibility = 'hidden';
+        testEl.style.top = '-9999px';
+        document.body.appendChild(testEl);
+        
+        const logicalWidth = testEl.offsetWidth;
+        const visualWidth = testEl.getBoundingClientRect().width;
+        const zoom = visualWidth / logicalWidth;
+        
+        document.body.removeChild(testEl);
+        return zoom;
+      }
+
+      // Función simplificada para actualizar el tamaño del canvas y UI
+      function updateCanvasSizeGlobal() {
+        const canvasEl = document.getElementById("simulation-canvas");
+        if (!canvasEl) return;
+        
+        const container = canvasEl.parentElement;
+        if (!container) return;
+        
+        const browserZoom = getBrowserZoom();
+        const containerRect = container.getBoundingClientRect();
+        const visualWidth = containerRect.width;
+        const visualHeight = containerRect.height;
+        const logicalWidth = container.clientWidth;
+        const logicalHeight = container.clientHeight;
+        
+        // Calcular escala para el canvas (física)
+        const scaleX = visualWidth / BASE_CONFIG.canvas.width;
+        const scaleY = visualHeight / BASE_CONFIG.canvas.height;
+        scaleFactor = Math.min(scaleX, scaleY);
+        
+        // El escalado de UI ahora se maneja completamente por CSS usando clamp()
+        // Solo necesitamos actualizar la variable CSS si hay cambios significativos
+        // El CSS ya tiene media queries para diferentes tamaños de pantalla
+        const viewportWidth = window.innerWidth;
+        const viewportHeight = window.innerHeight;
+        const baseViewportWidth = 1920;
+        const baseViewportHeight = 1080;
+        
+        // Calcular escala UI basada en el menor de los dos (ancho o alto)
+        const uiScaleX = viewportWidth / baseViewportWidth;
+        const uiScaleY = viewportHeight / baseViewportHeight;
+        let uiScale = Math.min(uiScaleX, uiScaleY);
+        
+        // Para pantallas muy grandes, hacer el escalado más agresivo
+        if (viewportWidth > 2560) {
+          // Aumentar el escalado progresivamente para pantallas muy grandes
+          const extraScale = Math.min((viewportWidth - 2560) / 1000, 1.5); // Hasta 1.5x adicional
+          uiScale = uiScale * (1 + extraScale * 0.3); // Aumentar hasta 45% más
+        }
+        
+        // Limitar el rango de escala UI (el CSS también tiene sus propios límites)
+        // Aumentado el máximo a 4.5 para pantallas muy grandes
+        const clampedUIScale = Math.max(0.5, Math.min(4.5, uiScale));
+        
+        // Solo actualizar si cambió significativamente
+        if (Math.abs(clampedUIScale - lastKnownScale) > 0.01) {
+          lastKnownScale = clampedUIScale;
+          updateUIScaling(clampedUIScale);
+        }
+        
+        // Actualizar canvas para física
+        // Usar devicePixelRatio para aumentar resolución interna y mejorar calidad
+        const dpr = window.devicePixelRatio || 1;
+        const baseCanvasWidth = visualWidth / browserZoom;
+        const baseCanvasHeight = visualHeight / browserZoom;
+        
+        // Resolución interna del canvas (más alta para mejor calidad)
+        const internalWidth = Math.round(baseCanvasWidth * dpr);
+        const internalHeight = Math.round(baseCanvasHeight * dpr);
+        
+        // Establecer tamaño interno del canvas (alta resolución)
+        canvasEl.width = internalWidth;
+        canvasEl.height = internalHeight;
+        
+        // Establecer tamaño visual del canvas (tamaño CSS)
+        canvasEl.style.width = baseCanvasWidth + 'px';
+        canvasEl.style.height = baseCanvasHeight + 'px';
+        
+        // Obtener el contexto y configurarlo para alta calidad
+        // NO escalar aquí porque cada función de renderizado maneja su propio escalado
+        const ctx = canvasEl.getContext("2d");
+        if (ctx) {
+          // Resetear la transformación para empezar limpio
+          ctx.setTransform(1, 0, 0, 1, 0, 0);
+          ctx.imageSmoothingEnabled = true;
+          ctx.imageSmoothingQuality = "high";
+        }
+        
+        CONFIG.canvas.width = baseCanvasWidth;
+        CONFIG.canvas.height = baseCanvasHeight;
+        CONFIG.wound.width = BASE_CONFIG.wound.width * scaleFactor;
+        CONFIG.wound.height = BASE_CONFIG.wound.height * scaleFactor;
+        CONFIG.wound.x = baseCanvasWidth / 2;
+        CONFIG.wall.thickness = BASE_CONFIG.wall.thickness * scaleFactor;
+        CONFIG.adhesionLineY = logicalHeight - (250 * scaleFactor);
+        CONFIG.physics.suctionRadius = 2000 * scaleFactor;
+
+        if (render) {
+          render.options.width = baseCanvasWidth;
+          render.options.height = baseCanvasHeight;
+          render.canvas.width = internalWidth;
+          render.canvas.height = internalHeight;
+          render.context = ctx;
+          
+          // Asegurar que el contexto tenga la mejor calidad
+          if (render.context) {
+            render.context.imageSmoothingEnabled = true;
+            render.context.imageSmoothingQuality = "high";
+            // Asegurar que el contexto esté escalado correctamente
+            render.context.setTransform(dpr, 0, 0, dpr, 0, 0);
+          }
+        }
+
+        vesselBackgroundCache = null;
+        suctionFieldCache = null;
+      }
+
+      // Función simplificada para inicializar el sistema de resize
+      function initializeResizeHandlers() {
+        if (resizeInitialized) return;
+        resizeInitialized = true;
+        
+        // Handler de resize con debounce simple
+        const handleResize = () => {
+          clearTimeout(resizeTimeout);
+          resizeTimeout = setTimeout(() => {
+            updateCanvasSizeGlobal();
+            
+            // Solo reiniciar la simulación si está corriendo
+            if (state.simulationRunning) {
+              const wasRunning = state.simulationRunning;
+              state.simulationRunning = false;
+              initSimulation();
+              if (wasRunning) {
+                setTimeout(() => {
+                  state.simulationRunning = true;
+                  lastPhysicsTime = 0;
+                  accumulatedTime = 0;
+                }, 100);
+              }
+            }
+          }, 150); // Debounce corto y simple
+        };
+
+        // Event listener de resize de ventana
+        window.addEventListener("resize", handleResize);
+        
+        // ResizeObserver para detectar cambios de zoom
+        const resizeObserver = new ResizeObserver(() => {
+          handleResize();
+        });
+        
+        const canvasEl = document.getElementById("simulation-canvas");
+        if (canvasEl) {
+          resizeObserver.observe(canvasEl);
+          
+          // Inicializar tamaño una vez
+          setTimeout(() => {
+            updateCanvasSizeGlobal();
+          }, 100);
+        }
+      }
+
       document.addEventListener("DOMContentLoaded", () => {
+        // Inicializar el sistema de resize primero
+        initializeResizeHandlers();
+        
+        // Luego inicializar la simulación
         initSimulation();
 
 
@@ -3886,6 +4515,13 @@
           const resetBtn = document.getElementById("reset-btn");
           if (resetBtn) {
             resetBtn.classList.remove("hemostasis-pulse");
+          }
+          
+          // Ocultar el label "Lesión Activa" al resetear
+          const woundLabel = document.getElementById("wound-label");
+          if (woundLabel) {
+            woundLabel.classList.add("hidden");
+            woundLabel.classList.remove("active-pulse", "healed");
           }
           
           state.treatmentApplied = false;
