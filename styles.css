@@ -58,8 +58,9 @@
   }
   
   .simulation-controls-row .treatment-btn.control-btn-large {
-    width: auto;
+    width: calc(320px * var(--ui-scale));
     min-width: calc(320px * var(--ui-scale));
+    max-width: calc(320px * var(--ui-scale));
     font-size: calc(1.1rem * var(--ui-scale)) !important;
   }
   
@@ -377,13 +378,17 @@ body {
 }
 
 .simulation-controls-row .treatment-btn.control-btn-large {
-  width: max(300px, calc(300px * var(--ui-scale)));
-  min-width: max(300px, calc(300px * var(--ui-scale)));
+  width: calc(320px * var(--ui-scale));
+  min-width: calc(320px * var(--ui-scale));
+  max-width: calc(320px * var(--ui-scale));
 }
 
 .simulation-controls-row .treatment-btn.control-btn-large.applied {
-  width: max(300px, calc(300px * var(--ui-scale)));
-  min-width: max(300px, calc(300px * var(--ui-scale)));
+  width: calc(320px * var(--ui-scale));
+  min-width: calc(320px * var(--ui-scale));
+  max-width: calc(320px * var(--ui-scale));
+  height: max(48px, calc(48px * var(--ui-scale))) !important;
+  padding: max(12px, calc(12px * var(--ui-scale))) max(24px, calc(24px * var(--ui-scale))) !important;
 }
 
 /* Botones pequeños (Pausa y Reiniciar) */
@@ -1068,10 +1073,11 @@ body {
 .treatment-btn.applied {
   background: linear-gradient(135deg, #752378 0%, #752378 100%);
   box-shadow: 0 4px 14px rgba(117, 35, 120, 0.4);
-  width: calc(300px * var(--ui-scale)) !important;
-  min-width: calc(300px * var(--ui-scale)) !important;
-  height: calc(48px * var(--ui-scale));
-  padding: calc(12px * var(--ui-scale)) calc(24px * var(--ui-scale));
+  width: calc(320px * var(--ui-scale)) !important;
+  min-width: calc(320px * var(--ui-scale)) !important;
+  max-width: calc(320px * var(--ui-scale)) !important;
+  height: max(48px, calc(48px * var(--ui-scale))) !important;
+  padding: max(12px, calc(12px * var(--ui-scale))) max(24px, calc(24px * var(--ui-scale))) !important;
   flex: 0 0 auto;
 }
 
@@ -1336,70 +1342,135 @@ body {
   align-self: center;
 }
 
-/* Plaqueta: circular gris con highlight */
+/* Plaqueta: diseño complejo con textura y gránulos */
 .legend-dot.platelet {
   width: calc(12px * var(--ui-scale));
   height: calc(12px * var(--ui-scale));
   border-radius: 50%;
-  background: #808080;
-  box-shadow: 0 0 calc(2px * var(--ui-scale)) rgba(100, 100, 100, 0.3),
-    inset calc(-2px * var(--ui-scale)) calc(-2px * var(--ui-scale)) calc(2px * var(--ui-scale)) rgba(220, 220, 220, 0.4);
+  background: radial-gradient(circle at 30% 30%, #f8f8f0 0%, #cece7e 50%, #a3a380 100%);
   position: relative;
+  box-shadow: 
+    0 0 calc(2px * var(--ui-scale)) rgba(160, 160, 144, 0.3),
+    inset 0 0 calc(2px * var(--ui-scale)) rgba(128, 128, 128, 0.15);
 }
 
+/* Textura con efecto de ruido */
 .legend-dot.platelet::before {
   content: "";
   position: absolute;
-  top: calc(2px * var(--ui-scale));
-  left: calc(2px * var(--ui-scale));
-  width: calc(3px * var(--ui-scale));
-  height: calc(3px * var(--ui-scale));
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
   border-radius: 50%;
-  background: rgba(220, 220, 220, 0.7);
+  background: #808080;
+  opacity: 0.15;
+  mix-blend-mode: multiply;
 }
 
-/* Glóbulo rojo: ovalado con highlight */
+/* Gránulos y elipse central usando box-shadow */
+.legend-dot.platelet::after {
+  content: "";
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  width: calc(5px * var(--ui-scale));
+  height: calc(5px * var(--ui-scale));
+  border-radius: 50%;
+  background: radial-gradient(circle, rgba(150, 150, 81, 0.4) 0%, rgba(155, 155, 106, 0) 100%);
+  filter: blur(calc(0.5px * var(--ui-scale)));
+  opacity: 0.3;
+  box-shadow: 
+    calc(-3px * var(--ui-scale)) calc(-2px * var(--ui-scale)) 0 calc(1px * var(--ui-scale)) rgba(150, 150, 81, 0.3),
+    calc(3px * var(--ui-scale)) calc(1px * var(--ui-scale)) 0 calc(1px * var(--ui-scale)) rgba(150, 150, 81, 0.25),
+    calc(1px * var(--ui-scale)) calc(-5px * var(--ui-scale)) 0 calc(0.5px * var(--ui-scale)) rgba(150, 150, 81, 0.2),
+    calc(-2px * var(--ui-scale)) calc(4px * var(--ui-scale)) 0 calc(0.5px * var(--ui-scale)) rgba(150, 150, 81, 0.2);
+}
+
+/* Glóbulo rojo: diseño complejo con efecto biconcavo */
 .legend-dot.rbc {
   width: calc(14px * var(--ui-scale));
   height: calc(10px * var(--ui-scale));
   border-radius: 50%;
-  background: #B91C1C;
-  box-shadow: 0 0 calc(2px * var(--ui-scale)) rgba(139, 0, 0, 0.3),
-    inset calc(-1px * var(--ui-scale)) calc(-1px * var(--ui-scale)) calc(1px * var(--ui-scale)) rgba(255, 200, 200, 0.4);
+  background: linear-gradient(135deg, #d13f3f 0%, #b30000 60%, #700000 100%);
   position: relative;
+  box-shadow: 
+    inset calc(-2px * var(--ui-scale)) calc(-1px * var(--ui-scale)) calc(2px * var(--ui-scale)) rgba(255, 255, 255, 0.4),
+    0 0 calc(1px * var(--ui-scale)) rgba(139, 0, 0, 0.2);
 }
 
+/* Cavidad central (efecto biconcavo) */
 .legend-dot.rbc::before {
   content: "";
   position: absolute;
-  top: calc(1px * var(--ui-scale));
-  left: calc(1px * var(--ui-scale));
-  width: calc(3px * var(--ui-scale));
-  height: calc(2px * var(--ui-scale));
+  top: calc(50% - 1px * var(--ui-scale));
+  left: 50%;
+  transform: translate(-50%, -50%);
+  width: calc(10px * var(--ui-scale));
+  height: calc(5px * var(--ui-scale));
   border-radius: 50%;
-  background: rgba(255, 200, 200, 0.8);
+  background: radial-gradient(ellipse at center 35%, rgba(34, 0, 0, 0.3) 0%, rgba(54, 0, 0, 0.9) 40%, rgba(153, 1, 1, 0.5) 75%, rgba(179, 0, 0, 0.3) 100%);
+  filter: blur(calc(1px * var(--ui-scale)));
+  opacity: 0.9;
 }
 
-/* Glóbulo blanco: circular azul con highlight brillante */
+/* Borde superior iluminado */
+.legend-dot.rbc::after {
+  content: "";
+  position: absolute;
+  top: calc(-1px * var(--ui-scale));
+  left: 0;
+  width: 100%;
+  height: calc(3px * var(--ui-scale));
+  border-radius: 50% 50% 0 0 / 100% 100% 0 0;
+  background: linear-gradient(to bottom, rgba(255, 204, 204, 0.9) 0%, rgba(255, 153, 153, 0.2) 30%, rgba(255, 153, 153, 0) 100%);
+  filter: blur(calc(0.5px * var(--ui-scale)));
+  opacity: 0.6;
+}
+
+/* Glóbulo blanco: diseño complejo con núcleo y gránulos */
 .legend-dot.wbc {
   width: calc(20px * var(--ui-scale));
   height: calc(20px * var(--ui-scale));
   border-radius: 50%;
-  background: #87CEEB;
-  box-shadow: 0 0 calc(4px * var(--ui-scale)) rgba(74, 144, 226, 0.5),
-    inset calc(-3px * var(--ui-scale)) calc(-3px * var(--ui-scale)) calc(4px * var(--ui-scale)) rgba(255, 255, 255, 0.6);
+  background: radial-gradient(circle at 30% 30%, #ffffff 0%, #e6eeff 40%, #c0d0e8 80%, #90a0c0 100%);
   position: relative;
+  box-shadow: 
+    0 0 calc(2px * var(--ui-scale)) rgba(144, 160, 192, 0.3),
+    inset 0 0 calc(2px * var(--ui-scale)) rgba(96, 112, 144, 0.3);
 }
 
+/* Textura con efecto de ruido */
 .legend-dot.wbc::before {
   content: "";
   position: absolute;
-  top: calc(3px * var(--ui-scale));
-  left: calc(3px * var(--ui-scale));
-  width: calc(6px * var(--ui-scale));
-  height: calc(6px * var(--ui-scale));
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
   border-radius: 50%;
-  background: rgba(255, 255, 255, 0.95);
+  background: #607090;
+  opacity: 0.3;
+  mix-blend-mode: multiply;
+}
+
+/* Núcleo y gránulos usando box-shadow */
+.legend-dot.wbc::after {
+  content: "";
+  position: absolute;
+  top: calc(50% - 3px * var(--ui-scale));
+  left: calc(50% - 4px * var(--ui-scale));
+  width: calc(8px * var(--ui-scale));
+  height: calc(6px * var(--ui-scale));
+  border-radius: 40% 60% 50% 50%;
+  background: linear-gradient(135deg, rgba(112, 128, 176, 0.9) 0%, rgba(64, 80, 128, 0.9) 100%);
+  filter: blur(calc(0.5px * var(--ui-scale)));
+  opacity: 0.85;
+  box-shadow: 
+    calc(6px * var(--ui-scale)) calc(2px * var(--ui-scale)) 0 calc(1px * var(--ui-scale)) rgba(80, 96, 144, 0.5),
+    calc(-4px * var(--ui-scale)) calc(8px * var(--ui-scale)) 0 calc(1px * var(--ui-scale)) rgba(80, 96, 144, 0.4),
+    calc(-8px * var(--ui-scale)) calc(-2px * var(--ui-scale)) 0 calc(0.5px * var(--ui-scale)) rgba(80, 96, 144, 0.3);
 }
 
 /* Fibrina: línea morada horizontal */
@@ -1424,6 +1495,27 @@ body {
 .fps-counter {
   position: absolute;
   top: calc(16px * var(--ui-scale));
+  left: calc(16px * var(--ui-scale));
+  z-index: 25;
+  background: rgba(15, 23, 42, 0.9);
+  backdrop-filter: blur(8px);
+  padding: calc(6px * var(--ui-scale)) calc(12px * var(--ui-scale));
+  border-radius: calc(8px * var(--ui-scale));
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  color: #ffffff;
+  font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+  font-size: calc(0.875rem * var(--ui-scale));
+  font-weight: 600;
+  letter-spacing: 0.5px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.3);
+  user-select: none;
+  pointer-events: none;
+}
+
+/* Particles Counter */
+.particles-counter {
+  position: absolute;
+  top: calc(56px * var(--ui-scale));
   left: calc(16px * var(--ui-scale));
   z-index: 25;
   background: rgba(15, 23, 42, 0.9);
@@ -1940,6 +2032,15 @@ body {
   .simulation-controls-row .treatment-btn.control-btn-large {
     width: 100%;
     min-width: 100%;
+    max-width: 100%;
+  }
+  
+  .simulation-controls-row .treatment-btn.control-btn-large.applied {
+    width: 100%;
+    min-width: 100%;
+    max-width: 100%;
+    height: inherit !important;
+    padding: inherit !important;
   }
 
   .simulation-controls-row .control-speed {
@@ -2028,6 +2129,14 @@ body {
     padding: calc(4px * var(--ui-scale)) calc(8px * var(--ui-scale));
     font-size: calc(0.7rem * var(--ui-scale));
     top: calc(8px * var(--ui-scale));
+    left: calc(8px * var(--ui-scale));
+  }
+  
+  /* Particles counter más pequeño */
+  .particles-counter {
+    padding: calc(4px * var(--ui-scale)) calc(8px * var(--ui-scale));
+    font-size: calc(0.7rem * var(--ui-scale));
+    top: calc(48px * var(--ui-scale));
     left: calc(8px * var(--ui-scale));
   }
   
@@ -2325,10 +2434,20 @@ body {
   }
 
   .simulation-controls-row .treatment-btn.control-btn-large {
-    width: auto;
-    min-width: max(220px, calc(220px * var(--ui-scale)));
-    flex: 1 1 calc(200px * var(--ui-scale));
+    width: max(320px, calc(320px * var(--ui-scale)));
+    min-width: max(320px, calc(320px * var(--ui-scale)));
+    max-width: max(320px, calc(320px * var(--ui-scale)));
+    flex: 0 0 auto;
     font-size: max(1rem, calc(1.1rem * var(--ui-scale))) !important;
+  }
+  
+  .simulation-controls-row .treatment-btn.control-btn-large.applied {
+    width: max(320px, calc(320px * var(--ui-scale)));
+    min-width: max(320px, calc(320px * var(--ui-scale)));
+    max-width: max(320px, calc(320px * var(--ui-scale)));
+    height: calc(52px * var(--ui-scale)) !important;
+    padding: calc(14px * var(--ui-scale)) calc(18px * var(--ui-scale)) !important;
+    flex: 0 0 auto;
   }
 
   .simulation-controls-row .start-btn.control-btn-large {
@@ -2536,35 +2655,14 @@ body {
     height: calc(6px * var(--ui-scale));
   }
   
-  .legend-dot.platelet::before {
-    width: calc(2px * var(--ui-scale));
-    height: calc(2px * var(--ui-scale));
-    top: calc(1px * var(--ui-scale));
-    left: calc(1px * var(--ui-scale));
-  }
-  
   .legend-dot.rbc {
     width: calc(8px * var(--ui-scale));
     height: calc(6px * var(--ui-scale));
   }
   
-  .legend-dot.rbc::before {
-    width: calc(2px * var(--ui-scale));
-    height: calc(1.5px * var(--ui-scale));
-    top: calc(0.5px * var(--ui-scale));
-    left: calc(0.5px * var(--ui-scale));
-  }
-  
   .legend-dot.wbc {
     width: calc(12px * var(--ui-scale));
     height: calc(12px * var(--ui-scale));
-  }
-  
-  .legend-dot.wbc::before {
-    width: calc(4px * var(--ui-scale));
-    height: calc(4px * var(--ui-scale));
-    top: calc(2px * var(--ui-scale));
-    left: calc(2px * var(--ui-scale));
   }
   
   .legend-dot.fibrin {

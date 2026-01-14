@@ -122,6 +122,9 @@
             <!-- Contador de FPS -->
             <div class="fps-counter" id="fps-counter">FPS: --</div>
             
+            <!-- Contador de partículas -->
+            <div class="particles-counter" id="particles-counter">Partículas: 0</div>
+            
             <!-- Leyenda dentro del visor -->
           <div class="legend">
             <div class="legend-item tooltip-container">
@@ -375,7 +378,7 @@
           large: {
             height: 48, // px
             padding: { top: 12, right: 24, bottom: 12, left: 24 }, // px
-            minWidth: { start: 200, treatment: 300 }, // px
+            minWidth: { start: 200, treatment: 320 }, // px - mismo tamaño para ambos estados
             fontSize: 1.0, // rem
           },
           small: {
@@ -1011,6 +1014,175 @@
       let fpsLastTime = performance.now();
       let currentFPS = 0;
 
+      // Particle SVG caches
+      let particleCaches = {
+        rbc: null,
+        wbc: null,
+        platelet: null
+      };
+
+      // SVG strings para cada partícula
+      const rbcSVG = `<svg width="500" height="350" viewBox="0 0 500 350" xmlns="http://www.w3.org/2000/svg">
+        <defs>
+          <filter id="deepBlur" x="-50%" y="-50%" width="200%" height="200%">
+            <feGaussianBlur in="SourceGraphic" stdDeviation="8" />
+          </filter>
+          <filter id="softBlur" x="-20%" y="-20%" width="140%" height="140%">
+            <feGaussianBlur in="SourceGraphic" stdDeviation="3" />
+          </filter>
+          <linearGradient id="bodyGrad" x1="10%" y1="10%" x2="90%" y2="90%">
+            <stop offset="0%" stop-color="#d13f3f" />
+            <stop offset="60%" stop-color="#b30000" />
+            <stop offset="100%" stop-color="#700000" />
+          </linearGradient>
+          <radialGradient id="cavityGrad" cx="50%" cy="50%" r="55%" fx="50%" fy="35%">
+            <stop offset="0%" stop-color="#220000" stop-opacity="0.3"/>
+            <stop offset="40%" stop-color="#360000" stop-opacity="0.9"/>
+            <stop offset="75%" stop-color="#990101" stop-opacity="0.5"/>
+            <stop offset="100%" stop-color="#b30000" stop-opacity="0.3"/>
+          </radialGradient>
+          <linearGradient id="highlightMain" x1="0%" y1="0%" x2="100%" y2="20%">
+            <stop offset="0%" stop-color="#ffffff" stop-opacity="0.95"/>
+            <stop offset="100%" stop-color="#ffffff57" stop-opacity="0"/>
+          </linearGradient>
+          <linearGradient id="rimLightTop" x1="0%" y1="0%" x2="0%" y2="100%">
+            <stop offset="0%" stop-color="#ffcccc" stop-opacity="0.9"/>
+            <stop offset="30%" stop-color="#ff999965" stop-opacity="0.2"/>
+            <stop offset="100%" stop-color="#ff999956" stop-opacity="0"/>
+          </linearGradient>
+        </defs>
+        <ellipse cx="250" cy="175" rx="200" ry="125" fill="url(#bodyGrad)"/>
+        <ellipse cx="250" cy="172" rx="198" ry="123" fill="none" stroke="url(#rimLightTop)" stroke-width="4" filter="url(#softBlur)" opacity="1"/>
+        <ellipse cx="250" cy="160" rx="140" ry="70" fill="url(#cavityGrad)" filter="url(#deepBlur)"/>
+        <ellipse cx="150" cy="95" rx="40" ry="15" fill="white" opacity="0.4" filter="url(#softBlur)" transform="rotate(-20 150 95)"/>
+      </svg>`;
+
+      const wbcSVG = `<svg width="400" height="400" viewBox="0 0 400 400" xmlns="http://www.w3.org/2000/svg">
+        <defs>
+          <clipPath id="cellClip">
+            <circle cx="200" cy="200" r="180" />
+          </clipPath>
+          <filter id="strongTexture" x="-20%" y="-20%" width="140%" height="140%">
+            <feTurbulence type="fractalNoise" baseFrequency="0.06" numOctaves="4" result="noise" />
+            <feColorMatrix type="matrix" values="0.5 0 0 0 0.1 0.5 0 0 0 0.2 0.8 0 0 0 0.5 0 0 0 1 -0.1" in="noise" result="softNoise" />
+            <feGaussianBlur stdDeviation="0.8" in="softNoise" result="blurredTexture"/>
+          </filter>
+          <filter id="internalBlur" stdDeviation="4" /> 
+          <filter id="softGlow" stdDeviation="4" />
+          <radialGradient id="sphereBodyGrad" cx="50%" cy="50%" r="50%" fx="30%" fy="30%">
+            <stop offset="0%" stop-color="#ffffff" stop-opacity="1"/>
+            <stop offset="40%" stop-color="#e6eeff" stop-opacity="1"/>
+            <stop offset="80%" stop-color="#c0d0e8" stop-opacity="1"/>
+            <stop offset="100%" stop-color="#90a0c0" stop-opacity="1"/>
+          </radialGradient>
+          <linearGradient id="nucleusGrad" x1="20%" y1="20%" x2="80%" y2="80%">
+            <stop offset="0%" stop-color="#7080b0" stop-opacity="0.9" />
+            <stop offset="100%" stop-color="#405080" stop-opacity="0.9" />
+          </linearGradient>
+          <linearGradient id="rimLightGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+            <stop offset="85%" stop-color="#ffffff" stop-opacity="0"/>
+            <stop offset="100%" stop-color="#ffffff" stop-opacity="0.9"/>
+          </linearGradient>
+          <solidColor id="granuleColor" solid-color="#506090" solid-opacity="0.7" />
+        </defs>
+        <circle cx="200" cy="200" r="180" fill="url(#sphereBodyGrad)"/>
+        <g clip-path="url(#cellClip)">
+          <circle cx="200" cy="200" r="180" fill="#607090" opacity="0.3" filter="url(#strongTexture)" style="mix-blend-mode: multiply;"/>
+          <g filter="url(#internalBlur)">
+            <path d="M 190,140 C 140,100 250,80 280,110 C 310,140 330,190 290,220 S 200,280 160,240 S 130,180 190,140 z" fill="url(#nucleusGrad)"/>
+            <circle cx="150" cy="190" r="18" fill="url(#granuleColor)"/>
+            <circle cx="250" cy="140" r="14" fill="url(#granuleColor)"/>
+            <circle cx="230" cy="250" r="20" fill="url(#granuleColor)"/>
+            <circle cx="120" cy="230" r="12" fill="url(#granuleColor)"/>
+            <circle cx="290" cy="190" r="16" fill="url(#granuleColor)"/>
+            <circle cx="350" cy="200" r="25" fill="url(#granuleColor)"/> 
+            <circle cx="60" cy="150" r="20" fill="url(#granuleColor)"/>
+          </g>
+        </g>
+        <circle cx="200" cy="200" r="178" fill="none" stroke="url(#rimLightGrad)" stroke-width="5" filter="url(#softGlow)"/>
+        <ellipse cx="130" cy="120" rx="90" ry="70" fill="#ffffff" opacity="0.65" filter="url(#softGlow)" transform="rotate(-35 130 120)"/>
+        <ellipse cx="170" cy="100" rx="30" ry="15" fill="#ffffff" opacity="0.5" filter="url(#softGlow)" transform="rotate(-20 170 100)"/>
+      </svg>`;
+
+      const plateletSVG = `<svg width="400" height="400" viewBox="0 0 400 400" xmlns="http://www.w3.org/2000/svg">
+        <defs>
+          <circle id="roundPlatelet" cx="200" cy="200" r="180" />
+          <clipPath id="shapeClip"><use href="#roundPlatelet" /></clipPath>
+          <filter id="softTexture" x="-20%" y="-20%" width="140%" height="140%">
+            <feTurbulence type="fractalNoise" baseFrequency="0.04" numOctaves="3" result="noise" />
+            <feColorMatrix type="matrix" values="0.3 0 0 0 0 0.3 0 0 0 0 0.3 0 0 0 0 0 0 0 0.3 0" in="noise" result="softNoise" />
+            <feGaussianBlur stdDeviation="2" in="softNoise" result="blurredTexture"/>
+          </filter>
+          <filter id="velvetGlow" stdDeviation="6" />
+          <filter id="mediumBlur" stdDeviation="5" />
+          <filter id="softHighlight" stdDeviation="4" />
+          <radialGradient id="plateletGreyishGrad" cx="50%" cy="50%" r="50%" fx="30%" fy="30%">
+            <stop offset="0%" stop-color="#f8f8f0" />   
+            <stop offset="50%" stop-color="#cece7e" />  
+            <stop offset="100%" stop-color="#a3a380" /> 
+          </radialGradient>
+          <linearGradient id="rimLightGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+            <stop offset="80%" stop-color="#ffffff" stop-opacity="0"/>
+            <stop offset="100%" stop-color="#ffffff" stop-opacity="0.95"/> 
+          </linearGradient>
+          <radialGradient id="greyishSpot" cx="50%" cy="50%" r="50%">
+            <stop offset="0%" stop-color="#969651" stop-opacity="0.4"/> 
+            <stop offset="100%" stop-color="#9b9b6a" stop-opacity="0"/>
+          </radialGradient>
+        </defs>
+        <use href="#roundPlatelet" fill="url(#plateletGreyishGrad)" />
+        <g clip-path="url(#shapeClip)">
+          <rect x="0" y="0" width="400" height="400" fill="#808080" opacity="0.15" filter="url(#softTexture)" style="mix-blend-mode: multiply;" />
+          <g filter="url(#mediumBlur)">
+            <ellipse cx="200" cy="200" rx="70" ry="70" fill="#b0b0a0" opacity="0.3" /> 
+            <circle cx="160" cy="170" r="15" fill="url(#greyishSpot)" />
+            <circle cx="240" cy="210" r="20" fill="url(#greyishSpot)" />
+            <circle cx="210" cy="130" r="12" fill="url(#greyishSpot)" />
+            <circle cx="180" cy="250" r="16" fill="url(#greyishSpot)" />
+          </g>
+        </g>
+        <use href="#roundPlatelet" fill="none" stroke="url(#rimLightGrad)" stroke-width="5" filter="url(#velvetGlow)" />
+        <ellipse cx="130" cy="120" rx="80" ry="60" fill="#ffffff" opacity="0.6" filter="url(#softHighlight)" transform="rotate(-35 130 120)" />
+        <circle cx="170" cy="100" r="10" fill="#ffffff" opacity="0.4" filter="url(#softHighlight)" />
+      </svg>`;
+
+      // Función para crear cache de SVG
+      function createParticleCache(svgString, size) {
+        return new Promise((resolve) => {
+          const canvas = document.createElement('canvas');
+          canvas.width = size;
+          canvas.height = size;
+          const ctx = canvas.getContext('2d');
+          
+          const img = new Image();
+          
+          img.onload = () => {
+            ctx.drawImage(img, 0, 0, size, size);
+            URL.revokeObjectURL(url);
+            resolve(canvas);
+          };
+          
+          img.onerror = () => {
+            // Fallback: crear canvas vacío si falla la carga
+            URL.revokeObjectURL(url);
+            resolve(canvas);
+          };
+          
+          // Convertir SVG string a data URL
+          const svgBlob = new Blob([svgString], { type: 'image/svg+xml;charset=utf-8' });
+          const url = URL.createObjectURL(svgBlob);
+          img.src = url;
+        });
+      }
+
+      // Precargar todos los caches de partículas
+      async function preloadParticleCaches() {
+        const cacheSize = 400; // Tamaño del cache (alto para buena calidad)
+        particleCaches.rbc = await createParticleCache(rbcSVG, cacheSize);
+        particleCaches.wbc = await createParticleCache(wbcSVG, cacheSize);
+        particleCaches.platelet = await createParticleCache(plateletSVG, cacheSize);
+      }
+
       function initSimulation() {
         // CRITICAL: Cancel existing animation loops to prevent accumulation
         if (renderLoopId !== null) {
@@ -1117,6 +1289,13 @@
         treatmentBtn.classList.remove("applied");
         treatmentBtn.innerHTML = `Administrar Tratamiento`;
         treatmentBtn.disabled = false;
+        // Asegurar que mantenga el mismo tamaño
+        const currentWidth = treatmentBtn.style.width || getComputedStyle(treatmentBtn).width;
+        if (currentWidth && currentWidth !== 'auto') {
+          treatmentBtn.style.width = currentWidth;
+          treatmentBtn.style.minWidth = currentWidth;
+          treatmentBtn.style.maxWidth = currentWidth;
+        }
 
         // Resetear tiempo hasta cierre de herida
         const adhesionTimeEl = document.getElementById(
@@ -1219,6 +1398,17 @@
             const fpsCounterEl = document.getElementById("fps-counter");
             if (fpsCounterEl) {
               fpsCounterEl.textContent = `FPS: ${currentFPS}`;
+            }
+            
+            // Contar partículas vivas (platelet, rbc, wbc)
+            const particleCount = state.allBodies.filter(body => 
+              body.label === "platelet" || body.label === "rbc" || body.label === "wbc"
+            ).length;
+            
+            // Actualizar el contador de partículas en el DOM
+            const particlesCounterEl = document.getElementById("particles-counter");
+            if (particlesCounterEl) {
+              particlesCounterEl.textContent = `Partículas: ${particleCount}`;
             }
           }
           
@@ -1416,6 +1606,15 @@
         });
 
         // Custom render - todo en afterRender, en orden: fondo, paredes, fibrina, vWF, partículas
+        // Limpiar áreas de partículas antes del renderizado de Matter.js para evitar superposiciones
+        Events.on(render, "beforeRender", function() {
+          // Asegurar que los cuerpos con visible: false no se rendericen
+          state.allBodies.forEach((body) => {
+            if (body.label === "rbc" || body.label === "wbc" || body.label === "platelet") {
+              body.render.visible = false;
+            }
+          });
+        });
         Events.on(render, "afterRender", renderVesselBackground);
         Events.on(render, "afterRender", renderVesselWalls);
         Events.on(render, "afterRender", renderFibrin);
@@ -2514,6 +2713,7 @@
         const woundLeft = woundX - woundWidth / 2;
         const woundRight = woundX + woundWidth / 2;
         const adhesionLineY = CONFIG.adhesionLineY; // Posición de la herida
+        const FADE_OUT_DURATION = 300; // Duración de la animación de desvanecimiento en ms
 
         // Optimized cleanup: iterate backwards for better performance when removing
         for (let i = state.allBodies.length - 1; i >= 0; i--) {
@@ -2525,6 +2725,16 @@
           const isStuck = state.stuckPlatelets.some((p) => p.body === body);
 
           if (!isStuck) {
+            // Si ya está en fadeOut, verificar si debe eliminarse completamente
+            if (body.fadeOutStart) {
+              const fadeOutElapsed = performance.now() - body.fadeOutStart;
+              if (fadeOutElapsed >= FADE_OUT_DURATION) {
+                toRemove.push(body);
+                continue;
+              }
+              continue; // Aún está en animación, no marcar para eliminar todavía
+            }
+
             // CRITICAL: Scale cleanup margins with scaleFactor - declare at start of block
             const leftCleanupMargin = 30 * scaleFactor;
             const topCleanupMargin = 20 * scaleFactor;
@@ -2532,32 +2742,33 @@
             const bottomMargin = 20 * scaleFactor;
             const rightCleanupMargin = 20 * scaleFactor;
             
-            // Verificar duración de vida de 10 segundos
+            // Verificar duración de vida de 5 segundos
             if (body.createdAt) {
               const age = (performance.now() - body.createdAt) / 1000; // Edad en segundos
-              if (age >= 10) {
-                toRemove.push(body);
-                continue; // Ya marcada para eliminar, no verificar otras condiciones
+              if (age >= 5) {
+                // Iniciar animación de desvanecimiento
+                body.fadeOutStart = performance.now();
+                continue;
               }
             }
             
             // Remove particles that exit right (eliminar cuando salen completamente del canvas)
             if (px > CONFIG.canvas.width + rightCleanupMargin) {
-              toRemove.push(body);
+              body.fadeOutStart = performance.now();
             }
             // Remove particles way off screen (left side)
             else if (px < -leftCleanupMargin) {
-              toRemove.push(body);
+              body.fadeOutStart = performance.now();
             }
             // Remove particles that exit bottom visually (top in canvas coords, outside screen)
             else if (py < -topCleanupMargin) {
-              toRemove.push(body);
+              body.fadeOutStart = performance.now();
             }
             // Remove particles that have passed through the wound and reached the bottom
             // Particles that are below the wound (adhesionLineY) and reach the bottom disappear
             // Solo eliminar si están realmente fuera del canvas (más allá del borde inferior)
             else if (py > adhesionLineY + cleanupMargin && py > CONFIG.canvas.height + bottomMargin) {
-              toRemove.push(body);
+              body.fadeOutStart = performance.now();
               state.bloodLoss++;
             }
           }
@@ -2599,12 +2810,10 @@
         // Remove from allBodies array (more efficient)
         state.allBodies = state.allBodies.filter((b) => !bodySet.has(b));
 
-        // Limpieza agresiva: eliminar partículas que están cerca del borde derecho
+        // Limpieza agresiva: iniciar fadeOut en partículas que están cerca del borde derecho
         // Esto asegura que las partículas se eliminen antes de llegar al límite máximo
         const aggressiveCleanupThreshold = CONFIG.particles.maxCount * 0.7; // 70% del límite (105 partículas)
         if (state.allBodies.length > aggressiveCleanupThreshold) {
-          const additionalToRemove = [];
-
           for (let i = state.allBodies.length - 1; i >= 0; i--) {
             const body = state.allBodies[i];
             if (!body || !body.position) continue;
@@ -2616,29 +2825,19 @@
             const isStuck = state.stuckPlatelets.some((p) => p.body === body);
             if (isStuck) continue;
 
-            // Eliminar partículas que están muy cerca del borde derecho (dentro de 30px del final)
+            // Si ya está en fadeOut, continuar
+            if (body.fadeOutStart) continue;
+
+            // Iniciar fadeOut en partículas que están muy cerca del borde derecho (dentro de 30px del final)
             if (px > CONFIG.canvas.width - 30) {
-              additionalToRemove.push(body);
+              body.fadeOutStart = performance.now();
             }
-            // También eliminar partículas que han atravesado la herida y están muy abajo visualmente
+            // También iniciar fadeOut en partículas que han atravesado la herida y están muy abajo visualmente
             const adhesionLineY = CONFIG.adhesionLineY;
             if (py > adhesionLineY + 20 && py > CONFIG.canvas.height - 10) {
-              additionalToRemove.push(body);
+              body.fadeOutStart = performance.now();
             }
           }
-
-          // Eliminar las partículas adicionales encontradas
-          additionalToRemove.forEach((body) => {
-            try {
-              Composite.remove(engine.world, body);
-              const index = state.allBodies.indexOf(body);
-              if (index > -1) {
-                state.allBodies.splice(index, 1);
-              }
-            } catch (e) {
-              // Ignorar errores si el body ya fue eliminado
-            }
-          });
         }
       }
 
@@ -3922,10 +4121,13 @@
         // Asegurar que el contexto esté escalado correctamente para alta resolución
         ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
         ctx.imageSmoothingEnabled = true;
-        ctx.imageSmoothingQuality = "high";
+        // Optimización: reducir calidad cuando hay muchas partículas para mejor rendimiento
+        const particleCount = state.allBodies.filter(body => 
+          body.label === "platelet" || body.label === "rbc" || body.label === "wbc"
+        ).length;
+        ctx.imageSmoothingQuality = particleCount > 100 ? "low" : "high";
 
-        // Renderizar todas las partículas con estilo personalizado (highlights, sombras, formas)
-        // Renderizar solo plaquetas, glóbulos rojos y glóbulos blancos
+        // Renderizar todas las partículas usando caches de SVG optimizados
         state.allBodies.forEach((body) => {
           if (
             !body.label ||
@@ -3935,106 +4137,56 @@
           )
             return;
 
+          // Verificar que el cache esté disponible
+          const cache = particleCaches[body.label];
+          if (!cache) return;
+
           const x = body.position.x;
           const y = body.position.y;
           const angle = body.angle;
 
+          // Calcular tamaño de renderizado según el tipo de partícula
+          let renderSize;
+          if (body.label === "rbc") {
+            const radiusX = BASE_CONFIG.particles.rbcRadius * scaleFactor;
+            renderSize = radiusX * 2.5; // Ajustar según el tamaño del SVG (viewBox 500x350, rx=200)
+          } else if (body.label === "wbc") {
+            const radius = BASE_CONFIG.particles.wbcRadius * scaleFactor;
+            renderSize = radius * 2.2; // Ajustar según el tamaño del SVG (viewBox 400x400, r=180)
+          } else { // platelet
+            const radius = BASE_CONFIG.particles.plateletRadius * scaleFactor;
+            renderSize = radius * 2.2; // Ajustar según el tamaño del SVG (viewBox 400x400, r=180)
+          }
+
           ctx.save();
           ctx.translate(x, y);
           ctx.rotate(angle);
-
-          if (body.label === "rbc") {
-            // Glóbulo rojo: ovalado con highlight y sombra
-            const radiusX = BASE_CONFIG.particles.rbcRadius * scaleFactor;
-            const radiusY = radiusX * 0.75; // Más ancho que alto para efecto ovalado
-
-            // Sombra/contorno oscuro
-            ctx.beginPath();
-            ctx.ellipse(0, 0, radiusX + 0.5 * scaleFactor, radiusY + 0.5 * scaleFactor, 0, 0, Math.PI * 2);
-            ctx.fillStyle = "rgba(139, 0, 0, 0.3)"; // Rojo muy oscuro para sombra
-            ctx.fill();
-
-            // Cuerpo principal rojo oscuro
-            ctx.beginPath();
-            ctx.ellipse(0, 0, radiusX, radiusY, 0, 0, Math.PI * 2);
-            ctx.fillStyle = "#B91C1C"; // Rojo oscuro
-            ctx.fill();
-
-            // Highlight pequeño cerca del centro (superior izquierda)
-            // Mantener tamaño mínimo para visibilidad
-            const highlightRadiusRBC = Math.max(1.0, 1.2 * scaleFactor);
-            ctx.beginPath();
-            ctx.arc(-1.5 * scaleFactor, -1 * scaleFactor, highlightRadiusRBC, 0, Math.PI * 2);
-            ctx.fillStyle = "rgba(255, 200, 200, 0.8)"; // Rojo claro/rosa para highlight
-            ctx.fill();
-          } else if (body.label === "wbc") {
-            // Glóbulo blanco: circular con highlight brillante y contorno azul oscuro
-            const radius = BASE_CONFIG.particles.wbcRadius * scaleFactor;
-
-            // Contorno azul oscuro para profundidad (mantener grosor mínimo)
-            const outlineWidth = Math.max(1.0, 1.5 * scaleFactor);
-            ctx.beginPath();
-            ctx.arc(0, 0, radius + Math.max(0.5, 1 * scaleFactor), 0, Math.PI * 2);
-            ctx.strokeStyle = "#4A90E2"; // Azul más oscuro para contorno
-            ctx.lineWidth = outlineWidth;
-            ctx.stroke();
-
-            // Cuerpo principal azul claro
-            ctx.beginPath();
-            ctx.arc(0, 0, radius, 0, Math.PI * 2);
-            ctx.fillStyle = "#87CEEB"; // Azul claro
-            ctx.fill();
-
-            // Highlight brillante blanco en cuadrante superior izquierdo
-            const highlightX = -3 * scaleFactor;
-            const highlightY = -3 * scaleFactor;
-            const highlightRadius = Math.max(3.0, 4 * scaleFactor); // Mantener tamaño mínimo
-            const gradient = ctx.createRadialGradient(highlightX, highlightY, 0, highlightX, highlightY, highlightRadius);
-            gradient.addColorStop(0, "rgba(255, 255, 255, 0.95)"); // Blanco brillante en el centro
-            gradient.addColorStop(0.5, "rgba(255, 255, 255, 0.6)");
-            gradient.addColorStop(1, "rgba(255, 255, 255, 0)"); // Transparente hacia afuera
-
-            ctx.beginPath();
-            ctx.arc(highlightX, highlightY, highlightRadius, 0, Math.PI * 2);
-            ctx.fillStyle = gradient;
-            ctx.fill();
-
-            // Punto de highlight más pequeño y brillante (mantener tamaño mínimo)
-            const highlightDotRadius = Math.max(1.0, 1.5 * scaleFactor);
-            ctx.beginPath();
-            ctx.arc(highlightX, highlightY, highlightDotRadius, 0, Math.PI * 2);
-            ctx.fillStyle = "rgba(255, 255, 255, 1)"; // Blanco sólido
-            ctx.fill();
-          } else if (body.label === "platelet") {
-            // Plaqueta: circular gris con highlight sutil
-            const radius = BASE_CONFIG.particles.plateletRadius * scaleFactor;
-
-            // Sombra sutil (mantener grosor mínimo para visibilidad)
-            const shadowOffsetPlatelet = Math.max(0.3, 0.3 * scaleFactor);
-            ctx.beginPath();
-            ctx.arc(0, 0, radius + shadowOffsetPlatelet, 0, Math.PI * 2);
-            ctx.fillStyle = "rgba(100, 100, 100, 0.2)"; // Gris oscuro para sombra
-            ctx.fill();
-
-            // Cuerpo principal gris
-            ctx.beginPath();
-            ctx.arc(0, 0, radius, 0, Math.PI * 2);
-            ctx.fillStyle = "#808080"; // Gris medio
-            ctx.fill();
-
-            // Highlight pequeño en cuadrante superior izquierdo (mantener tamaño mínimo)
-            const highlightRadiusPlatelet = Math.max(0.6, 0.8 * scaleFactor);
-            ctx.beginPath();
-            ctx.arc(-1.2 * scaleFactor, -1.2 * scaleFactor, highlightRadiusPlatelet, 0, Math.PI * 2);
-            ctx.fillStyle = "rgba(220, 220, 220, 0.7)"; // Gris claro para highlight
-            ctx.fill();
+          
+          // Aplicar animación de desvanecimiento si está marcada para eliminar
+          let opacity = 1.0;
+          if (body.fadeOutStart) {
+            const fadeOutElapsed = performance.now() - body.fadeOutStart;
+            const FADE_OUT_DURATION = 300; // 300ms de animación
+            opacity = Math.max(0, 1 - (fadeOutElapsed / FADE_OUT_DURATION));
           }
-
+          
+          // Aplicar opacidad
+          ctx.globalAlpha = opacity;
+          
+          // Dibujar desde el cache - MUY RÁPIDO: solo una operación drawImage
+          ctx.drawImage(cache, -renderSize / 2, -renderSize / 2, renderSize, renderSize);
+          
+          // Restaurar opacidad
+          ctx.globalAlpha = 1.0;
+          
           ctx.restore();
         });
-        
+
         ctx.restore();
       }
+
+      // Código antiguo de renderizado manual - REMOVIDO para optimización
+      // Ahora usamos caches de SVG precargados para mejor rendimiento
 
       function calculateClotPercentage() {
         // Si la herida está sellada (red de fibrina de izquierda a derecha y no pasan partículas), 100%
@@ -4191,11 +4343,27 @@
           indicator.classList.remove("visible");
         }, 2000);
 
-        // Update button
+        // Update button - mantener el mismo tamaño y altura
         const btn = document.getElementById("treatment-btn");
+        const currentHeight = btn.style.height || getComputedStyle(btn).height;
+        const currentPadding = btn.style.padding || getComputedStyle(btn).padding;
         btn.classList.add("applied");
         btn.innerHTML = "Tratamiento Aplicado";
         btn.disabled = true;
+        // Asegurar que mantenga el mismo tamaño que antes
+        const currentWidth = btn.style.width || getComputedStyle(btn).width;
+        if (currentWidth && currentWidth !== 'auto') {
+          btn.style.width = currentWidth;
+          btn.style.minWidth = currentWidth;
+          btn.style.maxWidth = currentWidth;
+        }
+        // Asegurar que mantenga la misma altura
+        if (currentHeight && currentHeight !== 'auto') {
+          btn.style.height = currentHeight;
+        }
+        if (currentPadding && currentPadding !== 'initial') {
+          btn.style.padding = currentPadding;
+        }
 
         // Apply treatment effects based on condition
         const condition = CONFIG.conditions[state.condition];
@@ -4768,7 +4936,10 @@
         }
       }
 
-      document.addEventListener("DOMContentLoaded", () => {
+      document.addEventListener("DOMContentLoaded", async () => {
+        // Precargar caches de partículas primero
+        await preloadParticleCaches();
+        
         // Inicializar el sistema de resize primero
         initializeResizeHandlers();
         
