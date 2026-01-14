@@ -1340,22 +1340,36 @@ body {
   display: inline-block;
   flex-shrink: 0;
   align-self: center;
+  overflow: hidden;
 }
 
-/* Plaqueta: diseño complejo con textura y gránulos */
+.legend-dot img {
+  display: block;
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+}
+
+/* Plaqueta: usar SVG en lugar de CSS */
 .legend-dot.platelet {
-  width: calc(12px * var(--ui-scale));
-  height: calc(12px * var(--ui-scale));
+  width: calc(16px * var(--ui-scale));
+  height: calc(16px * var(--ui-scale));
+  border-radius: 0;
+  background: transparent;
+  position: relative;
+  box-shadow: none;
+}
+
+/* Solo aplicar estilos CSS si no hay SVG (fallback) */
+.legend-dot.platelet:not(.has-svg) {
   border-radius: 50%;
   background: radial-gradient(circle at 30% 30%, #f8f8f0 0%, #cece7e 50%, #a3a380 100%);
-  position: relative;
   box-shadow: 
     0 0 calc(2px * var(--ui-scale)) rgba(160, 160, 144, 0.3),
     inset 0 0 calc(2px * var(--ui-scale)) rgba(128, 128, 128, 0.15);
 }
 
-/* Textura con efecto de ruido */
-.legend-dot.platelet::before {
+.legend-dot.platelet:not(.has-svg)::before {
   content: "";
   position: absolute;
   top: 0;
@@ -1368,8 +1382,7 @@ body {
   mix-blend-mode: multiply;
 }
 
-/* Gránulos y elipse central usando box-shadow */
-.legend-dot.platelet::after {
+.legend-dot.platelet:not(.has-svg)::after {
   content: "";
   position: absolute;
   top: 50%;
@@ -1388,20 +1401,25 @@ body {
     calc(-2px * var(--ui-scale)) calc(4px * var(--ui-scale)) 0 calc(0.5px * var(--ui-scale)) rgba(150, 150, 81, 0.2);
 }
 
-/* Glóbulo rojo: diseño complejo con efecto biconcavo */
+/* Glóbulo rojo: usar SVG */
 .legend-dot.rbc {
-  width: calc(14px * var(--ui-scale));
-  height: calc(10px * var(--ui-scale));
+  width: calc(18px * var(--ui-scale));
+  height: calc(14px * var(--ui-scale));
+  border-radius: 0;
+  background: transparent;
+  position: relative;
+  box-shadow: none;
+}
+
+.legend-dot.rbc:not(.has-svg) {
   border-radius: 50%;
   background: linear-gradient(135deg, #d13f3f 0%, #b30000 60%, #700000 100%);
-  position: relative;
   box-shadow: 
     inset calc(-2px * var(--ui-scale)) calc(-1px * var(--ui-scale)) calc(2px * var(--ui-scale)) rgba(255, 255, 255, 0.4),
     0 0 calc(1px * var(--ui-scale)) rgba(139, 0, 0, 0.2);
 }
 
-/* Cavidad central (efecto biconcavo) */
-.legend-dot.rbc::before {
+.legend-dot.rbc:not(.has-svg)::before {
   content: "";
   position: absolute;
   top: calc(50% - 1px * var(--ui-scale));
@@ -1415,8 +1433,7 @@ body {
   opacity: 0.9;
 }
 
-/* Borde superior iluminado */
-.legend-dot.rbc::after {
+.legend-dot.rbc:not(.has-svg)::after {
   content: "";
   position: absolute;
   top: calc(-1px * var(--ui-scale));
@@ -1429,20 +1446,25 @@ body {
   opacity: 0.6;
 }
 
-/* Glóbulo blanco: diseño complejo con núcleo y gránulos */
+/* Glóbulo blanco: usar SVG */
 .legend-dot.wbc {
-  width: calc(20px * var(--ui-scale));
-  height: calc(20px * var(--ui-scale));
+  width: calc(18px * var(--ui-scale));
+  height: calc(18px * var(--ui-scale));
+  border-radius: 0;
+  background: transparent;
+  position: relative;
+  box-shadow: none;
+}
+
+.legend-dot.wbc:not(.has-svg) {
   border-radius: 50%;
   background: radial-gradient(circle at 30% 30%, #ffffff 0%, #e6eeff 40%, #c0d0e8 80%, #90a0c0 100%);
-  position: relative;
   box-shadow: 
     0 0 calc(2px * var(--ui-scale)) rgba(144, 160, 192, 0.3),
     inset 0 0 calc(2px * var(--ui-scale)) rgba(96, 112, 144, 0.3);
 }
 
-/* Textura con efecto de ruido */
-.legend-dot.wbc::before {
+.legend-dot.wbc:not(.has-svg)::before {
   content: "";
   position: absolute;
   top: 0;
@@ -1455,8 +1477,7 @@ body {
   mix-blend-mode: multiply;
 }
 
-/* Núcleo y gránulos usando box-shadow */
-.legend-dot.wbc::after {
+.legend-dot.wbc:not(.has-svg)::after {
   content: "";
   position: absolute;
   top: calc(50% - 3px * var(--ui-scale));
@@ -2104,14 +2125,19 @@ body {
     height: calc(8px * var(--ui-scale));
   }
   
-  .legend-dot.rbc {
+  .legend-dot.platelet {
     width: calc(10px * var(--ui-scale));
-    height: calc(7px * var(--ui-scale));
+    height: calc(10px * var(--ui-scale));
+  }
+  
+  .legend-dot.rbc {
+    width: calc(12px * var(--ui-scale));
+    height: calc(9px * var(--ui-scale));
   }
   
   .legend-dot.wbc {
-    width: calc(14px * var(--ui-scale));
-    height: calc(14px * var(--ui-scale));
+    width: calc(12px * var(--ui-scale));
+    height: calc(12px * var(--ui-scale));
   }
   
   .legend-dot.fibrin {
@@ -2656,13 +2682,13 @@ body {
   }
   
   .legend-dot.rbc {
-    width: calc(8px * var(--ui-scale));
-    height: calc(6px * var(--ui-scale));
+    width: calc(7px * var(--ui-scale));
+    height: calc(5px * var(--ui-scale));
   }
   
   .legend-dot.wbc {
-    width: calc(12px * var(--ui-scale));
-    height: calc(12px * var(--ui-scale));
+    width: calc(7px * var(--ui-scale));
+    height: calc(7px * var(--ui-scale));
   }
   
   .legend-dot.fibrin {

@@ -128,7 +128,7 @@
             <!-- Leyenda dentro del visor -->
           <div class="legend">
             <div class="legend-item tooltip-container">
-              <div class="legend-dot platelet"></div>
+              <div class="legend-dot platelet" data-svg-type="platelet"></div>
               <span class="tooltip-trigger">Plaquetas</span>
               <div class="tooltip">
                 Células sanguíneas pequeñas que se adhieren a la herida y forman
@@ -136,7 +136,7 @@
               </div>
             </div>
             <div class="legend-item tooltip-container">
-              <div class="legend-dot rbc"></div>
+              <div class="legend-dot rbc" data-svg-type="rbc"></div>
               <span class="tooltip-trigger">Glóbulos Rojos</span>
               <div class="tooltip">
                 Eritrocitos que transportan oxígeno. No participan directamente en
@@ -144,7 +144,7 @@
               </div>
             </div>
             <div class="legend-item tooltip-container">
-              <div class="legend-dot wbc"></div>
+              <div class="legend-dot wbc" data-svg-type="wbc"></div>
               <span class="tooltip-trigger wbc-text">Glóbulos Blancos</span>
               <div class="tooltip">
                 Leucocitos que participan en la respuesta inmune. Pueden ayudar en
@@ -980,6 +980,8 @@
         simulationRunning: false, // Control manual de simulación
         startTime: null,
         plateletsSpawned: 0,
+        pauseStartTime: null, // Tiempo cuando se pausó la simulación
+        totalPausedTime: 0, // Tiempo total que la simulación ha estado pausada (en ms)
         // Controles de velocidad
         timeScale: 1.0,
         isPaused: false,
@@ -1181,6 +1183,54 @@
         particleCaches.rbc = await createParticleCache(rbcSVG, cacheSize);
         particleCaches.wbc = await createParticleCache(wbcSVG, cacheSize);
         particleCaches.platelet = await createParticleCache(plateletSVG, cacheSize);
+        
+        // Actualizar leyenda con los SVG
+        updateLegendSVGs();
+      }
+      
+      // Función para actualizar los SVG en la leyenda
+      function updateLegendSVGs() {
+        const legendDots = document.querySelectorAll('.legend-dot[data-svg-type]');
+        
+        legendDots.forEach(dot => {
+          const svgType = dot.getAttribute('data-svg-type');
+          let svgString = '';
+          
+          if (svgType === 'rbc') {
+            svgString = rbcSVG;
+          } else if (svgType === 'wbc') {
+            svgString = wbcSVG;
+          } else if (svgType === 'platelet') {
+            svgString = plateletSVG;
+          }
+          
+          if (svgString) {
+            // Crear un contenedor para el SVG
+            const svgBlob = new Blob([svgString], { type: 'image/svg+xml;charset=utf-8' });
+            const url = URL.createObjectURL(svgBlob);
+            
+            // Limpiar contenido anterior
+            dot.innerHTML = '';
+            
+            // Agregar clase para indicar que tiene SVG
+            dot.classList.add('has-svg');
+            
+            // Crear imagen para el SVG
+            const img = document.createElement('img');
+            img.src = url;
+            img.style.width = '100%';
+            img.style.height = '100%';
+            img.style.objectFit = 'contain';
+            img.style.display = 'block';
+            
+            // Limpiar URL después de cargar
+            img.onload = () => {
+              URL.revokeObjectURL(url);
+            };
+            
+            dot.appendChild(img);
+          }
+        });
       }
 
       function initSimulation() {
@@ -1225,6 +1275,8 @@
           simulationRunning: false,
           startTime: null,
           plateletsSpawned: 0,
+          pauseStartTime: null,
+          totalPausedTime: 0,
           // Controles de velocidad (base speed = 0.75, slider 1.0 = velocidad normal más lenta)
           timeScale: state.timeScale || 0.75,
           isPaused: false,
@@ -1592,7 +1644,8 @@
           }
 
           // Throttle expensive operations
-          if (frameCount % CLEANUP_INTERVAL === 0) {
+          // Solo ejecutar cleanup si la simulación está corriendo y no está pausada
+          if (frameCount % CLEANUP_INTERVAL === 0 && state.simulationRunning && !state.isPaused) {
             cleanupParticles();
             // También limpiar plaquetas pegadas antiguas periódicamente
             cleanupOldStuckPlatelets();
@@ -1840,6 +1893,7 @@
             });
             // Agregar timestamp de creación para duración de vida
             body.createdAt = performance.now();
+            body.totalPausedTime = 0; // Tiempo total que esta partícula ha estado pausada
             // Rastrear plaquetas spawnadas
             state.plateletsSpawned++;
             break;
@@ -1868,6 +1922,7 @@
             });
             // Agregar timestamp de creación para duración de vida
             body.createdAt = performance.now();
+            body.totalPausedTime = 0; // Tiempo total que esta partícula ha estado pausada
             break;
 
           case "wbc":
@@ -1893,6 +1948,7 @@
             });
             // Agregar timestamp de creación para duración de vida
             body.createdAt = performance.now();
+            body.totalPausedTime = 0; // Tiempo total que esta partícula ha estado pausada
             break;
         }
 
@@ -2071,6 +2127,40 @@
           // Iniciar simulación
           state.simulationRunning = true;
           state.isPaused = false;
+          // Si había una pausa activa, calcular el tiempo pausado y agregarlo al totalPausedTime de cada partícula
+          if (state.pauseStartTime !== null) {
+            const pauseDuration = performance.now() - state.pauseStartTime;
+            state.totalPausedTime += pauseDuration;
+            const pauseStartTime = state.pauseStartTime;
+            const resumeTime = performance.now();
+            // Agregar el tiempo pausado al totalPausedTime de cada partícula que existía antes de la pausa
+            state.allBodies.forEach(body => {
+              if (body.createdAt && body.createdAt < pauseStartTime) {
+                // Partícula creada antes de la pausa: agregar el tiempo pausado a su totalPausedTime
+                if (!body.totalPausedTime) body.totalPausedTime = 0;
+                body.totalPausedTime += pauseDuration;
+              }
+              // Las partículas creadas durante la pausa: ajustar createdAt para que empiecen desde ahora
+              else if (body.createdAt && body.createdAt >= pauseStartTime) {
+                // Estas partículas se crearon durante la pausa, así que ajustamos createdAt para que empiecen desde ahora
+                body.createdAt = resumeTime;
+                body.totalPausedTime = 0;
+              }
+              
+              // También ajustar fadeOutStart si existe
+              if (body.fadeOutStart) {
+                if (body.fadeOutStart < pauseStartTime) {
+                  // El fadeOut comenzó antes de la pausa: ajustar fadeOutStart sumando el tiempo pausado
+                  // Esto compensa el tiempo que pasó durante la pausa
+                  body.fadeOutStart += pauseDuration;
+                } else {
+                  // El fadeOut comenzó durante la pausa: reiniciar al tiempo de reanudación
+                  body.fadeOutStart = resumeTime;
+                }
+              }
+            });
+            state.pauseStartTime = null;
+          }
           state.startTime = Date.now();
           state.adhesionTime = null;
           state.closureTime = null;
@@ -2116,6 +2206,8 @@
           // Pausar simulación
           state.simulationRunning = false;
           state.isPaused = true;
+          // Guardar el tiempo cuando se pausa
+          state.pauseStartTime = performance.now();
           // No usar Runner.stop() - usamos nuestro propio loop
           
           // Actualizar botón a inicio
@@ -2707,6 +2799,11 @@
       }
 
       function cleanupParticles() {
+        // CRITICAL: No ejecutar cleanup si está pausado
+        if (state.isPaused || !state.simulationRunning) {
+          return;
+        }
+        
         const toRemove = [];
         const woundX = CONFIG.wound.x;
         const woundWidth = CONFIG.wound.width;
@@ -2726,8 +2823,28 @@
 
           if (!isStuck) {
             // Si ya está en fadeOut, verificar si debe eliminarse completamente
+            // El fadeOut también debe pausarse cuando la simulación está pausada
             if (body.fadeOutStart) {
-              const fadeOutElapsed = performance.now() - body.fadeOutStart;
+              let fadeOutElapsed;
+              
+              if (state.pauseStartTime !== null) {
+                // Si hay una pausa activa
+                if (body.fadeOutStart < state.pauseStartTime) {
+                  // FadeOut comenzó antes de la pausa: calcular tiempo hasta el momento de la pausa
+                  // No restamos pausedTime aquí porque el fadeOutStart es un tiempo absoluto
+                  fadeOutElapsed = state.pauseStartTime - body.fadeOutStart;
+                } else {
+                  // FadeOut comenzó durante la pausa: tiempo = 0 (no ha avanzado)
+                  fadeOutElapsed = 0;
+                }
+              } else {
+                // No hay pausa activa: calcular tiempo normalmente
+                // fadeOutStart ya está ajustado para compensar el tiempo pausado cuando se reanudó
+                fadeOutElapsed = performance.now() - body.fadeOutStart;
+                // Asegurar que no sea negativo
+                if (fadeOutElapsed < 0) fadeOutElapsed = 0;
+              }
+              
               if (fadeOutElapsed >= FADE_OUT_DURATION) {
                 toRemove.push(body);
                 continue;
@@ -2742,10 +2859,29 @@
             const bottomMargin = 20 * scaleFactor;
             const rightCleanupMargin = 20 * scaleFactor;
             
-            // Verificar duración de vida de 5 segundos
+            // Verificar duración de vida de 7 segundos
+            // El tiempo de vida se pausa cuando la simulación está pausada
             if (body.createdAt) {
-              const age = (performance.now() - body.createdAt) / 1000; // Edad en segundos
-              if (age >= 5) {
+              let age;
+              const pausedTime = body.totalPausedTime || 0;
+              
+              if (state.pauseStartTime !== null) {
+                // Si hay una pausa activa, calcular edad hasta el momento de la pausa
+                if (body.createdAt < state.pauseStartTime) {
+                  // Partícula creada antes de la pausa: calcular edad hasta el momento de la pausa
+                  // El tiempo transcurrido es desde createdAt hasta pauseStartTime, menos el tiempo ya pausado anteriormente
+                  age = (state.pauseStartTime - body.createdAt - pausedTime) / 1000;
+                } else {
+                  // Partícula creada durante la pausa: edad = 0 (no ha envejecido)
+                  age = 0;
+                }
+              } else {
+                // No hay pausa activa: calcular edad restando el tiempo total pausado
+                // El tiempo transcurrido es desde createdAt hasta ahora, menos todo el tiempo pausado
+                age = (performance.now() - body.createdAt - pausedTime) / 1000; // Edad en segundos
+              }
+              
+              if (age >= 7) {
                 // Iniciar animación de desvanecimiento
                 body.fadeOutStart = performance.now();
                 continue;
@@ -4163,10 +4299,36 @@
           ctx.rotate(angle);
           
           // Aplicar animación de desvanecimiento si está marcada para eliminar
+          // El fadeOut también debe pausarse cuando la simulación está pausada
           let opacity = 1.0;
           if (body.fadeOutStart) {
-            const fadeOutElapsed = performance.now() - body.fadeOutStart;
+            let fadeOutElapsed;
             const FADE_OUT_DURATION = 300; // 300ms de animación
+            
+            // CRITICAL: Si está pausado, el fadeOut no debe avanzar
+            if (state.isPaused || !state.simulationRunning) {
+              // Durante la pausa, calcular tiempo hasta el momento de la pausa (si existe)
+              if (state.pauseStartTime !== null && body.fadeOutStart < state.pauseStartTime) {
+                fadeOutElapsed = state.pauseStartTime - body.fadeOutStart;
+              } else {
+                // Si no hay pauseStartTime o el fadeOut comenzó durante la pausa, tiempo = 0
+                fadeOutElapsed = 0;
+              }
+            } else if (state.pauseStartTime !== null) {
+              // Si hay una pausa activa (aunque no debería llegar aquí si isPaused es true)
+              if (body.fadeOutStart < state.pauseStartTime) {
+                fadeOutElapsed = state.pauseStartTime - body.fadeOutStart;
+              } else {
+                fadeOutElapsed = 0;
+              }
+            } else {
+              // No hay pausa activa: calcular tiempo normalmente
+              // fadeOutStart ya está ajustado para compensar el tiempo pausado cuando se reanudó
+              fadeOutElapsed = performance.now() - body.fadeOutStart;
+              // Asegurar que no sea negativo
+              if (fadeOutElapsed < 0) fadeOutElapsed = 0;
+            }
+            
             opacity = Math.max(0, 1 - (fadeOutElapsed / FADE_OUT_DURATION));
           }
           
