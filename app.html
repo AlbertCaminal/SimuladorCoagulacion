@@ -2678,19 +2678,29 @@
         const adhesionZoneHalfWidth = 12 * scaleFactor; // Mitad del ancho del área de adhesión escalada
         const adhesionZoneTop = lineY - adhesionZoneHalfWidth;
         const adhesionZoneBottom = lineY + adhesionZoneHalfWidth;
-        // Posición aleatoria dentro del área de adhesión, con distribución normal centrada
         // Usar la posición actual de la plaqueta como referencia, pero limitada al área de adhesión
+        // NO hacer que suban - solo ajustar si están fuera del área
         const currentY = platelet.position.y;
-        const targetY = Math.max(
-          adhesionZoneTop,
-          Math.min(adhesionZoneBottom, currentY)
-        );
-        // Añadir pequeña variación aleatoria para efecto de profundidad
-        const randomVariation = (Math.random() - 0.5) * 4; // Variación de ±2 píxeles
-        const stickY = Math.max(
-          adhesionZoneTop,
-          Math.min(adhesionZoneBottom, targetY + randomVariation)
-        );
+        let stickY;
+        if (currentY < adhesionZoneTop) {
+          // Si está por encima del área, moverla al límite superior (pero no más arriba)
+          stickY = adhesionZoneTop;
+        } else if (currentY > adhesionZoneBottom) {
+          // Si está por debajo del área, moverla al límite inferior
+          stickY = adhesionZoneBottom;
+        } else {
+          // Si ya está dentro del área, mantener su posición actual sin variación aleatoria hacia arriba
+          // Solo permitir pequeña variación hacia abajo si está cerca del límite superior
+          const distanceFromTop = currentY - adhesionZoneTop;
+          const distanceFromBottom = adhesionZoneBottom - currentY;
+          // Si está cerca del límite superior, permitir pequeña variación hacia abajo
+          if (distanceFromTop < 2 * scaleFactor) {
+            stickY = Math.min(adhesionZoneBottom, currentY + Math.random() * 2 * scaleFactor);
+          } else {
+            // Mantener posición actual sin hacer que suba
+            stickY = currentY;
+          }
+        }
         Body.setPosition(platelet, { x: platelet.position.x, y: stickY });
 
         // Make platelet completely static so it doesn't move
@@ -3158,9 +3168,6 @@
           Body.setVelocity(actualParticle, { x: 0, y: 0 });
           Body.setAngularVelocity(actualParticle, 0);
           
-          // AHORA hacer la partícula estática después de crear el constraint
-          Body.setStatic(actualParticle, true);
-          
           // Desactivar cualquier fuerza aplicada SOLO a esta partícula
           Body.setForce(actualParticle, { x: 0, y: 0 });
           Body.setTorque(actualParticle, 0);
@@ -3191,9 +3198,36 @@
             y: fibrinStart.y + t * dy
           };
 
+          // Ajustar la posición de la partícula ANTES de hacerla estática
+          // CRITICAL: No hacer que la partícula suba - solo ajustar si está por debajo o muy lejos
+          const currentY = actualParticle.position.y;
+          const currentX = actualParticle.position.x;
+          
+          // Si está por debajo del punto más cercano, moverla al punto exacto
+          // Si está por encima, mantener su posición Y actual (no hacer que suba)
+          let finalY = currentY;
+          if (currentY > closestPoint.y) {
+            // Está por debajo, moverla al punto exacto
+            finalY = closestPoint.y;
+          } else if (currentY < closestPoint.y - 5 * scaleFactor) {
+            // Está muy arriba (más de 5px), moverla un poco hacia abajo pero no al punto exacto
+            finalY = closestPoint.y - 2 * scaleFactor;
+          }
+          // Si está cerca o por encima del punto, mantener su posición Y actual
+          
+          // Ajustar posición antes de hacer estática
+          Body.setPosition(actualParticle, { 
+            x: currentX, 
+            y: finalY 
+          });
+          
+          // AHORA hacer la partícula estática después de ajustar la posición
+          Body.setStatic(actualParticle, true);
+
+          // Usar la posición final ajustada como punto de constraint para evitar que se mueva
           const constraint = Constraint.create({
             bodyA: actualParticle,
-            pointB: closestPoint,
+            pointB: { x: currentX, y: finalY }, // Usar posición final, no el punto más cercano
             stiffness: 1.0,
             damping: 0.8,
             length: 0,
@@ -4304,15 +4338,17 @@
         const woundRight = woundX + woundWidth / 2;
         const adhesionLineY = CONFIG.adhesionLineY; // Centro del área de adhesión (more down visually = higher Y in canvas coords)
         const adhesionZoneHalfWidth = 12 * scaleFactor; // Mitad del ancho del área de adhesión escalada
+        // Altura visual aumentada para el rectángulo morado (50% más alto)
+        const visualMeshHalfWidth = adhesionZoneHalfWidth * 1.5; // 50% más alto visualmente
 
         // Render ointment layer when treatment is applied - ultra simple for performance
         if (state.showOintment) {
           ctx.fillStyle = "rgba(117, 35, 120, 0.35)";
           ctx.fillRect(
             woundLeft,
-            adhesionLineY - adhesionZoneHalfWidth,
+            adhesionLineY - visualMeshHalfWidth,
             woundWidth,
-            adhesionZoneHalfWidth * 2
+            visualMeshHalfWidth * 2
           );
         }
 
@@ -4336,9 +4372,9 @@
           0.05 + (stuckPlateletsInWound / maxPlatelets) * 0.85
         );
 
-        // Área de la malla morada coincide con el área de adhesión
-        const meshTopY = adhesionLineY - adhesionZoneHalfWidth;
-        const meshHeight = adhesionZoneHalfWidth * 2; // Altura total del área de adhesión
+        // Área de la malla morada - usar altura visual aumentada (50% más alto)
+        const meshTopY = adhesionLineY - visualMeshHalfWidth;
+        const meshHeight = visualMeshHalfWidth * 2; // Altura total del área de adhesión visual (50% más alto)
 
         // Renderizar malla morada horizontal en la zona de adhesión que se opaca progresivamente
         // Solo esta área horizontal es morada - las cuerdas son verdes
