@@ -985,6 +985,7 @@
         // Controles de velocidad
         timeScale: 1.0,
         isPaused: false,
+        vWFBodies: [], // Cuerpos físicos para las líneas de vWF
       };
 
       // Spawn timing for fixed interval
@@ -1289,6 +1290,7 @@
           Events.off(engine, "beforeUpdate");
           Events.off(engine, "afterUpdate");
           Events.off(engine, "collisionStart");
+          Events.off(engine, "collisionActive");
           // Remove anchor platelets before clearing world
           if (state.stuckPlatelets) {
             state.stuckPlatelets.forEach((plateletData) => {
@@ -1296,6 +1298,13 @@
                 Composite.remove(engine.world, plateletData.body);
               }
             });
+          }
+          // Remove vWF bodies before clearing world
+          if (state.vWFBodies) {
+            state.vWFBodies.forEach((body) => {
+              Composite.remove(engine.world, body);
+            });
+            state.vWFBodies = [];
           }
           Composite.clear(engine.world);
           Engine.clear(engine);
@@ -1610,32 +1619,64 @@
                     break;
                 }
                 
-                // El grosor físico debe coincidir exactamente con el visual
-                // CRITICAL: Recalcular el grosor desde el grosor base almacenado
-                // Si el cuerpo tiene un grosor base almacenado, usarlo; si no, calcular desde el bounding box
-                let currentThickness;
-                if (fibrin.body.baseThickness !== undefined && fibrin.body.currentScaleFactor !== undefined) {
-                  // Recalcular desde el grosor base usando el scaleFactor actual
-                  const expectedThickness = fibrin.body.baseThickness * scaleFactor;
-                  // Obtener el grosor actual del cuerpo (para rectángulos rotados, usar la dimensión más pequeña del bbox)
-                  const bboxWidth = fibrin.body.bounds.max.x - fibrin.body.bounds.min.x;
-                  const bboxHeight = fibrin.body.bounds.max.y - fibrin.body.bounds.min.y;
-                  currentThickness = Math.min(bboxWidth, bboxHeight);
+                // CRITICAL: El grosor físico debe compensar la proyección del rectángulo rotado
+                // Calcular el grosor necesario para que la proyección vertical sea igual al grosor visual
+                const absSinAngle = Math.abs(Math.sin(angle));
+                const absCosAngle = Math.abs(Math.cos(angle));
+                const projectedWidth = dist * absSinAngle;
+                // En pantallas pequeñas, reducir MUCHO más el grosor físico para evitar colisiones demasiado grandes
+                // En pantallas muy pequeñas, usar directamente el grosor visual sin compensación adicional
+                let targetBarrierThickness;
+                if (scaleFactor < 0.4) {
+                  // En pantallas muy pequeñas, usar directamente el grosor visual sin multiplicadores
+                  targetBarrierThickness = targetVisualLineWidth;
+                } else if (scaleFactor < 0.5) {
+                  // En pantallas pequeñas, reducir significativamente (30% del calculado)
+                  const thicknessReductionFactor = 0.3;
+                  if (projectedWidth >= targetVisualLineWidth) {
+                    targetBarrierThickness = Math.max(targetVisualLineWidth * 0.15 * thicknessReductionFactor, 0.2 * scaleFactor);
+                  } else {
+                    targetBarrierThickness = (targetVisualLineWidth - projectedWidth) / Math.max(absCosAngle, 0.01);
+                    targetBarrierThickness *= thicknessReductionFactor;
+                    targetBarrierThickness = Math.max(targetBarrierThickness, targetVisualLineWidth * 0.1);
+                  }
+                } else if (scaleFactor < 0.8) {
+                  // En pantallas medianas, reducir moderadamente (50% del calculado)
+                  const thicknessReductionFactor = 0.5;
+                  if (projectedWidth >= targetVisualLineWidth) {
+                    targetBarrierThickness = Math.max(targetVisualLineWidth * 0.2 * thicknessReductionFactor, 0.25 * scaleFactor);
+                  } else {
+                    targetBarrierThickness = (targetVisualLineWidth - projectedWidth) / Math.max(absCosAngle, 0.01);
+                    targetBarrierThickness *= thicknessReductionFactor;
+                    targetBarrierThickness = Math.max(targetBarrierThickness, targetVisualLineWidth * 0.15);
+                  }
                 } else {
-                  // Fallback: calcular desde bounding box
-                  const bboxWidth = fibrin.body.bounds.max.x - fibrin.body.bounds.min.x;
-                  const bboxHeight = fibrin.body.bounds.max.y - fibrin.body.bounds.min.y;
-                  currentThickness = Math.min(bboxWidth, bboxHeight);
+                  // En pantallas grandes, usar reducción normal (80% del calculado)
+                  const thicknessReductionFactor = 0.8;
+                  if (projectedWidth >= targetVisualLineWidth) {
+                    targetBarrierThickness = Math.max(targetVisualLineWidth * 0.2 * thicknessReductionFactor, 0.3 * scaleFactor);
+                  } else {
+                    targetBarrierThickness = (targetVisualLineWidth - projectedWidth) / Math.max(absCosAngle, 0.01);
+                    targetBarrierThickness *= thicknessReductionFactor;
+                    targetBarrierThickness = Math.max(targetBarrierThickness, targetVisualLineWidth * 0.25);
+                  }
                 }
                 
-                const heightScale = targetVisualLineWidth / Math.max(currentThickness, 0.1);
+                // Obtener el grosor actual del cuerpo (para rectángulos rotados, usar la dimensión más pequeña del bbox)
+                const bboxWidth = fibrin.body.bounds.max.x - fibrin.body.bounds.min.x;
+                const bboxHeight = fibrin.body.bounds.max.y - fibrin.body.bounds.min.y;
+                const currentThickness = Math.min(bboxWidth, bboxHeight);
+                
+                const heightScale = targetBarrierThickness / Math.max(currentThickness, 0.1);
                 
                 // Only scale if there's a significant difference
-                if (Math.abs(currentWidth - dist) > 1 || Math.abs(currentThickness - targetVisualLineWidth) > 0.3) {
+                // En pantallas pequeñas, usar un umbral más pequeño para detectar diferencias más precisas
+                const thicknessThreshold = scaleFactor < 0.5 ? 0.1 : (scaleFactor < 0.8 ? 0.2 : 0.3);
+                if (Math.abs(currentWidth - dist) > 1 || Math.abs(currentThickness - targetBarrierThickness) > thicknessThreshold) {
                   Body.scale(fibrin.body, widthScale, heightScale);
-                  // Actualizar el grosor base si se escaló
+                  // Actualizar el grosor base si se escaló (usar grosor físico, no visual)
                   if (fibrin.body.baseThickness !== undefined) {
-                    fibrin.body.baseThickness = targetVisualLineWidth / scaleFactor;
+                    fibrin.body.baseThickness = targetBarrierThickness / scaleFactor;
                     fibrin.body.currentScaleFactor = scaleFactor;
                   }
                 }
@@ -1702,7 +1743,7 @@
             isStatic: true,
             render: { visible: false }, // Renderizado personalizado
             label: "wall",
-            restitution: 0.8, // Higher restitution for stronger bounce
+            restitution: 0, // Sin rebote
             friction: 0.1,
             collisionFilter: {
               category: 0x0004, // Wall category
@@ -1723,7 +1764,7 @@
             isStatic: true,
             render: { visible: false }, // Renderizado personalizado
             label: "wall",
-            restitution: 0.8, // Higher restitution for stronger bounce
+            restitution: 0, // Sin rebote
             friction: 0.1,
             collisionFilter: {
               category: 0x0004, // Wall category
@@ -1751,7 +1792,7 @@
             render: { visible: false }, // Renderizado personalizado
             label: "woundEdge",
             isSensor: true, // Cambiar a sensor para que no bloquee físicamente
-            restitution: 0.8,
+            restitution: 0, // Sin rebote
             friction: 0.1,
             collisionFilter: {
               category: 0x0004, // Wall category
@@ -1770,7 +1811,7 @@
             render: { visible: false }, // Renderizado personalizado
             label: "woundEdge",
             isSensor: true, // Cambiar a sensor para que no bloquee físicamente
-            restitution: 0.8,
+            restitution: 0, // Sin rebote
             friction: 0.1,
             collisionFilter: {
               category: 0x0004, // Wall category
@@ -1840,6 +1881,11 @@
 
         state.stuckPlatelets.push(leftAnchorData, rightAnchorData);
 
+        // Crear cuerpos de vWF iniciales para las plaquetas ancla
+        setTimeout(() => {
+          updateVWFBodies();
+        }, 100);
+
         // Try to form fibrin connections from anchor platelets after a delay
         setTimeout(() => {
           if (state.stuckPlatelets.includes(leftAnchorData)) {
@@ -1862,13 +1908,7 @@
 
         switch (type) {
           case "platelet":
-            // En Von Willebrand, las plaquetas tienen alta restitución (rebotan)
-            const conditionConfig = CONFIG.conditions[state.condition];
-            const plateletRestitution = 
-              (state.condition === "vwd" && !state.treatmentApplied) 
-                ? 0.9 // Alta restitución para vWD - rebotan en lugar de adherirse
-                : 0.5; // Rebote medio normal
-            
+            // Sin rebote y alta fricción para todas las plaquetas
             body = Bodies.circle(x, y, BASE_CONFIG.particles.plateletRadius * scaleFactor, {
               render: {
                 fillStyle: "transparent",
@@ -1876,16 +1916,16 @@
                 visible: false, // No renderizar con Matter.js - solo custom
               },
               label: "platelet",
-              restitution: plateletRestitution,
-              friction: 0.1,
-              frictionAir: 0.02, // Reducido para que se muevan más rápido, pero aún suficiente para adhesión
+              restitution: 0, // Sin rebote
+              friction: 0.1, // Fricción normal (se aumentará al colisionar con fibrina)
+              frictionAir: 0.02, // Fricción del aire normal
               density: 0.001,
               isSticky: true,
               isStuck: false,
               collisionFilter: {
                 group: 0,
                 category: 0x0001,
-                mask: 0x0002 | 0x0004, // Collide with fibrin barriers and walls
+                mask: 0x0002 | 0x0004 | 0x0008, // Collide with fibrin barriers, walls, and vWF
               },
               // CRITICAL: Store base radius for recalculation when scaleFactor changes
               baseRadius: BASE_CONFIG.particles.plateletRadius,
@@ -1900,21 +1940,30 @@
 
           case "rbc":
             // Glóbulos rojos: usar círculo pero renderizar como elipse en custom render
-            body = Bodies.circle(x, y, BASE_CONFIG.particles.rbcRadius * scaleFactor, {
+            // CRITICAL: Ajustar el radio físico para que coincida mejor con el tamaño visual
+            // El tamaño visual es radiusX * 2.5, pero el radio visual efectivo es aproximadamente radiusX * 1.25
+            // En pantallas pequeñas, reducir el radio físico para evitar colisiones demasiado grandes
+            const rbcVisualRadius = BASE_CONFIG.particles.rbcRadius * scaleFactor;
+            const rbcPhysicalRadius = scaleFactor < 0.5 
+              ? rbcVisualRadius * 0.7  // En pantallas muy pequeñas, reducir 30%
+              : scaleFactor < 0.8 
+                ? rbcVisualRadius * 0.85  // En pantallas pequeñas, reducir 15%
+                : rbcVisualRadius * 0.95; // En pantallas grandes, reducir solo 5%
+            body = Bodies.circle(x, y, rbcPhysicalRadius, {
               render: {
                 fillStyle: "transparent",
                 strokeStyle: "transparent",
                 visible: false, // No renderizar con Matter.js - solo custom
               },
               label: "rbc",
-              restitution: 0.5, // Rebote medio - ligero, relleno visual
-              friction: 0.05,
-              frictionAir: 0.01,
+              restitution: 0, // Sin rebote
+              friction: 0.05, // Fricción normal (se aumentará al colisionar con fibrina)
+              frictionAir: 0.01, // Fricción del aire normal
               density: 0.0008, // Ligero
               collisionFilter: {
                 group: 0,
                 category: 0x0001, // RBC category
-                mask: 0x0002 | 0x0004, // Collide with fibrin barriers and walls
+                mask: 0x0002 | 0x0004 | 0x0008, // Collide with fibrin barriers, walls, and vWF
               },
               // CRITICAL: Store base radius for recalculation when scaleFactor changes
               baseRadius: BASE_CONFIG.particles.rbcRadius,
@@ -1936,14 +1985,14 @@
               // CRITICAL: Store base radius for recalculation when scaleFactor changes
               baseRadius: BASE_CONFIG.particles.wbcRadius,
               currentScaleFactor: scaleFactor,
-              restitution: 0.7,
-              friction: 0.1,
-              frictionAir: 0.03,
+              restitution: 0, // Sin rebote
+              friction: 0.1, // Fricción normal (se aumentará al colisionar con fibrina)
+              frictionAir: 0.03, // Fricción del aire normal
               density: 0.04, // Pesado - obstáculo visual
               collisionFilter: {
                 group: 0,
                 category: 0x0001, // WBC category
-                mask: 0x0002 | 0x0004, // Collide with fibrin barriers and walls
+                mask: 0x0002 | 0x0004 | 0x0008, // Collide with fibrin barriers, walls, and vWF
               },
             });
             // Agregar timestamp de creación para duración de vida
@@ -2133,25 +2182,26 @@
             state.totalPausedTime += pauseDuration;
             const pauseStartTime = state.pauseStartTime;
             const resumeTime = performance.now();
+            
             // Agregar el tiempo pausado al totalPausedTime de cada partícula que existía antes de la pausa
+            // NO ajustamos createdAt, solo acumulamos el tiempo pausado
             state.allBodies.forEach(body => {
-              if (body.createdAt && body.createdAt < pauseStartTime) {
-                // Partícula creada antes de la pausa: agregar el tiempo pausado a su totalPausedTime
-                if (!body.totalPausedTime) body.totalPausedTime = 0;
-                body.totalPausedTime += pauseDuration;
-              }
-              // Las partículas creadas durante la pausa: ajustar createdAt para que empiecen desde ahora
-              else if (body.createdAt && body.createdAt >= pauseStartTime) {
-                // Estas partículas se crearon durante la pausa, así que ajustamos createdAt para que empiecen desde ahora
-                body.createdAt = resumeTime;
-                body.totalPausedTime = 0;
+              if (body.createdAt) {
+                if (body.createdAt < pauseStartTime) {
+                  // Partícula creada antes de la pausa: agregar el tiempo pausado a su totalPausedTime
+                  if (!body.totalPausedTime) body.totalPausedTime = 0;
+                  body.totalPausedTime += pauseDuration;
+                } else {
+                  // Partícula creada durante la pausa: ajustar createdAt para que empiecen desde ahora
+                  body.createdAt = resumeTime;
+                  body.totalPausedTime = 0;
+                }
               }
               
               // También ajustar fadeOutStart si existe
               if (body.fadeOutStart) {
                 if (body.fadeOutStart < pauseStartTime) {
                   // El fadeOut comenzó antes de la pausa: ajustar fadeOutStart sumando el tiempo pausado
-                  // Esto compensa el tiempo que pasó durante la pausa
                   body.fadeOutStart += pauseDuration;
                 } else {
                   // El fadeOut comenzó durante la pausa: reiniciar al tiempo de reanudación
@@ -2250,11 +2300,22 @@
           const { width, height } = CONFIG.canvas;
           const wallThickness = CONFIG.wall.thickness;
           // CRITICAL: Always use scaled particle radii for consistent collision detection
-          const particleRadius =
-            body.circleRadius ||
-            (body.label === "rbc" ? BASE_CONFIG.particles.rbcRadius * scaleFactor : 
-             body.label === "wbc" ? BASE_CONFIG.particles.wbcRadius * scaleFactor : 
-             BASE_CONFIG.particles.plateletRadius * scaleFactor);
+          // Para glóbulos rojos, aplicar el mismo ajuste que en la creación para que coincida con el tamaño visual
+          let particleRadius = body.circleRadius;
+          if (!particleRadius) {
+            if (body.label === "rbc") {
+              const rbcVisualRadius = BASE_CONFIG.particles.rbcRadius * scaleFactor;
+              particleRadius = scaleFactor < 0.5 
+                ? rbcVisualRadius * 0.7  // En pantallas muy pequeñas, reducir 30%
+                : scaleFactor < 0.8 
+                  ? rbcVisualRadius * 0.85  // En pantallas pequeñas, reducir 15%
+                  : rbcVisualRadius * 0.95; // En pantallas grandes, reducir solo 5%
+            } else if (body.label === "wbc") {
+              particleRadius = BASE_CONFIG.particles.wbcRadius * scaleFactor;
+            } else {
+              particleRadius = BASE_CONFIG.particles.plateletRadius * scaleFactor;
+            }
+          }
 
           // Check top walls (left and right segments)
           const woundX = CONFIG.wound.x;
@@ -2280,10 +2341,12 @@
                 x: body.position.x,
                 y: adhesionLineY + (woundCollisionThreshold + 1) * pushDirection,
               });
+              // Reducir velocidad sin invertir para evitar rebotes
               Body.setVelocity(body, {
-                x: body.velocity.x,
-                y: body.velocity.y * -0.8,
+                x: body.velocity.x * 0.5,
+                y: body.velocity.y * 0.5,
               });
+              body.restitution = 0; // Asegurar sin rebote
             }
           }
 
@@ -2364,14 +2427,14 @@
             }
           }
 
-          // FIBRIN NET BOUNCE - Make RBCs and WBCs bounce off fibrin network
+          // FIBRIN NET INTERACTION - RBCs and WBCs interact with fibrin network without bouncing
           if (
             (body.label === "rbc" || body.label === "wbc") &&
             state.fibrinConstraints.length > 0
           ) {
             const cellRadius = body.label === "rbc" ? 6 : 10;
-            const bounceThreshold = cellRadius + 6; // Increased detection threshold
-            const bounceStrength = body.label === "rbc" ? 0.008 : 0.012; // Much stronger bounce force
+            const bounceThreshold = cellRadius + 6; // Detection threshold
+            // Sin bounce force - solo reducir velocidad cuando están cerca
             const cellPos = body.position;
 
             // Only check fibrin near the wound area for performance
@@ -2459,42 +2522,20 @@
                     body.velocity.x * bounceDir.x +
                     body.velocity.y * bounceDir.y;
 
-                  // Only apply bounce if moving towards the line
+                  // Solo reducir velocidad cuando están cerca, sin rebote
                   if (velocityDot < 0) {
-                    // Bounce force reduced by stability - weaker fibrin = weaker bounce
+                    // Reducir velocidad progresivamente según la proximidad
                     const proximityFactor = 1 - distance / bounceThreshold;
-                    const stabilityMultiplier = 0.3 + fibrinStability * 0.7; // 0.3-1.0 range
-                    const bounceForce =
-                      bounceStrength *
-                      proximityFactor *
-                      proximityFactor *
-                      stabilityMultiplier;
-
-                    // Scale bounce force by timestep for frame independence (use timeScale from function scope)
-                    Body.applyForce(body, body.position, {
-                      x: bounceDir.x * bounceForce * body.mass * 10 * timeScale,
-                      y: bounceDir.y * bounceForce * body.mass * 10 * timeScale,
-                    });
-
-                    // Invert velocity component - effectiveness depends on stability
-                    const bounceFactor =
-                      0.5 + fibrinStability * 0.3 + proximityFactor * 0.2; // 0.5-1.0 range
+                    const speedReduction = 0.3 + proximityFactor * 0.5; // Reducir velocidad entre 30% y 80%
+                    
+                    // Reducir velocidad sin invertirla
                     Body.setVelocity(body, {
-                      x:
-                        body.velocity.x -
-                        bounceDir.x * velocityDot * bounceFactor,
-                      y:
-                        body.velocity.y -
-                        bounceDir.y * velocityDot * bounceFactor,
+                      x: body.velocity.x * speedReduction,
+                      y: body.velocity.y * speedReduction,
                     });
-
-                    // Push cell away from the line - less effective for weak fibrin
-                    const pushDistance =
-                      (bounceThreshold - distance) * 0.3 * fibrinStability;
-                    Body.setPosition(body, {
-                      x: body.position.x + bounceDir.x * pushDistance,
-                      y: body.position.y + bounceDir.y * pushDistance,
-                    });
+                    
+                    // Asegurar que no haya rebote
+                    body.restitution = 0;
                   }
                 }
               }
@@ -2679,6 +2720,11 @@
 
         state.stuckPlatelets.push(plateletData);
 
+        // Actualizar cuerpos de vWF cuando se pega una nueva plaqueta
+        setTimeout(() => {
+          updateVWFBodies();
+        }, 0);
+
         // Rastrear primera adhesión
         if (!state.adhesionTime && state.startTime) {
           state.adhesionTime = Date.now();
@@ -2861,7 +2907,8 @@
             
             // Verificar duración de vida de 7 segundos
             // El tiempo de vida se pausa cuando la simulación está pausada
-            if (body.createdAt) {
+            // CRITICAL: Verificar también aquí para asegurar que no se ejecute durante la pausa
+            if (body.createdAt && !state.isPaused && state.simulationRunning) {
               let age;
               const pausedTime = body.totalPausedTime || 0;
               
@@ -2869,7 +2916,7 @@
                 // Si hay una pausa activa, calcular edad hasta el momento de la pausa
                 if (body.createdAt < state.pauseStartTime) {
                   // Partícula creada antes de la pausa: calcular edad hasta el momento de la pausa
-                  // El tiempo transcurrido es desde createdAt hasta pauseStartTime, menos el tiempo ya pausado anteriormente
+                  // Restamos el tiempo pausado anterior (antes de esta pausa)
                   age = (state.pauseStartTime - body.createdAt - pausedTime) / 1000;
                 } else {
                   // Partícula creada durante la pausa: edad = 0 (no ha envejecido)
@@ -2877,7 +2924,6 @@
                 }
               } else {
                 // No hay pausa activa: calcular edad restando el tiempo total pausado
-                // El tiempo transcurrido es desde createdAt hasta ahora, menos todo el tiempo pausado
                 age = (performance.now() - body.createdAt - pausedTime) / 1000; // Edad en segundos
               }
               
@@ -2982,6 +3028,15 @@
           event.pairs.forEach((pair) => {
             const { bodyA, bodyB } = pair;
 
+            // Aplicar alta fricción cuando comienzan a colisionar con la barrera de fibrina
+            const isFibrinBarrier = (body) => body && body.label === "fibrinBarrier";
+            const isParticle = (body) => body && (body.label === "rbc" || body.label === "wbc" || body.label === "platelet");
+            if (isFibrinBarrier(bodyA) && isParticle(bodyB) && !bodyB.isStuck) {
+              bodyB.friction = 0.9; // Alta fricción al rozar con la fibrina
+            } else if (isParticle(bodyA) && isFibrinBarrier(bodyB) && !bodyA.isStuck) {
+              bodyA.friction = 0.9; // Alta fricción al rozar con la fibrina
+            }
+
             // Check for platelet collision with wound edges or stuck platelets
             handlePlateletCollision(bodyA, bodyB);
             handlePlateletCollision(bodyB, bodyA);
@@ -2989,56 +3044,183 @@
             // Handle weak fibrin barrier collisions - allow occasional passage
             handleFibrinBarrierCollision(bodyA, bodyB);
             handleFibrinBarrierCollision(bodyB, bodyA);
+
+            // Handle vWF collisions - particles stick to vWF lines
+            handleVWFCollision(bodyA, bodyB);
+            handleVWFCollision(bodyB, bodyA);
           });
+        });
+        
+        // También escuchar collisionActive para capturar partículas que están en contacto continuo
+        // Pero limitar el procesamiento para evitar que todas se peguen simultáneamente
+        let lastFibrinProcessTime = 0;
+        const minTimeBetweenFibrinProcesses = 50; // Procesar máximo cada 50ms
+        
+        Events.on(engine, "collisionActive", (event) => {
+          const currentTime = performance.now();
+          // Limitar la frecuencia de procesamiento para evitar que todas se peguen a la vez
+          if (currentTime - lastFibrinProcessTime < minTimeBetweenFibrinProcesses) {
+            return;
+          }
+          
+          // Procesar solo el primer par que encontremos que sea válido
+          for (const pair of event.pairs) {
+            const { bodyA, bodyB } = pair;
+            const isFibrinBarrier = (body) => body && body.label === "fibrinBarrier";
+            const isParticle = (body) => body && (body.label === "rbc" || body.label === "wbc" || body.label === "platelet");
+            
+            // Verificar si es una colisión de fibrina y si la partícula no está ya pegada
+            let actualParticle;
+            if (isFibrinBarrier(bodyA) && isParticle(bodyB) && !bodyB.isStuck && !bodyB.fibrinConstraint) {
+              actualParticle = bodyB;
+            } else if (isParticle(bodyA) && isFibrinBarrier(bodyB) && !bodyA.isStuck && !bodyA.fibrinConstraint) {
+              actualParticle = bodyA;
+            }
+            
+            // Aplicar alta fricción cuando están en contacto con la barrera de fibrina
+            if (isFibrinBarrier(bodyA) && isParticle(bodyB) && !bodyB.isStuck) {
+              bodyB.friction = 0.9; // Alta fricción al rozar con la fibrina
+            } else if (isParticle(bodyA) && isFibrinBarrier(bodyB) && !bodyA.isStuck) {
+              bodyA.friction = 0.9; // Alta fricción al rozar con la fibrina
+            }
+            
+            // Si encontramos una partícula válida, procesarla y salir
+            if (actualParticle) {
+              lastFibrinProcessTime = currentTime;
+              handleFibrinBarrierCollision(bodyA, bodyB);
+              break; // Solo procesar una partícula por frame
+            }
+          }
         });
       }
 
-      function handleFibrinBarrierCollision(cell, barrier) {
-        // Check if cell (RBC/WBC) collides with fibrin barrier
-        if (
-          (cell.label !== "rbc" && cell.label !== "wbc") ||
-          barrier.label !== "fibrinBarrier"
-        ) {
+      function handleFibrinBarrierCollision(particle, barrier) {
+        // Verificar si es una colisión entre una partícula y barrera de fibrina
+        // Verificar ambos órdenes posibles de la colisión
+        const isFibrinBarrier = (body) => body && body.label === "fibrinBarrier";
+        const isParticle = (body) => body && (body.label === "rbc" || body.label === "wbc" || body.label === "platelet");
+        
+        let actualParticle, actualBarrier;
+        if (isFibrinBarrier(particle) && isParticle(barrier)) {
+          actualParticle = barrier;
+          actualBarrier = particle;
+        } else if (isParticle(particle) && isFibrinBarrier(barrier)) {
+          actualParticle = particle;
+          actualBarrier = barrier;
+        } else {
+          return; // No es una colisión fibrina-partícula
+        }
+        
+        if (!actualParticle || !actualBarrier) return;
+        if (actualParticle.isStuck) return; // Ya está pegada
+        
+        // Verificar que la partícula no tenga ya un constraint de fibrina
+        if (actualParticle.fibrinConstraint) return;
+        
+        // Marcar que esta partícula está siendo procesada para evitar procesamiento múltiple
+        if (actualParticle._processingFibrinStick) return;
+        actualParticle._processingFibrinStick = true;
+        
+        // Verificar que la partícula aún existe y está en el mundo
+        if (!actualParticle.position || !actualParticle.id) {
+          actualParticle._processingFibrinStick = false;
           return;
         }
 
-        // Get fibrin stability from barrier
-        const fibrinStability = barrier.fibrinStability || 1.0;
+        // CRÍTICO: Detener la velocidad inmediatamente SOLO de esta partícula específica
+        // NO hacerla estática todavía para evitar afectar otras partículas
+        Body.setVelocity(actualParticle, { x: 0, y: 0 });
+        Body.setAngularVelocity(actualParticle, 0);
+        
+        // Reducir temporalmente la velocidad para evitar que pase a través
+        actualParticle.restitution = 0; // Sin rebote
+        actualParticle.friction = 1.0; // Máxima fricción
+        
+        // Marcar como pegada inmediatamente para que otras funciones la ignoren
+        actualParticle.isStuck = true;
 
-        // Si está sellado, bloquear completamente el paso
-        if (state.hemostasisAchieved) {
-          return; // No permitir paso cuando está sellado
-        }
-
-        // Weak fibrin occasionally allows cells to pass through
-        if (fibrinStability < 0.6) {
-          const passThroughChance = (1 - fibrinStability) * 0.4; // Up to 40% chance for very weak fibrin
-
-          if (Math.random() < passThroughChance) {
-            // Allow cell to pass through - make barrier temporarily non-collidable
-            barrier.collisionFilter.mask = 0x0000; // No collisions
-
-            // Restore collision after a short time
-            setTimeout(() => {
-              if (barrier.label === "fibrinBarrier") {
-                barrier.collisionFilter.mask = 0x0001;
-              }
-            }, 500);
-
-            // Reduce cell velocity slightly as it passes through
-            Body.setVelocity(cell, {
-              x: cell.velocity.x * 0.85,
-              y: cell.velocity.y * 0.85,
-            });
-          } else {
-            // Reduce bounce effectiveness for weak fibrin
-            const bounceReduction = 1 - fibrinStability;
-            Body.setVelocity(cell, {
-              x: cell.velocity.x * (1 - bounceReduction * 0.3),
-              y: cell.velocity.y * (1 - bounceReduction * 0.3),
-            });
+        // Usar setTimeout para evitar que se ejecute durante el manejo de colisiones
+        // Esto previene que múltiples partículas se peguen simultáneamente
+        setTimeout(() => {
+          // Verificar nuevamente que no se haya pegado mientras esperábamos
+          if (actualParticle.fibrinConstraint) {
+            actualParticle._processingFibrinStick = false;
+            return;
           }
-        }
+          
+          // Verificar que la partícula aún existe antes de continuar
+          if (!actualParticle || !actualParticle.position || !actualParticle.id) {
+            actualParticle._processingFibrinStick = false;
+            return;
+          }
+          
+          // Asegurar que el movimiento esté completamente detenido SOLO de esta partícula
+          Body.setVelocity(actualParticle, { x: 0, y: 0 });
+          Body.setAngularVelocity(actualParticle, 0);
+          
+          // AHORA hacer la partícula estática después de crear el constraint
+          Body.setStatic(actualParticle, true);
+          
+          // Desactivar cualquier fuerza aplicada SOLO a esta partícula
+          Body.setForce(actualParticle, { x: 0, y: 0 });
+          Body.setTorque(actualParticle, 0);
+
+          // Crear constraint para mantenerla pegada al punto de colisión en la línea de fibrina
+          // Calcular el punto más cercano en la línea de fibrina
+          const fibrinLength = actualBarrier.bounds.max.x - actualBarrier.bounds.min.x;
+          const fibrinHalfLength = fibrinLength / 2;
+          const fibrinStart = {
+            x: actualBarrier.position.x - fibrinHalfLength * Math.cos(actualBarrier.angle),
+            y: actualBarrier.position.y - fibrinHalfLength * Math.sin(actualBarrier.angle)
+          };
+          const fibrinEnd = {
+            x: actualBarrier.position.x + fibrinHalfLength * Math.cos(actualBarrier.angle),
+            y: actualBarrier.position.y + fibrinHalfLength * Math.sin(actualBarrier.angle)
+          };
+          
+          // Encontrar el punto más cercano en el segmento de línea
+          const dx = fibrinEnd.x - fibrinStart.x;
+          const dy = fibrinEnd.y - fibrinStart.y;
+          const lengthSq = dx * dx + dy * dy;
+          let t = 0;
+          if (lengthSq > 0) {
+            t = Math.max(0, Math.min(1, ((actualParticle.position.x - fibrinStart.x) * dx + (actualParticle.position.y - fibrinStart.y) * dy) / lengthSq));
+          }
+          const closestPoint = {
+            x: fibrinStart.x + t * dx,
+            y: fibrinStart.y + t * dy
+          };
+
+          const constraint = Constraint.create({
+            bodyA: actualParticle,
+            pointB: closestPoint,
+            stiffness: 1.0,
+            damping: 0.8,
+            length: 0,
+            render: { visible: false },
+          });
+
+          Composite.add(engine.world, constraint);
+          
+          // Guardar referencia al constraint en la partícula
+          actualParticle.fibrinConstraint = constraint;
+          actualParticle.stuckToFibrin = true;
+          actualParticle._processingFibrinStick = false; // Limpiar el flag
+
+          // Agregar a stuckPlatelets si es una plaqueta
+          if (actualParticle.label === "platelet") {
+            const plateletData = {
+              body: actualParticle,
+              constraint: constraint,
+              hasFibrin: false,
+              fibrinConnections: [],
+              condition: state.condition,
+              stuckAt: Date.now(),
+              isAnchor: false,
+            };
+            state.stuckPlatelets.push(plateletData);
+          }
+        }, 0);
       }
 
       function handlePlateletCollision(platelet, other) {
@@ -3095,17 +3277,14 @@
                 ? 0.9
                 : conditionConfig.aggregationRate;
               if (Math.random() > aggregationRate) {
-                // Failed aggregation - plaquetas rebotan/se separan (sin cemento vWF)
-                platelet.restitution = 0.9;
-                // En vWD, rebote más fuerte para simular que no hay cemento
-                const bounceStrength =
-                  state.condition === "vwd" && !state.treatmentApplied
-                    ? 1.5
-                    : 1.0;
+                // Failed aggregation - plaquetas se separan sin rebote
+                platelet.restitution = 0; // Sin rebote
+                // Reducir velocidad sin rebote para simular que no hay cemento
                 Body.setVelocity(platelet, {
-                  x: platelet.velocity.x * (0.8 * bounceStrength),
-                  y: Math.abs(platelet.velocity.y) * (1.2 * bounceStrength) + 1,
+                  x: platelet.velocity.x * 0.5,
+                  y: platelet.velocity.y * 0.5,
                 });
+                platelet.restitution = 0; // Asegurar sin rebote
                 return;
               }
             }
@@ -3183,6 +3362,12 @@
         };
 
         state.stuckPlatelets.push(plateletData);
+
+        // Actualizar cuerpos de vWF cuando se pega una nueva plaqueta
+        // Usar setTimeout para evitar que se ejecute durante el manejo de colisiones
+        setTimeout(() => {
+          updateVWFBodies();
+        }, 0);
 
         // Rastrear primera adhesión
         if (!state.adhesionTime && state.startTime) {
@@ -3368,8 +3553,56 @@
                 visualLineWidth = Math.max(1.5, 2 * scaleFactor);
                 break;
             }
-            // El grosor físico debe ser igual al grosor visual para que coincidan exactamente
-            const barrierThickness = visualLineWidth;
+            // CRITICAL: El grosor físico debe compensar la proyección del rectángulo rotado
+            // Cuando un rectángulo está rotado, su bounding box axis-aligned puede ser más grande
+            // Para un rectángulo con ancho 'w' y alto 'h' rotado en ángulo 'θ':
+            // bbox_height = w * |sin(θ)| + h * |cos(θ)|
+            // Necesitamos ajustar 'h' para que bbox_height ≈ visualLineWidth
+            // Si la línea está casi horizontal (θ ≈ 0), entonces bbox_height ≈ h
+            // Pero si tiene un ángulo pequeño, necesitamos reducir h para compensar
+            const absSinAngle = Math.abs(Math.sin(angle));
+            const absCosAngle = Math.abs(Math.cos(angle));
+            // Calcular el grosor necesario para que la proyección vertical sea igual al grosor visual
+            // bbox_height = dist * absSinAngle + barrierThickness * absCosAngle = visualLineWidth
+            // barrierThickness = (visualLineWidth - dist * absSinAngle) / absCosAngle
+            const projectedWidth = dist * absSinAngle;
+            // En pantallas pequeñas, reducir MUCHO más el grosor físico para evitar colisiones demasiado grandes
+            // En pantallas muy pequeñas, usar directamente el grosor visual sin compensación adicional
+            let barrierThickness;
+            if (scaleFactor < 0.4) {
+              // En pantallas muy pequeñas, usar directamente el grosor visual sin multiplicadores
+              barrierThickness = visualLineWidth;
+            } else if (scaleFactor < 0.5) {
+              // En pantallas pequeñas, reducir significativamente (30% del calculado)
+              const thicknessReductionFactor = 0.3;
+              if (projectedWidth >= visualLineWidth) {
+                barrierThickness = Math.max(visualLineWidth * 0.15 * thicknessReductionFactor, 0.2 * scaleFactor);
+              } else {
+                barrierThickness = (visualLineWidth - projectedWidth) / Math.max(absCosAngle, 0.01);
+                barrierThickness *= thicknessReductionFactor;
+                barrierThickness = Math.max(barrierThickness, visualLineWidth * 0.1);
+              }
+            } else if (scaleFactor < 0.8) {
+              // En pantallas medianas, reducir moderadamente (50% del calculado)
+              const thicknessReductionFactor = 0.5;
+              if (projectedWidth >= visualLineWidth) {
+                barrierThickness = Math.max(visualLineWidth * 0.2 * thicknessReductionFactor, 0.25 * scaleFactor);
+              } else {
+                barrierThickness = (visualLineWidth - projectedWidth) / Math.max(absCosAngle, 0.01);
+                barrierThickness *= thicknessReductionFactor;
+                barrierThickness = Math.max(barrierThickness, visualLineWidth * 0.15);
+              }
+            } else {
+              // En pantallas grandes, usar reducción normal (80% del calculado)
+              const thicknessReductionFactor = 0.8;
+              if (projectedWidth >= visualLineWidth) {
+                barrierThickness = Math.max(visualLineWidth * 0.2 * thicknessReductionFactor, 0.3 * scaleFactor);
+              } else {
+                barrierThickness = (visualLineWidth - projectedWidth) / Math.max(absCosAngle, 0.01);
+                barrierThickness *= thicknessReductionFactor;
+                barrierThickness = Math.max(barrierThickness, visualLineWidth * 0.25);
+              }
+            }
             const fibrinBody = Bodies.rectangle(
               midX,
               midY,
@@ -3382,12 +3615,12 @@
                   visible: false,
                 },
                 label: "fibrinBarrier",
-                restitution: 0.9 * fibrinStability, // Stability affects bounce
-                friction: 0.1,
+                restitution: 0.2 * fibrinStability, // Lower restitution for less bounce
+                friction: 0.9, // Alta fricción para que las partículas se deslicen menos
                 collisionFilter: {
                   group: 0,
                   category: 0x0002, // Separate category for fibrin
-                  mask: 0x0001, // Only collide with RBCs and WBCs
+                  mask: 0x0001, // Collide with all particles (RBCs, WBCs, and platelets)
                 },
                 // Store stability and fibrinType for collision handling and updates
                 fibrinStability: fibrinStability,
@@ -4180,6 +4413,178 @@
           : { r: 0, g: 230, b: 118 };
       }
 
+      function updateVWFBodies() {
+        // Eliminar cuerpos de vWF existentes
+        state.vWFBodies.forEach(body => {
+          Composite.remove(engine.world, body);
+        });
+        state.vWFBodies = [];
+
+        // Verificar si debe crear vWF (cemento entre plaquetas)
+        const conditionConfig = CONFIG.conditions[state.condition];
+        const shouldShowVWF =
+          state.condition === "normal" ||
+          state.treatmentApplied ||
+          (state.condition === "vwd" && state.treatmentApplied);
+
+        if (!shouldShowVWF || state.stuckPlatelets.length < 2) {
+          return; // No crear vWF si no hay vWF o menos de 2 plaquetas
+        }
+
+        // Crear cuerpos físicos para las líneas de vWF
+        const maxVWFDistance = 15 * scaleFactor; // Distancia máxima escalada con scaleFactor (aumentada para cubrir más área)
+        const maxVWFDistanceSq = maxVWFDistance * maxVWFDistance;
+        const minDist = Math.max(2, 4 * scaleFactor); // Mínimo 2px, escalado con scaleFactor
+        const minDistSq = minDist * minDist;
+        const vWFThickness = Math.max(10, 15 * scaleFactor); // Grosor de la línea física (aumentado para mejor detección)
+
+        for (let i = 0; i < state.stuckPlatelets.length; i++) {
+          const plateletA = state.stuckPlatelets[i];
+          if (!plateletA.body) continue;
+
+          const posA = plateletA.body.position;
+
+          for (let j = i + 1; j < state.stuckPlatelets.length; j++) {
+            const plateletB = state.stuckPlatelets[j];
+            if (!plateletB.body) continue;
+
+            const posB = plateletB.body.position;
+            const dx = posB.x - posA.x;
+            const dy = posB.y - posA.y;
+            const distSq = dx * dx + dy * dy;
+
+            // Solo crear cuerpo físico si están cerca
+            if (distSq < maxVWFDistanceSq && distSq > minDistSq) {
+              const dist = Math.sqrt(distSq);
+              const angle = Math.atan2(dy, dx);
+              const centerX = (posA.x + posB.x) / 2;
+              const centerY = (posA.y + posB.y) / 2;
+
+              // Crear un rectángulo delgado para la línea de vWF
+              const vWFBody = Bodies.rectangle(
+                centerX,
+                centerY,
+                dist,
+                vWFThickness,
+                {
+                  label: "vWF",
+                  isStatic: true,
+                  render: {
+                    fillStyle: "transparent",
+                    strokeStyle: "transparent",
+                    visible: false, // No renderizar con Matter.js - solo custom
+                  },
+                  collisionFilter: {
+                    group: 0,
+                    category: 0x0008, // Categoría para vWF
+                    mask: 0x0001, // Solo colisionar con partículas (RBC, WBC, plaquetas)
+                  },
+                  angle: angle,
+                }
+              );
+
+              Composite.add(engine.world, vWFBody);
+              state.vWFBodies.push(vWFBody);
+            }
+          }
+        }
+      }
+
+      function handleVWFCollision(particle, vWFBody) {
+        // Verificar si es una colisión entre una partícula y vWF
+        // Verificar ambos órdenes posibles de la colisión
+        const isVWF = (body) => body && body.label === "vWF";
+        const isParticle = (body) => body && (body.label === "rbc" || body.label === "wbc" || body.label === "platelet");
+        
+        let actualParticle, actualVWF;
+        if (isVWF(particle) && isParticle(vWFBody)) {
+          actualParticle = vWFBody;
+          actualVWF = particle;
+        } else if (isParticle(particle) && isVWF(vWFBody)) {
+          actualParticle = particle;
+          actualVWF = vWFBody;
+        } else {
+          return; // No es una colisión vWF-partícula
+        }
+        
+        if (!actualParticle || !actualVWF) return;
+        if (actualParticle.isStuck) return; // Ya está pegada
+
+        // Hacer que la partícula se quede pegada al vWF
+        actualParticle.isStuck = true;
+        
+        // Detener el movimiento completamente
+        Body.setVelocity(actualParticle, { x: 0, y: 0 });
+        Body.setAngularVelocity(actualParticle, 0);
+        
+        // Hacer la partícula estática
+        Body.setStatic(actualParticle, true);
+        
+        // Desactivar cualquier fuerza aplicada
+        Body.setForce(actualParticle, { x: 0, y: 0 });
+        Body.setTorque(actualParticle, 0);
+
+        // Crear constraint para mantenerla pegada al punto de colisión en la línea de vWF
+        // Calcular el punto más cercano en la línea de vWF
+        const vWFLength = actualVWF.bounds.max.x - actualVWF.bounds.min.x;
+        const vWFHalfLength = vWFLength / 2;
+        const vWFStart = {
+          x: actualVWF.position.x - vWFHalfLength * Math.cos(actualVWF.angle),
+          y: actualVWF.position.y - vWFHalfLength * Math.sin(actualVWF.angle)
+        };
+        const vWFEnd = {
+          x: actualVWF.position.x + vWFHalfLength * Math.cos(actualVWF.angle),
+          y: actualVWF.position.y + vWFHalfLength * Math.sin(actualVWF.angle)
+        };
+        
+        // Encontrar el punto más cercano en el segmento de línea
+        const dx = vWFEnd.x - vWFStart.x;
+        const dy = vWFEnd.y - vWFStart.y;
+        const lengthSq = dx * dx + dy * dy;
+        let t = 0;
+        if (lengthSq > 0) {
+          t = Math.max(0, Math.min(1, ((actualParticle.position.x - vWFStart.x) * dx + (actualParticle.position.y - vWFStart.y) * dy) / lengthSq));
+        }
+        const closestPoint = {
+          x: vWFStart.x + t * dx,
+          y: vWFStart.y + t * dy
+        };
+
+        const constraint = Constraint.create({
+          bodyA: actualParticle,
+          pointB: closestPoint,
+          stiffness: 1.0,
+          damping: 0.8,
+          length: 0,
+          render: { visible: false },
+        });
+
+        Composite.add(engine.world, constraint);
+        
+        // Guardar referencia al constraint en la partícula
+        actualParticle.vWFConstraint = constraint;
+        actualParticle.stuckToVWF = true;
+
+        // Agregar a stuckPlatelets si es una plaqueta
+        if (actualParticle.label === "platelet") {
+          const plateletData = {
+            body: actualParticle,
+            constraint: constraint,
+            hasFibrin: false,
+            fibrinConnections: [],
+            condition: state.condition,
+            stuckAt: Date.now(),
+            isAnchor: false,
+          };
+          state.stuckPlatelets.push(plateletData);
+          // Actualizar cuerpos de vWF cuando se pega una nueva plaqueta
+          // Usar setTimeout para evitar que se ejecute durante el manejo de colisiones
+          setTimeout(() => {
+            updateVWFBodies();
+          }, 0);
+        }
+      }
+
       function renderVWF(event) {
         const ctx = render.context;
         const dpr = window.devicePixelRatio || 1;
@@ -4282,16 +4687,18 @@
           const angle = body.angle;
 
           // Calcular tamaño de renderizado según el tipo de partícula
+          // En pantallas móviles pequeñas, aumentar el tamaño visual para mejor visibilidad
+          const mobileSizeMultiplier = scaleFactor < 0.5 ? 1.4 : (scaleFactor < 0.8 ? 1.2 : 1.0);
           let renderSize;
           if (body.label === "rbc") {
             const radiusX = BASE_CONFIG.particles.rbcRadius * scaleFactor;
-            renderSize = radiusX * 2.5; // Ajustar según el tamaño del SVG (viewBox 500x350, rx=200)
+            renderSize = radiusX * 2.5 * mobileSizeMultiplier; // Ajustar según el tamaño del SVG (viewBox 500x350, rx=200)
           } else if (body.label === "wbc") {
             const radius = BASE_CONFIG.particles.wbcRadius * scaleFactor;
-            renderSize = radius * 2.2; // Ajustar según el tamaño del SVG (viewBox 400x400, r=180)
+            renderSize = radius * 2.2 * mobileSizeMultiplier; // Ajustar según el tamaño del SVG (viewBox 400x400, r=180)
           } else { // platelet
             const radius = BASE_CONFIG.particles.plateletRadius * scaleFactor;
-            renderSize = radius * 2.2; // Ajustar según el tamaño del SVG (viewBox 400x400, r=180)
+            renderSize = radius * 2.2 * mobileSizeMultiplier; // Ajustar según el tamaño del SVG (viewBox 400x400, r=180)
           }
 
           ctx.save();
@@ -4633,8 +5040,9 @@
         // Cambiar propiedades físicas de todas las plaquetas flotantes
         state.allBodies.forEach((body) => {
           if (body.label === "platelet" && !body.isStuck) {
-            // Cambiar restitución para que se peguen (reducir rebote)
-            body.restitution = 0.5; // Rebote normal
+            // Sin rebote, fricción normal (se aumentará al colisionar con fibrina)
+            body.restitution = 0; // Sin rebote
+            body.friction = 0.1; // Fricción normal
             body.isSticky = true; // Permitir adhesión
             Body.setVelocity(body, {
               x: body.velocity.x * 0.8, // Reducir velocidad para facilitar adhesión
@@ -4951,20 +5359,78 @@
                     break;
                 }
                 
+                // Buscar el constraint asociado para obtener la distancia real entre los puntos
+                let dist = 0;
+                const associatedFibrin = state.fibrinConstraints.find(f => f.body === fibrinBody);
+                if (associatedFibrin && associatedFibrin.pointA && associatedFibrin.pointB) {
+                  const dx = associatedFibrin.pointB.position.x - associatedFibrin.pointA.position.x;
+                  const dy = associatedFibrin.pointB.position.y - associatedFibrin.pointA.position.y;
+                  dist = Math.sqrt(dx * dx + dy * dy);
+                } else {
+                  // Fallback: estimar desde el bounding box
+                  const bboxWidth = fibrinBody.bounds.max.x - fibrinBody.bounds.min.x;
+                  const bboxHeight = fibrinBody.bounds.max.y - fibrinBody.bounds.min.y;
+                  // Para un rectángulo rotado, el ancho real es aproximadamente la dimensión mayor
+                  dist = Math.max(bboxWidth, bboxHeight);
+                }
+                
+                // CRITICAL: El grosor físico debe compensar la proyección del rectángulo rotado
+                const angle = fibrinBody.angle;
+                const absSinAngle = Math.abs(Math.sin(angle));
+                const absCosAngle = Math.abs(Math.cos(angle));
+                const projectedWidth = dist * absSinAngle;
+                // En pantallas pequeñas, reducir MUCHO más el grosor físico para evitar colisiones demasiado grandes
+                // En pantallas muy pequeñas, usar directamente el grosor visual sin compensación adicional
+                let targetBarrierThickness;
+                if (scaleFactor < 0.4) {
+                  // En pantallas muy pequeñas, usar directamente el grosor visual sin multiplicadores
+                  targetBarrierThickness = targetVisualLineWidth;
+                } else if (scaleFactor < 0.5) {
+                  // En pantallas pequeñas, reducir significativamente (30% del calculado)
+                  const thicknessReductionFactor = 0.3;
+                  if (projectedWidth >= targetVisualLineWidth) {
+                    targetBarrierThickness = Math.max(targetVisualLineWidth * 0.15 * thicknessReductionFactor, 0.2 * scaleFactor);
+                  } else {
+                    targetBarrierThickness = (targetVisualLineWidth - projectedWidth) / Math.max(absCosAngle, 0.01);
+                    targetBarrierThickness *= thicknessReductionFactor;
+                    targetBarrierThickness = Math.max(targetBarrierThickness, targetVisualLineWidth * 0.1);
+                  }
+                } else if (scaleFactor < 0.8) {
+                  // En pantallas medianas, reducir moderadamente (50% del calculado)
+                  const thicknessReductionFactor = 0.5;
+                  if (projectedWidth >= targetVisualLineWidth) {
+                    targetBarrierThickness = Math.max(targetVisualLineWidth * 0.2 * thicknessReductionFactor, 0.25 * scaleFactor);
+                  } else {
+                    targetBarrierThickness = (targetVisualLineWidth - projectedWidth) / Math.max(absCosAngle, 0.01);
+                    targetBarrierThickness *= thicknessReductionFactor;
+                    targetBarrierThickness = Math.max(targetBarrierThickness, targetVisualLineWidth * 0.15);
+                  }
+                } else {
+                  // En pantallas grandes, usar reducción normal (80% del calculado)
+                  const thicknessReductionFactor = 0.8;
+                  if (projectedWidth >= targetVisualLineWidth) {
+                    targetBarrierThickness = Math.max(targetVisualLineWidth * 0.2 * thicknessReductionFactor, 0.3 * scaleFactor);
+                  } else {
+                    targetBarrierThickness = (targetVisualLineWidth - projectedWidth) / Math.max(absCosAngle, 0.01);
+                    targetBarrierThickness *= thicknessReductionFactor;
+                    targetBarrierThickness = Math.max(targetBarrierThickness, targetVisualLineWidth * 0.25);
+                  }
+                }
+                
                 // Get current thickness - para un rectángulo rotado, usar la dimensión más pequeña del bbox
                 const bboxWidth = fibrinBody.bounds.max.x - fibrinBody.bounds.min.x;
                 const bboxHeight = fibrinBody.bounds.max.y - fibrinBody.bounds.min.y;
                 const currentThickness = Math.min(bboxWidth, bboxHeight);
                 
                 // Calculate scale factor for height (thickness)
-                const heightScale = targetVisualLineWidth / Math.max(currentThickness, 0.1);
+                const heightScale = targetBarrierThickness / Math.max(currentThickness, 0.1);
                 
                 // Only scale height (thickness), keep width as is (it will be updated by the beforeUpdate handler)
                 if (Math.abs(heightScale - 1) > 0.01) {
                   Body.scale(fibrinBody, 1, heightScale);
-                  // Actualizar el grosor base y el scaleFactor actual
+                  // Actualizar el grosor base y el scaleFactor actual (usar grosor físico, no visual)
                   if (fibrinBody.baseThickness !== undefined) {
-                    fibrinBody.baseThickness = targetVisualLineWidth / scaleFactor;
+                    fibrinBody.baseThickness = targetBarrierThickness / scaleFactor;
                   }
                   fibrinBody.currentScaleFactor = scaleFactor;
                 }
@@ -4990,7 +5456,16 @@
                 }
                 
                 // Calculate target radius with new scaleFactor
-                const targetRadius = baseRadius * scaleFactor;
+                // Para glóbulos rojos, aplicar el mismo ajuste que en la creación
+                let targetRadius = baseRadius * scaleFactor;
+                if (body.label === "rbc") {
+                  const rbcVisualRadius = targetRadius;
+                  targetRadius = scaleFactor < 0.5 
+                    ? rbcVisualRadius * 0.7  // En pantallas muy pequeñas, reducir 30%
+                    : scaleFactor < 0.8 
+                      ? rbcVisualRadius * 0.85  // En pantallas pequeñas, reducir 15%
+                      : rbcVisualRadius * 0.95; // En pantallas grandes, reducir solo 5%
+                }
                 const currentRadius = body.circleRadius || (body.bounds.max.x - body.bounds.min.x) / 2;
                 
                 // Scale particle if radius changed significantly
