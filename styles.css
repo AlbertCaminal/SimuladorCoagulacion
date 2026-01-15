@@ -44,6 +44,7 @@
     flex-direction: row;
     flex-wrap: wrap;
     gap: calc(10px * var(--ui-scale));
+    padding: 0 calc(16px * var(--ui-scale));
   }
   
   .simulation-controls-row .control-btn-large {
@@ -60,10 +61,16 @@
   }
   
   .simulation-controls-row .treatment-btn.control-btn-large {
-    width: calc(320px * var(--ui-scale));
-    min-width: calc(320px * var(--ui-scale));
-    max-width: calc(320px * var(--ui-scale));
+    width: 100% !important;
+    min-width: 100% !important;
+    max-width: 100% !important;
     font-size: calc(1.1rem * var(--ui-scale)) !important;
+  }
+  
+  .simulation-controls-row .treatment-btn.control-btn-large.applied {
+    width: 100% !important;
+    min-width: 100% !important;
+    max-width: 100% !important;
   }
   
   .simulation-controls-row .control-btn-small {

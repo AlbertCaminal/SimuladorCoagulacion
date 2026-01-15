@@ -4724,7 +4724,7 @@
 
           // Calcular tamaño de renderizado según el tipo de partícula
           // En pantallas móviles pequeñas, aumentar el tamaño visual para mejor visibilidad
-          const mobileSizeMultiplier = scaleFactor < 0.5 ? 1.4 : (scaleFactor < 0.8 ? 1.2 : 1.0);
+          const mobileSizeMultiplier = scaleFactor < 0.5 ? 1.8 : (scaleFactor < 0.8 ? 1.5 : (scaleFactor < 1.0 ? 1.2 : 1.0));
           let renderSize;
           if (body.label === "rbc") {
             const radiusX = BASE_CONFIG.particles.rbcRadius * scaleFactor;
