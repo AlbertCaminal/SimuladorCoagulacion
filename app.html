@@ -119,12 +119,6 @@
         <section class="viewer-section">
           
           <div class="viewer-container">
-            <!-- Contador de FPS -->
-            <div class="fps-counter" id="fps-counter">FPS: --</div>
-            
-            <!-- Contador de partículas -->
-            <div class="particles-counter" id="particles-counter">Partículas: 0</div>
-            
             <!-- Leyenda dentro del visor -->
           <div class="legend">
             <div class="legend-item tooltip-container">
@@ -200,56 +194,77 @@
 
           <!-- Contenedor de botones de control -->
           <div class="simulation-controls-row">
-            <button 
-              class="start-btn control-btn-large" 
-              id="start-btn"
-              aria-label="Iniciar la simulación"
-              title="Iniciar simulación (Alt+S)"
-            >
-              <svg class="btn-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
-                <polygon points="5 3 19 12 5 21 5 3"></polygon>
-              </svg>
-              Iniciar Simulación
-            </button>
-            <button 
-              class="reset-btn control-btn-small" 
-              id="reset-btn"
-              aria-label="Reiniciar la simulación"
-              title="Reiniciar simulación (Alt+R)"
-            >
-              <svg class="btn-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
-                <polyline points="23 4 23 10 17 10"></polyline>
-                <polyline points="1 20 1 14 7 14"></polyline>
-                <path d="M3.51 9a9 9 0 0 1 14.85-3.36L23 10M1 14l4.64 4.36A9 9 0 0 0 20.49 15"></path>
-              </svg>
-              Reiniciar
-            </button>
-            <div class="speed-control control-speed">
-              <label>
-                <svg class="speed-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
-                  <polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"></polygon>
+            <div class="controls-left-group">
+              <button 
+                class="start-btn control-btn-large" 
+                id="start-btn"
+                aria-label="Iniciar la simulación"
+                title="Iniciar simulación (Alt+S)"
+              >
+                <svg class="btn-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                  <polygon points="5 3 19 12 5 21 5 3"></polygon>
                 </svg>
-                Velocidad:
-              </label>
-              <input
-                type="range"
-                class="speed-slider"
-                id="speed-slider"
-                min="0.25"
-                max="2"
-                step="0.25"
-                value="1"
-              />
-              <span id="speed-value">1x</span>
+                Iniciar
+              </button>
+              <button 
+                class="reset-btn control-btn-small" 
+                id="reset-btn"
+                aria-label="Reiniciar la simulación"
+                title="Reiniciar simulación (Alt+R)"
+              >
+                <svg class="btn-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                  <polyline points="23 4 23 10 17 10"></polyline>
+                  <polyline points="1 20 1 14 7 14"></polyline>
+                  <path d="M3.51 9a9 9 0 0 1 14.85-3.36L23 10M1 14l4.64 4.36A9 9 0 0 0 20.49 15"></path>
+                </svg>
+                Reiniciar
+              </button>
+              <div class="speed-control control-speed">
+                <label>
+                  <svg class="speed-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                    <polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"></polygon>
+                  </svg>
+                  Velocidad:
+                </label>
+                <input
+                  type="range"
+                  class="speed-slider"
+                  id="speed-slider"
+                  min="0.25"
+                  max="2"
+                  step="0.25"
+                  value="1"
+                />
+                <span id="speed-value">1x</span>
+              </div>
             </div>
-            <button 
-              class="treatment-btn control-btn-large" 
-              id="treatment-btn"
-              aria-label="Administrar tratamiento médico"
-              title="Aplicar tratamiento (Alt+T)"
-            >
-              Administrar Tratamiento
-            </button>
+            <div class="controls-right-group">
+              <button 
+                class="treatment-btn control-btn-large" 
+                id="treatment-btn"
+                aria-label="Administrar tratamiento médico"
+                title="Aplicar tratamiento (Alt+T)"
+                disabled
+              >
+                <svg class="btn-icon" viewBox="0 0 24 24" fill="currentColor" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                  <g transform="rotate(-15 12 12)">
+                    <rect x="3" y="9.5" width="18" height="5" rx="1.2" fill="none"></rect>
+                    <rect x="9" y="10.5" width="6" height="3" fill="none" stroke-width="1.5"></rect>
+                    <g fill="currentColor">
+                      <rect x="4" y="10.5" width="2" height="2"></rect>
+                      <rect x="6.5" y="10.5" width="2" height="2"></rect>
+                      <rect x="4" y="13" width="2" height="2"></rect>
+                      <rect x="6.5" y="13" width="2" height="2"></rect>
+                      <rect x="15.5" y="10.5" width="2" height="2"></rect>
+                      <rect x="18" y="10.5" width="2" height="2"></rect>
+                      <rect x="15.5" y="13" width="2" height="2"></rect>
+                      <rect x="18" y="13" width="2" height="2"></rect>
+                    </g>
+                  </g>
+                </svg>
+                Administrar Tratamiento
+              </button>
+            </div>
           </div>
 
 
@@ -285,7 +300,7 @@
 
 
 
-      // Simulation Configuration - Tamaños base (referencia)
+      // Config base de simulación
       const BASE_CONFIG = {
         canvas: {
           width: 1300,
@@ -417,15 +432,6 @@
       
       // Función antigua (mantenida por compatibilidad pero no se usa)
       function updateUIScalingOld(scale) {
-        // FPS Counter
-        const fpsEl = document.getElementById('fps-counter');
-        if (fpsEl) {
-          fpsEl.style.fontSize = `${BASE_UI.fps.fontSize * scale}rem`;
-          fpsEl.style.padding = `${BASE_UI.fps.padding.top * scale}px ${BASE_UI.fps.padding.right * scale}px ${BASE_UI.fps.padding.bottom * scale}px ${BASE_UI.fps.padding.left * scale}px`;
-          fpsEl.style.top = `${BASE_UI.fps.top * scale}px`;
-          fpsEl.style.left = `${BASE_UI.fps.left * scale}px`;
-          fpsEl.style.borderRadius = `${BASE_UI.fps.borderRadius * scale}px`;
-        }
         
         // Leyenda
         const legendEl = document.querySelector('.legend');
@@ -622,7 +628,7 @@
         });
       }
       
-      // Simulation Configuration - Valores escalados dinámicamente
+      // Config escalada dinámicamente
       const CONFIG = {
         canvas: {
           width: BASE_CONFIG.canvas.width,
@@ -964,7 +970,7 @@
         },
       };
 
-      // Game State
+      // Estado del juego
       let state = {
         condition: "normal",
         treatmentApplied: false,
@@ -992,7 +998,7 @@
       let spawnInterval = null;
       let lastSpawnTime = 0;
       // spawnIntervalCounter removido
-      let actualSpawnIntervals = []; // Array para calcular el intervalo promedio
+      let spawnIntervals = []; // Array para calcular el intervalo promedio
       const SPAWN_INTERVAL_MS = 125; // Intervalo variable entre 100-150ms (promedio 125ms)
 
       // Performance optimization: frame counters for throttling
@@ -1006,16 +1012,12 @@
       let lastPhysicsTime = 0;
       const FIXED_TIMESTEP = 1000 / 60; // 16.67ms = 60 FPS fijo para física
       let accumulatedTime = 0;
-      let accumulatedSimulationTime = 0; // Tiempo de simulación acumulado (ajustado por timeScale)
-      let lastSimulationTimeUpdate = 0; // Última vez que se actualizó el tiempo de simulación
+      let simTime = 0; // Tiempo de simulación acumulado (ajustado por timeScale)
+      let lastTimeUpdate = 0; // Última vez que se actualizó el tiempo de simulación
 
       // Matter.js Setup
       let engine, render, runner;
       
-      // FPS Counter variables
-      let fpsFrameCount = 0;
-      let fpsLastTime = performance.now();
-      let currentFPS = 0;
 
       // Particle SVG caches
       let particleCaches = {
@@ -1235,7 +1237,7 @@
       }
 
       function initSimulation() {
-        // CRITICAL: Cancel existing animation loops to prevent accumulation
+        // Cancelar loops existentes para evitar acumulación
         if (renderLoopId !== null) {
           cancelAnimationFrame(renderLoopId);
           renderLoopId = null;
@@ -1245,7 +1247,7 @@
           physicsLoopId = null;
         }
 
-        // Clear spawn timeout
+        // Limpiar timeout de spawn
         if (spawnInterval !== null) {
           clearTimeout(spawnInterval);
           spawnInterval = null;
@@ -1253,8 +1255,8 @@
         // spawnIntervalCounter removido
 
         lastSpawnTime = 0;
-        actualSpawnIntervals = [];
-        spawnStats = {
+        spawnIntervals = [];
+        spawnData = {
           lastSpawnCount: 0,
           totalSpawned: 0,
           spawnHistory: [],
@@ -1283,7 +1285,6 @@
           isPaused: false,
         };
 
-        // FPS counter removed
 
         // Clear previous engine events
         if (engine) {
@@ -1330,8 +1331,8 @@
         state.simulationRunning = false;
 
         // Resetear tiempo acumulado de simulación
-        accumulatedSimulationTime = 0;
-        lastSimulationTimeUpdate = 0;
+        simTime = 0;
+        lastTimeUpdate = 0;
 
         // Reset UI elements
         const woundLabel = document.getElementById("wound-label");
@@ -1348,8 +1349,31 @@
 
         const treatmentBtn = document.getElementById("treatment-btn");
         treatmentBtn.classList.remove("applied");
-        treatmentBtn.innerHTML = `Administrar Tratamiento`;
-        treatmentBtn.disabled = false;
+        treatmentBtn.innerHTML = `
+                <svg class="btn-icon" viewBox="0 0 24 24" fill="currentColor" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                  <g transform="rotate(-15 12 12)">
+                    <rect x="3" y="9.5" width="18" height="5" rx="1.2" fill="none"></rect>
+                    <rect x="9" y="10.5" width="6" height="3" fill="none" stroke-width="1.5"></rect>
+                    <g fill="currentColor">
+                      <rect x="4" y="10.5" width="2" height="2"></rect>
+                      <rect x="6.5" y="10.5" width="2" height="2"></rect>
+                      <rect x="4" y="13" width="2" height="2"></rect>
+                      <rect x="6.5" y="13" width="2" height="2"></rect>
+                      <rect x="15.5" y="10.5" width="2" height="2"></rect>
+                      <rect x="18" y="10.5" width="2" height="2"></rect>
+                      <rect x="15.5" y="13" width="2" height="2"></rect>
+                      <rect x="18" y="13" width="2" height="2"></rect>
+                    </g>
+                  </g>
+                </svg>
+          Administrar Tratamiento
+        `;
+        // Solo habilitar si hay una condición seleccionada y la simulación está corriendo
+        if (state.condition && state.simulationRunning && !state.treatmentApplied) {
+          treatmentBtn.disabled = false;
+        } else {
+          treatmentBtn.disabled = true;
+        }
         // Asegurar que mantenga el mismo tamaño
         const currentWidth = treatmentBtn.style.width || getComputedStyle(treatmentBtn).width;
         if (currentWidth && currentWidth !== 'auto') {
@@ -1445,33 +1469,6 @@
             Render.world(render);
           }
           
-          // Calcular FPS
-          fpsFrameCount++;
-          const currentTime = performance.now();
-          const elapsed = currentTime - fpsLastTime;
-          
-          if (elapsed >= 1000) { // Actualizar cada segundo
-            currentFPS = Math.round((fpsFrameCount * 1000) / elapsed);
-            fpsFrameCount = 0;
-            fpsLastTime = currentTime;
-            
-            // Actualizar el contador de FPS en el DOM
-            const fpsCounterEl = document.getElementById("fps-counter");
-            if (fpsCounterEl) {
-              fpsCounterEl.textContent = `FPS: ${currentFPS}`;
-            }
-            
-            // Contar partículas vivas (platelet, rbc, wbc)
-            const particleCount = state.allBodies.filter(body => 
-              body.label === "platelet" || body.label === "rbc" || body.label === "wbc"
-            ).length;
-            
-            // Actualizar el contador de partículas en el DOM
-            const particlesCounterEl = document.getElementById("particles-counter");
-            if (particlesCounterEl) {
-              particlesCounterEl.textContent = `Partículas: ${particleCount}`;
-            }
-          }
           
           renderLoopId = requestAnimationFrame(renderLoop);
         }
@@ -1503,35 +1500,35 @@
           // Acumular tiempo de simulación ajustado por timeScale (solo cuando está corriendo y no pausada)
           if (!state.isPaused && state.simulationRunning) {
             const timeScale = state.timeScale || 1.0;
-            accumulatedSimulationTime += deltaTime * timeScale;
+            simTime += deltaTime * timeScale;
           }
 
           // Ejecutar tantos pasos de física como sean necesarios para mantener timestep fijo
           // Ajustar el número de pasos según timeScale para acelerar la simulación
           const timeScale = state.timeScale || 1.0;
-          const maxSteps = 5; // Limitar pasos por frame para evitar "spiral of death"
-          let stepsExecuted = 0;
+          const maxStepCount = 5; // Limitar pasos por frame para evitar "spiral of death"
+          let executed = 0;
 
           // Ejecutar múltiples pasos según timeScale, pero mantener timestep fijo
           // Esto acelera la simulación sin afectar la estabilidad física
-          const stepsToExecute = Math.max(1, Math.ceil(timeScale));
+          const steps = Math.max(1, Math.ceil(timeScale));
 
           while (
             accumulatedTime >= FIXED_TIMESTEP &&
-            stepsExecuted < maxSteps
+            executed < maxStepCount
           ) {
             // Solo ejecutar física si no está pausada
             if (!state.isPaused && state.simulationRunning) {
               // Ejecutar múltiples pasos de física con timestep fijo para acelerar la simulación
               // En lugar de escalar el timestep, ejecutamos más pasos por iteración
               // Esto mantiene la física estable pero acelera la simulación
-              for (let i = 0; i < stepsToExecute; i++) {
+              for (let i = 0; i < steps; i++) {
                 Engine.update(engine, FIXED_TIMESTEP);
               }
             }
             // Restar el tiempo correspondiente a los pasos ejecutados
             accumulatedTime -= FIXED_TIMESTEP;
-            stepsExecuted++;
+            executed++;
           }
 
           // Si acumulamos demasiado tiempo, resetear para evitar lag
@@ -1600,83 +1597,81 @@
                   fibrin.body.bounds.max.x - fibrin.body.bounds.min.x;
                 const widthScale = dist / currentWidth;
                 
-                // CRITICAL: Also update thickness (height) to match current scaleFactor and visual lineWidth
-                // Recalculate proper thickness based on current scaleFactor and fibrinType
+                // Actualizar grosor para que coincida con scaleFactor y lineWidth
                 const fibrinType = fibrin.body.fibrinType || fibrin.fibrinType || "thin";
                 
-                // Calcular el grosor visual esperado según el tipo (debe coincidir con renderFibrin)
-                let targetVisualLineWidth;
+                // Calcular grosor visual según el tipo
+                let targetWidth;
                 switch (fibrinType) {
                   case "thick":
-                    targetVisualLineWidth = Math.max(4, 7 * scaleFactor);
+                    targetWidth = Math.max(4, 7 * scaleFactor);
                     break;
                   case "medium":
-                    targetVisualLineWidth = Math.max(2.5, 4 * scaleFactor);
+                    targetWidth = Math.max(2.5, 4 * scaleFactor);
                     break;
                   case "thin":
                   default:
-                    targetVisualLineWidth = Math.max(1.5, 2 * scaleFactor);
+                    targetWidth = Math.max(1.5, 2 * scaleFactor);
                     break;
                 }
                 
-                // CRITICAL: El grosor físico debe compensar la proyección del rectángulo rotado
-                // Calcular el grosor necesario para que la proyección vertical sea igual al grosor visual
+                // Ajustar grosor físico por la rotación del rectángulo
                 const absSinAngle = Math.abs(Math.sin(angle));
                 const absCosAngle = Math.abs(Math.cos(angle));
                 const projectedWidth = dist * absSinAngle;
                 // En pantallas pequeñas, reducir MUCHO más el grosor físico para evitar colisiones demasiado grandes
                 // En pantallas muy pequeñas, usar directamente el grosor visual sin compensación adicional
-                let targetBarrierThickness;
+                let targetThickness;
                 if (scaleFactor < 0.4) {
                   // En pantallas muy pequeñas, usar directamente el grosor visual sin multiplicadores
-                  targetBarrierThickness = targetVisualLineWidth;
+                  targetThickness = targetWidth;
                 } else if (scaleFactor < 0.5) {
                   // En pantallas pequeñas, reducir significativamente (30% del calculado)
-                  const thicknessReductionFactor = 0.3;
-                  if (projectedWidth >= targetVisualLineWidth) {
-                    targetBarrierThickness = Math.max(targetVisualLineWidth * 0.15 * thicknessReductionFactor, 0.2 * scaleFactor);
+                  const reductionFactor = 0.3;
+                  if (projectedWidth >= targetWidth) {
+                    targetThickness = Math.max(targetWidth * 0.15 * reductionFactor, 0.2 * scaleFactor);
                   } else {
-                    targetBarrierThickness = (targetVisualLineWidth - projectedWidth) / Math.max(absCosAngle, 0.01);
-                    targetBarrierThickness *= thicknessReductionFactor;
-                    targetBarrierThickness = Math.max(targetBarrierThickness, targetVisualLineWidth * 0.1);
+                    targetThickness = (targetWidth - projectedWidth) / Math.max(absCosAngle, 0.01);
+                    targetThickness *= reductionFactor;
+                    targetThickness = Math.max(targetThickness, targetWidth * 0.1);
                   }
                 } else if (scaleFactor < 0.8) {
                   // En pantallas medianas, reducir moderadamente (50% del calculado)
-                  const thicknessReductionFactor = 0.5;
-                  if (projectedWidth >= targetVisualLineWidth) {
-                    targetBarrierThickness = Math.max(targetVisualLineWidth * 0.2 * thicknessReductionFactor, 0.25 * scaleFactor);
+                  const reductionFactor = 0.5;
+                  if (projectedWidth >= targetWidth) {
+                    targetThickness = Math.max(targetWidth * 0.2 * reductionFactor, 0.25 * scaleFactor);
                   } else {
-                    targetBarrierThickness = (targetVisualLineWidth - projectedWidth) / Math.max(absCosAngle, 0.01);
-                    targetBarrierThickness *= thicknessReductionFactor;
-                    targetBarrierThickness = Math.max(targetBarrierThickness, targetVisualLineWidth * 0.15);
+                    targetThickness = (targetWidth - projectedWidth) / Math.max(absCosAngle, 0.01);
+                    targetThickness *= reductionFactor;
+                    targetThickness = Math.max(targetThickness, targetWidth * 0.15);
                   }
                 } else {
                   // En pantallas grandes, usar reducción normal (80% del calculado)
-                  const thicknessReductionFactor = 0.8;
-                  if (projectedWidth >= targetVisualLineWidth) {
-                    targetBarrierThickness = Math.max(targetVisualLineWidth * 0.2 * thicknessReductionFactor, 0.3 * scaleFactor);
+                  const reductionFactor = 0.8;
+                  if (projectedWidth >= targetWidth) {
+                    targetThickness = Math.max(targetWidth * 0.2 * reductionFactor, 0.3 * scaleFactor);
                   } else {
-                    targetBarrierThickness = (targetVisualLineWidth - projectedWidth) / Math.max(absCosAngle, 0.01);
-                    targetBarrierThickness *= thicknessReductionFactor;
-                    targetBarrierThickness = Math.max(targetBarrierThickness, targetVisualLineWidth * 0.25);
+                    targetThickness = (targetWidth - projectedWidth) / Math.max(absCosAngle, 0.01);
+                    targetThickness *= reductionFactor;
+                    targetThickness = Math.max(targetThickness, targetWidth * 0.25);
                   }
                 }
                 
-                // Obtener el grosor actual del cuerpo (para rectángulos rotados, usar la dimensión más pequeña del bbox)
+                // Obtener grosor actual del cuerpo
                 const bboxWidth = fibrin.body.bounds.max.x - fibrin.body.bounds.min.x;
                 const bboxHeight = fibrin.body.bounds.max.y - fibrin.body.bounds.min.y;
-                const currentThickness = Math.min(bboxWidth, bboxHeight);
+                const thickness = Math.min(bboxWidth, bboxHeight);
                 
-                const heightScale = targetBarrierThickness / Math.max(currentThickness, 0.1);
+                const heightScale = targetThickness / Math.max(thickness, 0.1);
                 
                 // Only scale if there's a significant difference
                 // En pantallas pequeñas, usar un umbral más pequeño para detectar diferencias más precisas
-                const thicknessThreshold = scaleFactor < 0.5 ? 0.1 : (scaleFactor < 0.8 ? 0.2 : 0.3);
-                if (Math.abs(currentWidth - dist) > 1 || Math.abs(currentThickness - targetBarrierThickness) > thicknessThreshold) {
+                const threshold = scaleFactor < 0.5 ? 0.1 : (scaleFactor < 0.8 ? 0.2 : 0.3);
+                if (Math.abs(currentWidth - dist) > 1 || Math.abs(thickness - targetThickness) > threshold) {
                   Body.scale(fibrin.body, widthScale, heightScale);
                   // Actualizar el grosor base si se escaló (usar grosor físico, no visual)
                   if (fibrin.body.baseThickness !== undefined) {
-                    fibrin.body.baseThickness = targetBarrierThickness / scaleFactor;
+                    fibrin.body.baseThickness = targetThickness / scaleFactor;
                     fibrin.body.currentScaleFactor = scaleFactor;
                   }
                 }
@@ -1728,7 +1723,7 @@
         const woundWidth = CONFIG.wound.width;
 
         // Top wall - Left and Right segments - moved down visually to match wound position
-        // IMPORTANTE: Estas paredes deben bloquear partículas que están FUERA del área de la herida
+        // Estas paredes bloquean partículas fuera del área de la herida
         // Deben estar en adhesionLineY para bloquear correctamente
         const adhesionLineY = CONFIG.adhesionLineY;
         const leftWallWidth = woundX - woundWidth / 2;
@@ -1927,7 +1922,7 @@
                 category: 0x0001,
                 mask: 0x0002 | 0x0004 | 0x0008, // Collide with fibrin barriers, walls, and vWF
               },
-              // CRITICAL: Store base radius for recalculation when scaleFactor changes
+              // Guardar radio base para recalcular cuando cambie scaleFactor
               baseRadius: BASE_CONFIG.particles.plateletRadius,
               currentScaleFactor: scaleFactor,
             });
@@ -1940,7 +1935,7 @@
 
           case "rbc":
             // Glóbulos rojos: usar círculo pero renderizar como elipse en custom render
-            // CRITICAL: Ajustar el radio físico para que coincida mejor con el tamaño visual
+            // Ajustar radio físico para que coincida con el tamaño visual
             // El tamaño visual es radiusX * 2.5, pero el radio visual efectivo es aproximadamente radiusX * 1.25
             // En pantallas pequeñas, reducir el radio físico para evitar colisiones demasiado grandes
             const rbcVisualRadius = BASE_CONFIG.particles.rbcRadius * scaleFactor;
@@ -1965,7 +1960,7 @@
                 category: 0x0001, // RBC category
                 mask: 0x0002 | 0x0004 | 0x0008, // Collide with fibrin barriers, walls, and vWF
               },
-              // CRITICAL: Store base radius for recalculation when scaleFactor changes
+              // Guardar radio base para recalcular cuando cambie scaleFactor
               baseRadius: BASE_CONFIG.particles.rbcRadius,
               currentScaleFactor: scaleFactor,
             });
@@ -1982,7 +1977,7 @@
                 visible: false, // No renderizar con Matter.js - solo custom
               },
               label: "wbc",
-              // CRITICAL: Store base radius for recalculation when scaleFactor changes
+              // Guardar radio base para recalcular cuando cambie scaleFactor
               baseRadius: BASE_CONFIG.particles.wbcRadius,
               currentScaleFactor: scaleFactor,
               restitution: 0, // Sin rebote
@@ -2003,14 +1998,11 @@
 
         if (body) {
           // Aplicar velocidad inicial basada en la fuerza del flujo para que aparezcan ya con velocidad normal
-          // Calcular velocidad inicial basada en la fuerza promedio del flujo
-          // Simula que la partícula ya ha estado acelerándose por un tiempo
+          // Calcular velocidad inicial simulando aceleración previa
           const flowForceAvg = (CONFIG.physics.flowForceMin + CONFIG.physics.flowForceMax) / 2;
-          // Velocidad inicial: simula ~1 segundo de aceleración previa hacia abajo
-          // v = a * t, donde a = F/m y t = tiempo de aceleración
-          const accelerationTime = 1.0; // 1 segundo de aceleración previa
+          const accelTime = 1.0; // 1 segundo de aceleración previa
           const acceleration = flowForceAvg / body.mass; // a = F/m
-          const initialVelocityY = acceleration * accelerationTime;
+          const initVelY = acceleration * accelTime;
           
           // Inicializar dirección lateral aleatoria para movimiento suave
           // Valor entre -1 y 1 que representa la dirección del movimiento lateral
@@ -2019,11 +2011,11 @@
           body.lastLateralUpdate = performance.now();
           
           // Velocidad mínima escalada con scaleFactor para mantener velocidad visual constante
-          const minVelocityY = 0.02 * scaleFactor;
+          const minVelY = 0.02 * scaleFactor;
           
           Body.setVelocity(body, {
             x: 0, // Sin velocidad horizontal inicial
-            y: Math.max(minVelocityY, initialVelocityY), // Caer hacia abajo visualmente = aumentar Y en canvas coords (positivo)
+            y: Math.max(minVelY, initVelY), // Caer hacia abajo visualmente = aumentar Y en canvas coords (positivo)
           });
           
           Composite.add(engine.world, body);
@@ -2034,7 +2026,7 @@
       }
 
       // Variables para tracking de spawn
-      let spawnStats = {
+      let spawnData = {
         lastSpawnCount: 0,
         totalSpawned: 0,
         spawnHistory: [], // Últimos 10 conteos de spawn
@@ -2067,22 +2059,22 @@
           const actualInterval = currentTime - lastSpawnTime;
 
           // Registrar el intervalo real para el contador
-          actualSpawnIntervals.push(actualInterval);
-          if (actualSpawnIntervals.length > 20) {
-            actualSpawnIntervals.shift(); // Mantener solo los últimos 20
+          spawnIntervals.push(actualInterval);
+          if (spawnIntervals.length > 20) {
+            spawnIntervals.shift(); // Mantener solo los últimos 20
           }
 
-          let spawnedThisCycle = 0;
+          let spawned = 0;
 
           // Spawn constante: siempre generar partículas sin verificar límites
             const conditionConfig = CONFIG.conditions[state.condition];
             const plateletRatio = conditionConfig.plateletRatio;
 
             // Apply spawn rate multiplier for conditions like thrombocytopenia
-            const spawnMultiplier = conditionConfig.spawnRateMultiplier || 1.0;
+            const multiplier = conditionConfig.spawnRateMultiplier || 1.0;
             const spawnCount = Math.max(
               1,
-              Math.floor(CONFIG.particles.spawnRate * spawnMultiplier)
+              Math.floor(CONFIG.particles.spawnRate * multiplier)
             );
 
             for (let i = 0; i < spawnCount; i++) {
@@ -2090,22 +2082,22 @@
 
               if (rand < plateletRatio) {
                 createParticle("platelet");
-                spawnedThisCycle++;
+                spawned++;
               } else if (rand < plateletRatio + CONFIG.particles.rbcRatio) {
                 createParticle("rbc");
-                spawnedThisCycle++;
+                spawned++;
               } else {
                 createParticle("wbc");
-                spawnedThisCycle++;
+                spawned++;
             }
           }
 
           // Registrar estadísticas de spawn
-          spawnStats.lastSpawnCount = spawnedThisCycle;
-          spawnStats.totalSpawned += spawnedThisCycle;
-          spawnStats.spawnHistory.push(spawnedThisCycle);
-          if (spawnStats.spawnHistory.length > 10) {
-            spawnStats.spawnHistory.shift();
+          spawnData.lastSpawnCount = spawned;
+          spawnData.totalSpawned += spawned;
+          spawnData.spawnHistory.push(spawned);
+          if (spawnData.spawnHistory.length > 10) {
+            spawnData.spawnHistory.shift();
           }
 
           lastSpawnTime = currentTime;
@@ -2164,7 +2156,7 @@
             <svg class="btn-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
               <polygon points="5 3 19 12 5 21 5 3"></polygon>
             </svg>
-            Iniciar Simulación
+            Iniciar
           `;
           startBtn.setAttribute("aria-label", "Iniciar la simulación");
           startBtn.setAttribute("title", "Iniciar simulación (Alt+S)");
@@ -2281,26 +2273,21 @@
 
         // Invisible adhesion line parameters - positioned at wound opening
         const adhesionLineY = CONFIG.adhesionLineY; // Y position center of the adhesion zone (more down visually = higher Y in canvas coords)
-        // CRITICAL: Scale thresholds with scaleFactor for proper collision detection at all screen sizes
+        // Escalar umbrales con scaleFactor para detección correcta en todos los tamaños
         const adhesionLineThreshold = 25 * scaleFactor; // Width of adhesion zone (más ancho para efecto de profundidad)
         const adhesionDetectionThreshold = 8 * scaleFactor; // Umbral más estricto para detectar adhesión (solo cuando está muy cerca)
 
-        // IMPORTANTE: Con Runner.isFixed = true y delta = 16.67ms,
-        // el timestep siempre es constante independientemente del FPS del renderer.
-        // El Runner ejecuta pasos de física a intervalos fijos, y cada paso siempre es de 16.67ms.
-        // Por lo tanto, timeScale siempre debe ser 1.0 para mantener velocidad constante.
-        // NO escalamos por el timestep real porque ya está fijo en 16.67ms.
-        const timeScale = 1.0; // Siempre 1.0 porque el timestep es fijo
+        // El timestep es fijo en 16.67ms, así que timeScale siempre es 1.0
+        const timeScale = 1.0;
 
         state.allBodies.forEach((body) => {
-          // Skip stuck platelets and static bodies
+          // Saltar plaquetas pegadas y cuerpos estáticos
           if (body.isStuck || body.isStatic) return;
 
           // Prevent particles from passing through walls by checking bounds
           const { width, height } = CONFIG.canvas;
           const wallThickness = CONFIG.wall.thickness;
-          // CRITICAL: Always use scaled particle radii for consistent collision detection
-          // Para glóbulos rojos, aplicar el mismo ajuste que en la creación para que coincida con el tamaño visual
+          // Usar radios escalados para detección consistente de colisiones
           let particleRadius = body.circleRadius;
           if (!particleRadius) {
             if (body.label === "rbc") {
@@ -2327,7 +2314,7 @@
           // SOLO aplicar esta lógica a partículas que NO sean plaquetas
           // Las plaquetas pueden pasar libremente y adherirse cuando colisionen con woundEdge
           const adhesionLineY = CONFIG.adhesionLineY;
-          // CRITICAL: Scale collision threshold with scaleFactor
+          // Escalar umbral de colisión con scaleFactor
           const woundCollisionThreshold = 15 * scaleFactor;
           // Solo aplicar restricción a RBCs y WBCs, no a plaquetas
           if (body.label !== "platelet" && 
@@ -2438,7 +2425,7 @@
             const cellPos = body.position;
 
             // Only check fibrin near the wound area for performance
-            // CRITICAL: Scale margins and thresholds with scaleFactor
+            // Escalar márgenes y umbrales con scaleFactor
             const woundMargin = 30 * scaleFactor;
             const woundLeft = CONFIG.wound.x - CONFIG.wound.width / 2 - woundMargin;
             const woundRight = CONFIG.wound.x + CONFIG.wound.width / 2 + woundMargin;
@@ -2551,7 +2538,7 @@
               body.position.y - adhesionLineY
             );
             const nearAdhesionLine = distanceFromCenter < adhesionLineThreshold; // Área amplia para variación
-            // CRITICAL: Use scaled threshold for consistent adhesion detection
+            // Usar umbral escalado para detección consistente de adhesión
             const veryCloseToCenter = distanceFromCenter < adhesionDetectionThreshold; // Solo adherir cuando está muy cerca del centro
 
             if (inWoundZone && nearAdhesionLine && veryCloseToCenter) {
@@ -2645,12 +2632,12 @@
               platelet.fibrinConnections.length === 0
             ) {
               // Gradually increase dislodge force for platelets without fibrin support - scaled by timestep
-              const dislodgeForce =
+              const force =
                 0.00015 * (1 - conditionConfig.fibrinStability);
               Body.applyForce(platelet.body, platelet.body.position, {
                 x: 0,
                 y:
-                  -dislodgeForce *
+                  -force *
                   platelet.body.mass *
                   (1 + Math.random()) *
                   timeScale,
@@ -2675,27 +2662,27 @@
         Body.setVelocity(platelet, { x: 0, y: 0 });
         // Variar la posición Y dentro del área de adhesión para crear profundidad
         // Las plaquetas pueden adherirse en un rango simétrico alrededor de la línea central
-        const adhesionZoneHalfWidth = 12 * scaleFactor; // Mitad del ancho del área de adhesión escalada
-        const adhesionZoneTop = lineY - adhesionZoneHalfWidth;
-        const adhesionZoneBottom = lineY + adhesionZoneHalfWidth;
+        const zoneHalfWidth = 12 * scaleFactor; // Mitad del ancho del área de adhesión escalada
+        const zoneTop = lineY - zoneHalfWidth;
+        const zoneBottom = lineY + zoneHalfWidth;
         // Usar la posición actual de la plaqueta como referencia, pero limitada al área de adhesión
         // NO hacer que suban - solo ajustar si están fuera del área
         const currentY = platelet.position.y;
         let stickY;
-        if (currentY < adhesionZoneTop) {
+        if (currentY < zoneTop) {
           // Si está por encima del área, moverla al límite superior (pero no más arriba)
-          stickY = adhesionZoneTop;
-        } else if (currentY > adhesionZoneBottom) {
+          stickY = zoneTop;
+        } else if (currentY > zoneBottom) {
           // Si está por debajo del área, moverla al límite inferior
-          stickY = adhesionZoneBottom;
+          stickY = zoneBottom;
         } else {
           // Si ya está dentro del área, mantener su posición actual sin variación aleatoria hacia arriba
           // Solo permitir pequeña variación hacia abajo si está cerca del límite superior
-          const distanceFromTop = currentY - adhesionZoneTop;
-          const distanceFromBottom = adhesionZoneBottom - currentY;
+          const distTop = currentY - zoneTop;
+          const distBottom = zoneBottom - currentY;
           // Si está cerca del límite superior, permitir pequeña variación hacia abajo
-          if (distanceFromTop < 2 * scaleFactor) {
-            stickY = Math.min(adhesionZoneBottom, currentY + Math.random() * 2 * scaleFactor);
+          if (distTop < 2 * scaleFactor) {
+            stickY = Math.min(zoneBottom, currentY + Math.random() * 2 * scaleFactor);
           } else {
             // Mantener posición actual sin hacer que suba
             stickY = currentY;
@@ -2749,8 +2736,8 @@
         // Secuencia: plaquetas primero, luego malla
         // Activar formación de fibrina solo después de umbral de plaquetas
         // Con tratamiento, reducir el umbral mínimo de plaquetas
-        const minPlateletsForFibrin = state.treatmentApplied ? 2 : 3;
-        if (state.stuckPlatelets.length >= minPlateletsForFibrin) {
+        const minPlatelets = state.treatmentApplied ? 2 : 3;
+        if (state.stuckPlatelets.length >= minPlatelets) {
           state.fibrinStarted = true;
 
           // Try to form fibrin after delay if specified
@@ -2814,7 +2801,7 @@
             return (a.data.stuckAt || 0) - (b.data.stuckAt || 0);
           });
 
-        // Calcular cuántas necesitamos eliminar
+        // Calcular cuántas eliminar
         const toRemove = state.stuckPlatelets.length - maxStuckPlatelets;
 
         // Eliminar las más antiguas que están lejos de la herida
@@ -2855,7 +2842,7 @@
       }
 
       function cleanupParticles() {
-        // CRITICAL: No ejecutar cleanup si está pausado
+        // No ejecutar cleanup si está pausado
         if (state.isPaused || !state.simulationRunning) {
           return;
         }
@@ -2908,7 +2895,7 @@
               continue; // Aún está en animación, no marcar para eliminar todavía
             }
 
-            // CRITICAL: Scale cleanup margins with scaleFactor - declare at start of block
+            // Escalar márgenes de cleanup con scaleFactor
             const leftCleanupMargin = 30 * scaleFactor;
             const topCleanupMargin = 20 * scaleFactor;
             const cleanupMargin = 50 * scaleFactor;
@@ -2917,7 +2904,7 @@
             
             // Verificar duración de vida de 7 segundos
             // El tiempo de vida se pausa cuando la simulación está pausada
-            // CRITICAL: Verificar también aquí para asegurar que no se ejecute durante la pausa
+            // Verificar que no se ejecute durante la pausa
             if (body.createdAt && !state.isPaused && state.simulationRunning) {
               let age;
               const pausedTime = body.totalPausedTime || 0;
@@ -3039,11 +3026,11 @@
             const { bodyA, bodyB } = pair;
 
             // Aplicar alta fricción cuando comienzan a colisionar con la barrera de fibrina
-            const isFibrinBarrier = (body) => body && body.label === "fibrinBarrier";
-            const isParticle = (body) => body && (body.label === "rbc" || body.label === "wbc" || body.label === "platelet");
-            if (isFibrinBarrier(bodyA) && isParticle(bodyB) && !bodyB.isStuck) {
+            const isBarrier = (body) => body?.label === "fibrinBarrier";
+            const isParticle = (body) => ["rbc", "wbc", "platelet"].includes(body?.label);
+            if (isBarrier(bodyA) && isParticle(bodyB) && !bodyB.isStuck) {
               bodyB.friction = 0.9; // Alta fricción al rozar con la fibrina
-            } else if (isParticle(bodyA) && isFibrinBarrier(bodyB) && !bodyA.isStuck) {
+            } else if (isParticle(bodyA) && isBarrier(bodyB) && !bodyA.isStuck) {
               bodyA.friction = 0.9; // Alta fricción al rozar con la fibrina
             }
 
@@ -3076,21 +3063,21 @@
           // Procesar solo el primer par que encontremos que sea válido
           for (const pair of event.pairs) {
             const { bodyA, bodyB } = pair;
-            const isFibrinBarrier = (body) => body && body.label === "fibrinBarrier";
-            const isParticle = (body) => body && (body.label === "rbc" || body.label === "wbc" || body.label === "platelet");
+            const isBarrier = (body) => body?.label === "fibrinBarrier";
+            const isParticle = (body) => ["rbc", "wbc", "platelet"].includes(body?.label);
             
-            // Verificar si es una colisión de fibrina y si la partícula no está ya pegada
+            // Verificar colisión de fibrina
             let actualParticle;
-            if (isFibrinBarrier(bodyA) && isParticle(bodyB) && !bodyB.isStuck && !bodyB.fibrinConstraint) {
+            if (isBarrier(bodyA) && isParticle(bodyB) && !bodyB.isStuck && !bodyB.fibrinConstraint) {
               actualParticle = bodyB;
-            } else if (isParticle(bodyA) && isFibrinBarrier(bodyB) && !bodyA.isStuck && !bodyA.fibrinConstraint) {
+            } else if (isParticle(bodyA) && isBarrier(bodyB) && !bodyA.isStuck && !bodyA.fibrinConstraint) {
               actualParticle = bodyA;
             }
             
             // Aplicar alta fricción cuando están en contacto con la barrera de fibrina
-            if (isFibrinBarrier(bodyA) && isParticle(bodyB) && !bodyB.isStuck) {
+            if (isBarrier(bodyA) && isParticle(bodyB) && !bodyB.isStuck) {
               bodyB.friction = 0.9; // Alta fricción al rozar con la fibrina
-            } else if (isParticle(bodyA) && isFibrinBarrier(bodyB) && !bodyA.isStuck) {
+            } else if (isParticle(bodyA) && isBarrier(bodyB) && !bodyA.isStuck) {
               bodyA.friction = 0.9; // Alta fricción al rozar con la fibrina
             }
             
@@ -3105,16 +3092,16 @@
       }
 
       function handleFibrinBarrierCollision(particle, barrier) {
-        // Verificar si es una colisión entre una partícula y barrera de fibrina
+        // Verificar colisión partícula-barrera
         // Verificar ambos órdenes posibles de la colisión
-        const isFibrinBarrier = (body) => body && body.label === "fibrinBarrier";
-        const isParticle = (body) => body && (body.label === "rbc" || body.label === "wbc" || body.label === "platelet");
+        const isBarrier = (body) => body?.label === "fibrinBarrier";
+        const isParticle = (body) => ["rbc", "wbc", "platelet"].includes(body?.label);
         
         let actualParticle, actualBarrier;
-        if (isFibrinBarrier(particle) && isParticle(barrier)) {
+        if (isBarrier(particle) && isParticle(barrier)) {
           actualParticle = barrier;
           actualBarrier = particle;
-        } else if (isParticle(particle) && isFibrinBarrier(barrier)) {
+        } else if (isParticle(particle) && isBarrier(barrier)) {
           actualParticle = particle;
           actualBarrier = barrier;
         } else {
@@ -3173,7 +3160,7 @@
           Body.setTorque(actualParticle, 0);
 
           // Crear constraint para mantenerla pegada al punto de colisión en la línea de fibrina
-          // Calcular el punto más cercano en la línea de fibrina
+          // Calcular punto más cercano en la línea
           const fibrinLength = actualBarrier.bounds.max.x - actualBarrier.bounds.min.x;
           const fibrinHalfLength = fibrinLength / 2;
           const fibrinStart = {
@@ -3199,7 +3186,7 @@
           };
 
           // Ajustar la posición de la partícula ANTES de hacerla estática
-          // CRITICAL: No hacer que la partícula suba - solo ajustar si está por debajo o muy lejos
+          // No hacer que la partícula suba, solo ajustar si está por debajo o muy lejos
           const currentY = actualParticle.position.y;
           const currentX = actualParticle.position.x;
           
@@ -3284,12 +3271,12 @@
           ? 0.95
           : conditionConfig.adhesionStrength;
 
-        // Check if collision is with wound edge or stuck platelet
+        // Verificar si colisiona con borde de herida o plaqueta pegada
         const isWoundEdge = other.label === "woundEdge";
         const isStuckPlatelet = other.label === "platelet" && other.isStuck;
 
         if (isWoundEdge || isStuckPlatelet) {
-          // Check if in wound zone
+          // Verificar si está en zona de herida
           const woundLeft = CONFIG.wound.x - CONFIG.wound.width / 2;
           const woundRight = CONFIG.wound.x + CONFIG.wound.width / 2;
 
@@ -3489,10 +3476,10 @@
         // Weak fibrin (0.3): can connect up to 40px away, minimum 8px
         // El tratamiento NO afecta la distancia de conexión, solo la velocidad de adhesión
         // Escalar distancias con scaleFactor para mantener comportamiento constante en diferentes tamaños de pantalla
-        const baseMaxSearchRadius = (40 + fibrinStability * 50) * scaleFactor; // 40-90px range escalado
-        const maxSearchRadius = baseMaxSearchRadius; // Distancia escalada, no afectada por tratamiento
-        const minDistance = (8 + fibrinStability * 12) * scaleFactor; // 8-20px range escalado
-        const minDistanceSq = minDistance * minDistance;
+        const baseMaxRadius = (40 + fibrinStability * 50) * scaleFactor; // 40-90px range escalado
+        const maxRadius = baseMaxRadius; // Distancia escalada, no afectada por tratamiento
+        const minDist = (8 + fibrinStability * 12) * scaleFactor; // 8-20px range escalado
+        const minDistSq = minDist * minDist;
 
         const plateletX = platelet.position.x;
         const plateletY = platelet.position.y;
@@ -3514,9 +3501,9 @@
           const dx = other.body.position.x - plateletX;
           const dy = other.body.position.y - plateletY;
           const distSq = dx * dx + dy * dy;
-          const searchRadiusSq = maxSearchRadius * maxSearchRadius;
+          const radiusSq = maxRadius * maxRadius;
 
-          if (distSq < searchRadiusSq && distSq > minDistanceSq) {
+          if (distSq < radiusSq && distSq > minDistSq) {
             const dist = Math.sqrt(distSq);
 
             // Clasificar tipo de cuerda según distancia y estabilidad
@@ -3543,7 +3530,7 @@
               continue; // Saltar esta conexión si está bloqueada
             }
 
-            const visualEffects =
+            const effects =
               conditionConfig.visualEffects ||
               CONFIG.conditions.normal.visualEffects;
 
@@ -3559,7 +3546,7 @@
 
             Composite.add(engine.world, fibrinConstraint);
 
-            // Create physical body for fibrin barrier (thin rectangle)
+            // Crear cuerpo físico para barrera de fibrina
             const midX = (platelet.position.x + other.body.position.x) / 2;
             const midY = (platelet.position.y + other.body.position.y) / 2;
             const angle = Math.atan2(
@@ -3569,72 +3556,72 @@
 
             // Create a thin rectangular body as barrier
             // Thickness depends on stability - weaker fibrin = thinner barrier
-            // CRITICAL: El grosor físico debe coincidir exactamente con el grosor visual
+            // El grosor físico debe coincidir con el grosor visual
             // El grosor visual se calcula según fibrinType en renderFibrin:
             // - thick: Math.max(4, 7 * scaleFactor)
             // - medium: Math.max(2.5, 4 * scaleFactor)
             // - thin: Math.max(1.5, 2 * scaleFactor)
-            let visualLineWidth;
+            let lineWidth;
             switch (fibrinType) {
               case "thick":
-                visualLineWidth = Math.max(4, 7 * scaleFactor);
+                lineWidth = Math.max(4, 7 * scaleFactor);
                 break;
               case "medium":
-                visualLineWidth = Math.max(2.5, 4 * scaleFactor);
+                lineWidth = Math.max(2.5, 4 * scaleFactor);
                 break;
               case "thin":
               default:
-                visualLineWidth = Math.max(1.5, 2 * scaleFactor);
+                lineWidth = Math.max(1.5, 2 * scaleFactor);
                 break;
             }
-            // CRITICAL: El grosor físico debe compensar la proyección del rectángulo rotado
+            // Ajustar grosor físico por la rotación del rectángulo
             // Cuando un rectángulo está rotado, su bounding box axis-aligned puede ser más grande
             // Para un rectángulo con ancho 'w' y alto 'h' rotado en ángulo 'θ':
             // bbox_height = w * |sin(θ)| + h * |cos(θ)|
-            // Necesitamos ajustar 'h' para que bbox_height ≈ visualLineWidth
+            // Necesitamos ajustar 'h' para que bbox_height ≈ lineWidth
             // Si la línea está casi horizontal (θ ≈ 0), entonces bbox_height ≈ h
             // Pero si tiene un ángulo pequeño, necesitamos reducir h para compensar
             const absSinAngle = Math.abs(Math.sin(angle));
             const absCosAngle = Math.abs(Math.cos(angle));
-            // Calcular el grosor necesario para que la proyección vertical sea igual al grosor visual
-            // bbox_height = dist * absSinAngle + barrierThickness * absCosAngle = visualLineWidth
-            // barrierThickness = (visualLineWidth - dist * absSinAngle) / absCosAngle
+            // Calcular grosor necesario para la proyección vertical
+            // bbox_height = dist * absSinAngle + barrierThickness * absCosAngle = lineWidth
+            // barrierThickness = (lineWidth - dist * absSinAngle) / absCosAngle
             const projectedWidth = dist * absSinAngle;
             // En pantallas pequeñas, reducir MUCHO más el grosor físico para evitar colisiones demasiado grandes
             // En pantallas muy pequeñas, usar directamente el grosor visual sin compensación adicional
             let barrierThickness;
             if (scaleFactor < 0.4) {
               // En pantallas muy pequeñas, usar directamente el grosor visual sin multiplicadores
-              barrierThickness = visualLineWidth;
+              barrierThickness = lineWidth;
             } else if (scaleFactor < 0.5) {
               // En pantallas pequeñas, reducir significativamente (30% del calculado)
-              const thicknessReductionFactor = 0.3;
-              if (projectedWidth >= visualLineWidth) {
-                barrierThickness = Math.max(visualLineWidth * 0.15 * thicknessReductionFactor, 0.2 * scaleFactor);
+              const reductionFactor = 0.3;
+              if (projectedWidth >= lineWidth) {
+                barrierThickness = Math.max(lineWidth * 0.15 * reductionFactor, 0.2 * scaleFactor);
               } else {
-                barrierThickness = (visualLineWidth - projectedWidth) / Math.max(absCosAngle, 0.01);
-                barrierThickness *= thicknessReductionFactor;
-                barrierThickness = Math.max(barrierThickness, visualLineWidth * 0.1);
+                barrierThickness = (lineWidth - projectedWidth) / Math.max(absCosAngle, 0.01);
+                barrierThickness *= reductionFactor;
+                barrierThickness = Math.max(barrierThickness, lineWidth * 0.1);
               }
             } else if (scaleFactor < 0.8) {
               // En pantallas medianas, reducir moderadamente (50% del calculado)
-              const thicknessReductionFactor = 0.5;
-              if (projectedWidth >= visualLineWidth) {
-                barrierThickness = Math.max(visualLineWidth * 0.2 * thicknessReductionFactor, 0.25 * scaleFactor);
+              const reductionFactor = 0.5;
+              if (projectedWidth >= lineWidth) {
+                barrierThickness = Math.max(lineWidth * 0.2 * reductionFactor, 0.25 * scaleFactor);
               } else {
-                barrierThickness = (visualLineWidth - projectedWidth) / Math.max(absCosAngle, 0.01);
-                barrierThickness *= thicknessReductionFactor;
-                barrierThickness = Math.max(barrierThickness, visualLineWidth * 0.15);
+                barrierThickness = (lineWidth - projectedWidth) / Math.max(absCosAngle, 0.01);
+                barrierThickness *= reductionFactor;
+                barrierThickness = Math.max(barrierThickness, lineWidth * 0.15);
               }
             } else {
               // En pantallas grandes, usar reducción normal (80% del calculado)
-              const thicknessReductionFactor = 0.8;
-              if (projectedWidth >= visualLineWidth) {
-                barrierThickness = Math.max(visualLineWidth * 0.2 * thicknessReductionFactor, 0.3 * scaleFactor);
+              const reductionFactor = 0.8;
+              if (projectedWidth >= lineWidth) {
+                barrierThickness = Math.max(lineWidth * 0.2 * reductionFactor, 0.3 * scaleFactor);
               } else {
-                barrierThickness = (visualLineWidth - projectedWidth) / Math.max(absCosAngle, 0.01);
-                barrierThickness *= thicknessReductionFactor;
-                barrierThickness = Math.max(barrierThickness, visualLineWidth * 0.25);
+                barrierThickness = (lineWidth - projectedWidth) / Math.max(absCosAngle, 0.01);
+                barrierThickness *= reductionFactor;
+                barrierThickness = Math.max(barrierThickness, lineWidth * 0.25);
               }
             }
             const fibrinBody = Bodies.rectangle(
@@ -3659,7 +3646,7 @@
                 // Store stability and fibrinType for collision handling and updates
                 fibrinStability: fibrinStability,
                 fibrinType: fibrinType,
-                // CRITICAL: Store base thickness values for recalculation when scaleFactor changes
+                // Guardar grosor base para recalcular cuando cambie scaleFactor
                 baseThickness: barrierThickness / scaleFactor, // Store thickness at scaleFactor=1
                 currentScaleFactor: scaleFactor, // Track the scaleFactor when created
               }
@@ -3677,7 +3664,7 @@
               stability: fibrinStability,
               decayRate: conditionConfig.fibrinDecayRate || 0,
               visualColor: "#FFFFFF", // Blanco para las cuerdas (solo la malla horizontal es morada)
-              opacity: visualEffects.fibrinOpacity || 1.0,
+              opacity: effects.fibrinOpacity || 1.0,
               fibrinType: fibrinType, // 'thick', 'medium', o 'thin'
               createdAt: Date.now(),
             };
@@ -3709,7 +3696,7 @@
           }
         }
 
-        // Check if wound is sealed after forming new fibrin connection
+        // Verificar si la herida está sellada tras nueva conexión
         checkWoundSealed();
       }
 
@@ -3819,7 +3806,7 @@
           return; // Need platelets on both sides
         }
 
-        // Check if there's a path from left to right through fibrin connections
+        // Verificar si hay camino de izquierda a derecha por conexiones de fibrina
         for (let i = 0; i < leftSidePlatelets.length; i++) {
           const leftPlatelet = leftSidePlatelets[i];
           if (hasPathToRight(leftPlatelet, rightSidePlatelets, new Set())) {
@@ -3828,7 +3815,7 @@
             state.clotPercentage = 100;
             // Capturar el momento del cierre de la herida (tiempo de simulación acumulado)
             if (!state.closureTime && state.startTime) {
-              state.closureTime = accumulatedSimulationTime / 1000; // Guardar tiempo de simulación en segundos
+              state.closureTime = simTime / 1000; // Guardar tiempo de simulación en segundos
             }
             const woundLabel = document.getElementById("wound-label");
             woundLabel.classList.remove("active-pulse");
@@ -3848,7 +3835,7 @@
       }
 
       function hasPathToRight(currentPlatelet, rightSidePlatelets, visited) {
-        // Check if current platelet is on the right side
+        // Verificar si la plaqueta está en el lado derecho
         const woundX = CONFIG.wound.x;
         const woundWidth = CONFIG.wound.width;
         const woundRight = CONFIG.wound.x + CONFIG.wound.width / 2;
@@ -3877,7 +3864,7 @@
           }
 
           if (connectedPlatelet && !visited.has(connectedPlatelet.body.id)) {
-            // Check if this connection crosses the wound area
+            // Verificar si la conexión cruza el área de la herida
             const px1 = currentPlatelet.body.position.x;
             const px2 = connectedPlatelet.body.position.x;
             const woundLeft = woundX - woundWidth / 2;
@@ -3904,7 +3891,7 @@
         return false;
       }
 
-      // ==================== RENDERIZADO DEL VASO SANGUÍNEO ====================
+      // Render del vaso
 
       // Cache para el fondo del vaso (se genera una vez y se reutiliza)
       let vesselBackgroundCache = null;
@@ -4337,22 +4324,22 @@
         const woundLeft = woundX - woundWidth / 2;
         const woundRight = woundX + woundWidth / 2;
         const adhesionLineY = CONFIG.adhesionLineY; // Centro del área de adhesión (more down visually = higher Y in canvas coords)
-        const adhesionZoneHalfWidth = 12 * scaleFactor; // Mitad del ancho del área de adhesión escalada
+        const zoneHalfWidth = 12 * scaleFactor; // Mitad del ancho del área de adhesión escalada
         // Altura visual aumentada para el rectángulo morado (50% más alto)
-        const visualMeshHalfWidth = adhesionZoneHalfWidth * 1.5; // 50% más alto visualmente
+        const meshHalfWidth = zoneHalfWidth * 1.5; // 50% más alto visualmente
 
         // Render ointment layer when treatment is applied - ultra simple for performance
         if (state.showOintment) {
           ctx.fillStyle = "rgba(117, 35, 120, 0.35)";
           ctx.fillRect(
             woundLeft,
-            adhesionLineY - visualMeshHalfWidth,
+            adhesionLineY - meshHalfWidth,
             woundWidth,
-            visualMeshHalfWidth * 2
+            meshHalfWidth * 2
           );
         }
 
-        // Calcular opacidad de la malla morada basada en densidad de plaquetas pegadas en el área de adhesión
+        // Calcular opacidad de la malla según densidad de plaquetas
         const stuckPlateletsInWound = state.stuckPlatelets.filter((p) => {
           const px = p.body.position.x;
           const py = p.body.position.y;
@@ -4360,8 +4347,8 @@
           return (
             px >= woundLeft - margin &&
             px <= woundRight + margin &&
-            py >= adhesionLineY - adhesionZoneHalfWidth &&
-            py <= adhesionLineY + adhesionZoneHalfWidth
+            py >= adhesionLineY - zoneHalfWidth &&
+            py <= adhesionLineY + zoneHalfWidth
           );
         }).length;
 
@@ -4373,8 +4360,8 @@
         );
 
         // Área de la malla morada - usar altura visual aumentada (50% más alto)
-        const meshTopY = adhesionLineY - visualMeshHalfWidth;
-        const meshHeight = visualMeshHalfWidth * 2; // Altura total del área de adhesión visual (50% más alto)
+        const meshTopY = adhesionLineY - meshHalfWidth;
+        const meshHeight = meshHalfWidth * 2; // Altura total del área de adhesión visual (50% más alto)
 
         // Renderizar malla morada horizontal en la zona de adhesión que se opaca progresivamente
         // Solo esta área horizontal es morada - las cuerdas son verdes
@@ -4456,7 +4443,7 @@
         });
         state.vWFBodies = [];
 
-        // Verificar si debe crear vWF (cemento entre plaquetas)
+        // Verificar si debe crear vWF
         const conditionConfig = CONFIG.conditions[state.condition];
         const shouldShowVWF =
           state.condition === "normal" ||
@@ -4468,11 +4455,11 @@
         }
 
         // Crear cuerpos físicos para las líneas de vWF
-        const maxVWFDistance = 15 * scaleFactor; // Distancia máxima escalada con scaleFactor (aumentada para cubrir más área)
-        const maxVWFDistanceSq = maxVWFDistance * maxVWFDistance;
+        const maxDistance = 15 * scaleFactor; // Distancia máxima escalada con scaleFactor (aumentada para cubrir más área)
+        const maxDistSq = maxDistance * maxDistance;
         const minDist = Math.max(2, 4 * scaleFactor); // Mínimo 2px, escalado con scaleFactor
         const minDistSq = minDist * minDist;
-        const vWFThickness = Math.max(10, 15 * scaleFactor); // Grosor de la línea física (aumentado para mejor detección)
+        const thickness = Math.max(10, 15 * scaleFactor); // Grosor de la línea física (aumentado para mejor detección)
 
         for (let i = 0; i < state.stuckPlatelets.length; i++) {
           const plateletA = state.stuckPlatelets[i];
@@ -4490,7 +4477,7 @@
             const distSq = dx * dx + dy * dy;
 
             // Solo crear cuerpo físico si están cerca
-            if (distSq < maxVWFDistanceSq && distSq > minDistSq) {
+            if (distSq < maxDistSq && distSq > minDistSq) {
               const dist = Math.sqrt(distSq);
               const angle = Math.atan2(dy, dx);
               const centerX = (posA.x + posB.x) / 2;
@@ -4501,7 +4488,7 @@
                 centerX,
                 centerY,
                 dist,
-                vWFThickness,
+                thickness,
                 {
                   label: "vWF",
                   isStatic: true,
@@ -4529,8 +4516,8 @@
       function handleVWFCollision(particle, vWFBody) {
         // Verificar si es una colisión entre una partícula y vWF
         // Verificar ambos órdenes posibles de la colisión
-        const isVWF = (body) => body && body.label === "vWF";
-        const isParticle = (body) => body && (body.label === "rbc" || body.label === "wbc" || body.label === "platelet");
+        const isVWF = (body) => body?.label === "vWF";
+        const isParticle = (body) => ["rbc", "wbc", "platelet"].includes(body?.label);
         
         let actualParticle, actualVWF;
         if (isVWF(particle) && isParticle(vWFBody)) {
@@ -4641,8 +4628,8 @@
         ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
 
         // Dibujar líneas verdes cortas (cemento) entre plaquetas pegadas que están cerca
-        const maxVWFDistance = 12 * scaleFactor; // Distancia máxima escalada con scaleFactor
-        const maxVWFDistanceSq = maxVWFDistance * maxVWFDistance;
+        const maxDistance = 12 * scaleFactor; // Distancia máxima escalada con scaleFactor
+        const maxDistSq = maxDistance * maxDistance;
 
         // Usar rgba para asegurar que el color verde se aplique correctamente
         ctx.strokeStyle = "rgba(34, 197, 94, 1.0)"; // Verde #22C55E en formato rgba
@@ -4672,10 +4659,10 @@
             // Asegurar que la distancia mínima sea apropiada para pantallas pequeñas
             const minDist = Math.max(2, 4 * scaleFactor); // Mínimo 2px, escalado con scaleFactor
             const minDistSq = minDist * minDist;
-            if (distSq < maxVWFDistanceSq && distSq > minDistSq) {
+            if (distSq < maxDistSq && distSq > minDistSq) {
               const dist = Math.sqrt(distSq);
               // Opacidad basada en distancia (más opaco cuanto más cerca)
-              const opacity = 0.7 + (1.0 - dist / maxVWFDistance) * 0.3; // Entre 0.7 y 1.0
+              const opacity = 0.7 + (1.0 - dist / maxDistance) * 0.3; // Entre 0.7 y 1.0
 
               // Re-establecer el color verde antes de cada línea para asegurar que siempre sea verde
               ctx.strokeStyle = `rgba(34, 197, 94, ${opacity})`; // Verde con opacidad variable
@@ -4748,7 +4735,7 @@
             let fadeOutElapsed;
             const FADE_OUT_DURATION = 300; // 300ms de animación
             
-            // CRITICAL: Si está pausado, el fadeOut no debe avanzar
+            // Si está pausado, el fadeOut no avanza
             if (state.isPaused || !state.simulationRunning) {
               // Durante la pausa, calcular tiempo hasta el momento de la pausa (si existe)
               if (state.pauseStartTime !== null && body.fadeOutStart < state.pauseStartTime) {
@@ -4805,11 +4792,16 @@
         const adhesionLineY = CONFIG.adhesionLineY; // Y position where platelets stick (herida)
         const woundCenterY = adhesionLineY; // Usar la posición real de la herida
 
-        // Optimized coverage calculation
-        const segments = 20; // Reduced from 30 for better performance
+        // Más segmentos para progresión más suave (50 segmentos = 2% por segmento)
+        const segments = 50;
         const segmentWidth = woundWidth / segments;
         let coveredSegments = 0;
-        const coverageThreshold = 15 * 15; // Squared distance for comparison
+        
+        // Escalar umbral de cobertura con scaleFactor
+        const coverageRadius = 15 * scaleFactor;
+        const coverageThreshold = coverageRadius * coverageRadius; // Squared distance for comparison
+        const woundMargin = 20 * scaleFactor;
+        const verticalMargin = 15 * scaleFactor;
 
         // Pre-filter platelets that are actually in the wound area (exclude anchor platelets)
         const relevantPlatelets = state.stuckPlatelets.filter((p) => {
@@ -4819,22 +4811,84 @@
           const px = p.body.position.x;
           const py = p.body.position.y;
           return (
-            px >= woundLeft - 20 &&
-            px <= woundLeft + woundWidth + 20 &&
-            py >= woundCenterY - 15 &&
-            py <= woundCenterY + 15
+            px >= woundLeft - woundMargin &&
+            px <= woundLeft + woundWidth + woundMargin &&
+            py >= woundCenterY - verticalMargin &&
+            py <= woundCenterY + verticalMargin
+          );
+        });
+
+        // También considerar conexiones de fibrina para cobertura más precisa
+        const relevantFibrin = state.fibrinConstraints.filter((f) => {
+          if (!f.pointA || !f.pointB) return false;
+          const x1 = f.pointA.position.x;
+          const x2 = f.pointB.position.x;
+          const y1 = f.pointA.position.y;
+          const y2 = f.pointB.position.y;
+          // Verificar si la conexión cruza el área de la herida
+          const minX = Math.min(x1, x2);
+          const maxX = Math.max(x1, x2);
+          const minY = Math.min(y1, y2);
+          const maxY = Math.max(y1, y2);
+          return (
+            maxX >= woundLeft - woundMargin &&
+            minX <= woundLeft + woundWidth + woundMargin &&
+            maxY >= woundCenterY - verticalMargin &&
+            minY <= woundCenterY + verticalMargin
           );
         });
 
         for (let i = 0; i < segments; i++) {
           const segmentX = woundLeft + (i + 0.5) * segmentWidth;
 
-          // Check if any stuck platelet covers this segment (optimized)
-          const covered = relevantPlatelets.some((p) => {
+          // Check if any stuck platelet covers this segment
+          let covered = relevantPlatelets.some((p) => {
             const dx = p.body.position.x - segmentX;
             const dy = p.body.position.y - woundCenterY;
             return dx * dx + dy * dy < coverageThreshold;
           });
+
+          // Si no está cubierto por plaquetas, verificar si está cubierto por conexiones de fibrina
+          if (!covered) {
+            covered = relevantFibrin.some((f) => {
+              if (!f.pointA || !f.pointB) return false;
+              const x1 = f.pointA.position.x;
+              const x2 = f.pointB.position.x;
+              const y1 = f.pointA.position.y;
+              const y2 = f.pointB.position.y;
+              
+              // Calcular distancia del segmento al segmento de línea más cercano
+              const dx = x2 - x1;
+              const dy = y2 - y1;
+              const lengthSq = dx * dx + dy * dy;
+              
+              if (lengthSq === 0) {
+                // Punto único
+                const distSq = (x1 - segmentX) * (x1 - segmentX) + (y1 - woundCenterY) * (y1 - woundCenterY);
+                return distSq < coverageThreshold;
+              }
+              
+              // Calcular punto más cercano en el segmento de línea
+              const t = Math.max(0, Math.min(1, ((segmentX - x1) * dx + (woundCenterY - y1) * dy) / lengthSq));
+              const closestX = x1 + t * dx;
+              const closestY = y1 + t * dy;
+              
+              // Verificar si el punto más cercano está dentro del segmento de línea
+              const segMinX = Math.min(x1, x2);
+              const segMaxX = Math.max(x1, x2);
+              const segMinY = Math.min(y1, y2);
+              const segMaxY = Math.max(y1, y2);
+              
+              if (closestX >= segMinX && closestX <= segMaxX && 
+                  closestY >= segMinY && closestY <= segMaxY) {
+                const distSq = (closestX - segmentX) * (closestX - segmentX) + 
+                              (closestY - woundCenterY) * (closestY - woundCenterY);
+                return distSq < coverageThreshold;
+              }
+              
+              return false;
+            });
+          }
 
           if (covered) coveredSegments++;
         }
@@ -4953,7 +5007,25 @@
         const currentHeight = btn.style.height || getComputedStyle(btn).height;
         const currentPadding = btn.style.padding || getComputedStyle(btn).padding;
         btn.classList.add("applied");
-        btn.innerHTML = "Tratamiento Aplicado";
+        btn.innerHTML = `
+                <svg class="btn-icon" viewBox="0 0 24 24" fill="currentColor" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                  <g transform="rotate(-15 12 12)">
+                    <rect x="3" y="9.5" width="18" height="5" rx="1.2" fill="none"></rect>
+                    <rect x="9" y="10.5" width="6" height="3" fill="none" stroke-width="1.5"></rect>
+                    <g fill="currentColor">
+                      <rect x="4" y="10.5" width="2" height="2"></rect>
+                      <rect x="6.5" y="10.5" width="2" height="2"></rect>
+                      <rect x="4" y="13" width="2" height="2"></rect>
+                      <rect x="6.5" y="13" width="2" height="2"></rect>
+                      <rect x="15.5" y="10.5" width="2" height="2"></rect>
+                      <rect x="18" y="10.5" width="2" height="2"></rect>
+                      <rect x="15.5" y="13" width="2" height="2"></rect>
+                      <rect x="18" y="13" width="2" height="2"></rect>
+                    </g>
+                  </g>
+                </svg>
+          Tratamiento Aplicado
+        `;
         btn.disabled = true;
         // Asegurar que mantenga el mismo tamaño que antes
         const currentWidth = btn.style.width || getComputedStyle(btn).width;
@@ -5172,6 +5244,27 @@
         const treatmentBtn = document.getElementById("treatment-btn");
         if (treatmentBtn) {
           treatmentBtn.disabled = true;
+          // Asegurar que el botón tenga el estado correcto
+          treatmentBtn.classList.remove("applied");
+          treatmentBtn.innerHTML = `
+                <svg class="btn-icon" viewBox="0 0 24 24" fill="currentColor" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                  <g transform="rotate(-15 12 12)">
+                    <rect x="3" y="9.5" width="18" height="5" rx="1.2" fill="none"></rect>
+                    <rect x="9" y="10.5" width="6" height="3" fill="none" stroke-width="1.5"></rect>
+                    <g fill="currentColor">
+                      <rect x="4" y="10.5" width="2" height="2"></rect>
+                      <rect x="6.5" y="10.5" width="2" height="2"></rect>
+                      <rect x="4" y="13" width="2" height="2"></rect>
+                      <rect x="6.5" y="13" width="2" height="2"></rect>
+                      <rect x="15.5" y="10.5" width="2" height="2"></rect>
+                      <rect x="18" y="10.5" width="2" height="2"></rect>
+                      <rect x="15.5" y="13" width="2" height="2"></rect>
+                      <rect x="18" y="13" width="2" height="2"></rect>
+                    </g>
+                  </g>
+                </svg>
+            Administrar Tratamiento
+          `;
         }
 
       }
@@ -5347,7 +5440,7 @@
         CONFIG.wound.height = BASE_CONFIG.wound.height * scaleFactor;
         CONFIG.wound.x = baseCanvasWidth / 2;
         CONFIG.wall.thickness = BASE_CONFIG.wall.thickness * scaleFactor;
-        // CRITICAL: Use baseCanvasHeight (actual canvas size) not logicalHeight (CSS size)
+        // Usar baseCanvasHeight (tamaño real del canvas) no logicalHeight (tamaño CSS)
         // Asegurar que adhesionLineY nunca sea menor que un mínimo razonable
         // En pantallas muy pequeñas, usar un porcentaje del canvas en lugar de un valor fijo
         const minAdhesionLineY = Math.max(100, baseCanvasHeight * 0.3); // Al menos 100px o 30% del canvas
@@ -5374,13 +5467,13 @@
           // Recreate walls with new dimensions
           createVesselWalls();
           
-          // CRITICAL: Rescale all existing fibrin bodies to match new scaleFactor and visual lineWidth
+          // Reescalar todos los cuerpos de fibrina para que coincidan con el nuevo scaleFactor
           if (state.fibrinBodies && state.fibrinBodies.length > 0) {
             state.fibrinBodies.forEach((fibrinBody) => {
               if (fibrinBody && fibrinBody.label === "fibrinBarrier") {
                 const fibrinType = fibrinBody.fibrinType || "thin";
                 
-                // Calcular el grosor visual esperado según el tipo (debe coincidir con renderFibrin)
+                // Calcular grosor visual según el tipo
                 let targetVisualLineWidth;
                 switch (fibrinType) {
                   case "thick":
@@ -5410,7 +5503,7 @@
                   dist = Math.max(bboxWidth, bboxHeight);
                 }
                 
-                // CRITICAL: El grosor físico debe compensar la proyección del rectángulo rotado
+                // Ajustar grosor físico por la rotación del rectángulo
                 const angle = fibrinBody.angle;
                 const absSinAngle = Math.abs(Math.sin(angle));
                 const absCosAngle = Math.abs(Math.cos(angle));
@@ -5474,7 +5567,7 @@
             });
           }
           
-          // CRITICAL: Rescale all existing particles to match new scaleFactor
+          // Reescalar todas las partículas para que coincidan con el nuevo scaleFactor
           // This ensures physical collision matches visual rendering when screen size changes
           if (state.allBodies && state.allBodies.length > 0) {
             state.allBodies.forEach((body) => {
@@ -5670,7 +5763,25 @@
           if (treatmentBtn) {
             treatmentBtn.classList.remove("applied");
             treatmentBtn.disabled = true; // Deshabilitado hasta iniciar simulación
-            treatmentBtn.innerHTML = `Administrar Tratamiento`;
+            treatmentBtn.innerHTML = `
+                <svg class="btn-icon" viewBox="0 0 24 24" fill="currentColor" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                  <g transform="rotate(-15 12 12)">
+                    <rect x="3" y="9.5" width="18" height="5" rx="1.2" fill="none"></rect>
+                    <rect x="9" y="10.5" width="6" height="3" fill="none" stroke-width="1.5"></rect>
+                    <g fill="currentColor">
+                      <rect x="4" y="10.5" width="2" height="2"></rect>
+                      <rect x="6.5" y="10.5" width="2" height="2"></rect>
+                      <rect x="4" y="13" width="2" height="2"></rect>
+                      <rect x="6.5" y="13" width="2" height="2"></rect>
+                      <rect x="15.5" y="10.5" width="2" height="2"></rect>
+                      <rect x="18" y="10.5" width="2" height="2"></rect>
+                      <rect x="15.5" y="13" width="2" height="2"></rect>
+                      <rect x="18" y="13" width="2" height="2"></rect>
+                    </g>
+                  </g>
+                </svg>
+          Administrar Tratamiento
+        `;
           }
           
           // Remover efecto de pulsación del botón de reiniciar
